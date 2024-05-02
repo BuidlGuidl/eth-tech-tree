@@ -4,7 +4,7 @@
   "description": "",
   "repository": {
     "type": "git",
-    "url": "https://github.com/scaffold-eth/create-eth.git"
+    "url": "https://github.com/BuidlGuidl/eth-tech-tree.git"
   },
   "main": "dist/cli.js",
   "type": "module",
