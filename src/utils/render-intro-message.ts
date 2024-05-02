@@ -2,7 +2,7 @@ import chalk from "chalk";
 
 export const TITLE_TEXT = `
  ${chalk.bold.blue("+-+-+-+-+-+-+-+-+-+-+-+-+-+-+")}
- ${chalk.bold.blue("| Create Scaffold-ETH 2 app |")}
+ ${chalk.bold.blue("|     ETH Dev Tech Tree     |")}
  ${chalk.bold.blue("+-+-+-+-+-+-+-+-+-+-+-+-+-+-+")}
 `;
 

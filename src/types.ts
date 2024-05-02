@@ -81,3 +81,11 @@ export type TemplateDescriptor = {
   relativePath: string;
   source: string;
 };
+
+export type UserState = {
+  address?: `0x${string}`;
+  installLocation: string;
+  lastCompletedChallenge?: string;
+  lastTreeNode?: string;
+}
+

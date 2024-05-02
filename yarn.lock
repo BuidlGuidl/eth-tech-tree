@@ -1122,34 +1122,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"create-eth@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "create-eth@workspace:."
-  dependencies:
-    "@changesets/cli": ^2.26.2
-    "@rollup/plugin-typescript": 11.1.0
-    "@types/inquirer": 9.0.3
-    "@types/listr": 0.14.4
-    "@types/ncp": 2.0.5
-    "@types/node": 18.16.0
-    arg: 5.0.2
-    chalk: 5.2.0
-    execa: 7.1.1
-    handlebars: ^4.7.7
-    inquirer: 9.2.0
-    listr: 0.14.3
-    merge-packages: ^0.1.6
-    ncp: 2.0.0
-    pkg-install: 1.0.0
-    rollup: 3.21.0
-    rollup-plugin-auto-external: 2.0.0
-    tslib: 2.5.0
-    typescript: 5.0.4
-  bin:
-    create-eth: bin/create-dapp-se2.js
-  languageName: unknown
-  linkType: soft
-
 "cross-spawn@npm:^5.1.0":
   version: 5.1.0
   resolution: "cross-spawn@npm:5.1.0"
@@ -1504,6 +1476,34 @@ __metadata:
   checksum: 6151e6f9828abe2259e57f5fd3761335bb0d2ebd76dc1a01048ccee22fabcfef3c0859300f6d83ff0d1927849368775ec5a6d265dde2f6de5a1be1721cd94efc
   languageName: node
   linkType: hard
+
+"eth-tech-tree@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "eth-tech-tree@workspace:."
+  dependencies:
+    "@changesets/cli": ^2.26.2
+    "@rollup/plugin-typescript": 11.1.0
+    "@types/inquirer": 9.0.3
+    "@types/listr": 0.14.4
+    "@types/ncp": 2.0.5
+    "@types/node": 18.16.0
+    arg: 5.0.2
+    chalk: 5.2.0
+    execa: 7.1.1
+    handlebars: ^4.7.7
+    inquirer: 9.2.0
+    listr: 0.14.3
+    merge-packages: ^0.1.6
+    ncp: 2.0.0
+    pkg-install: 1.0.0
+    rollup: 3.21.0
+    rollup-plugin-auto-external: 2.0.0
+    tslib: 2.5.0
+    typescript: 5.0.4
+  bin:
+    eth-tech-tree: bin/create-dapp-se2.js
+  languageName: unknown
+  linkType: soft
 
 "execa@npm:7.1.1":
   version: 7.1.1

@@ -1,0 +1,415 @@
+[
+  {
+    "type": "challenge",
+    "level": 1,
+    "value": "token-voting",
+    "label": "Token Voting",
+    "tags": ["Governance"]
+  },
+  {
+    "type": "reference",
+    "level": 1,
+    "value": "the-dao-for-context",
+    "label": "The DAO (for context)",
+    "tags": ["Governance"]
+  },
+  {
+    "type": "challenge",
+    "level": 1,
+    "value": "multisend",
+    "label": "Multisend",
+    "tags": ["DeFi"]
+  },
+  {
+    "type": "challenge",
+    "level": 1,
+    "value": "eth-and-token-streaming",
+    "label": "ETH and Token Streaming",
+    "tags": ["DeFi"]
+  },
+  {
+    "type": "challenge",
+    "level": 1,
+    "value": "token-wrapper-weth",
+    "label": "Token Wrapper - WETH",
+    "tags": ["DeFi"]
+  },
+  {
+    "type": "challenge",
+    "level": 1,
+    "value": "rebasing-token",
+    "label": "Rebasing token",
+    "tags": ["DeFi"]
+  },
+  {
+    "type": "reference",
+    "level": 1,
+    "value": "timing-incentives",
+    "label": "Timing + incentives",
+    "tags": ["DeFi"]
+  },
+  {
+    "type": "reference",
+    "level": 1,
+    "value": "handle-tokens-in-wallet",
+    "label": "Handle tokens in wallet",
+    "tags": ["DeFi", "Wallets"]
+  },
+  {
+    "type": "challenge",
+    "level": 1,
+    "value": "token-curated-registry",
+    "label": "Token-Curated Registry",
+    "tags": ["General"]
+  },
+  {
+    "type": "reference",
+    "level": 1,
+    "value": "testing-contracts-fuzzing",
+    "label": "Testing contracts - fuzzing",
+    "tags": ["General"]
+  },
+  {
+    "type": "reference",
+    "level": 1,
+    "value": "reentrancy",
+    "label": "Reentrancy",
+    "tags": ["General"]
+  },
+  {
+    "type": "offchain-challenge",
+    "level": 1,
+    "value": "build-your-own-eth-cli",
+    "label": "Build your own eth CLI",
+    "tags": ["General"]
+  },
+  {
+    "type": "reference",
+    "level": 1,
+    "value": "merkle-trees",
+    "label": "Merkle Trees",
+    "tags": ["General", "NFTs"]
+  },
+  {
+    "type": "offchain-challenge",
+    "level": 1,
+    "value": "subgraphs",
+    "label": "Subgraphs",
+    "tags": ["General", "NFTs"]
+  },
+  {
+    "type": "offchain-challenge",
+    "level": 1,
+    "value": "indexer",
+    "label": "Indexer",
+    "tags": ["General", "NFTs"]
+  },
+  {
+    "type": "challenge",
+    "level": 1,
+    "value": "svg-nfts",
+    "label": "SVG NFTs",
+    "tags": ["NFTs"]
+  },
+  {
+    "type": "challenge",
+    "level": 1,
+    "value": "gated-nft",
+    "label": "Gated NFT",
+    "tags": ["NFTs"]
+  },
+  {
+    "type": "challenge",
+    "level": 1,
+    "value": "name-system",
+    "label": "Name system",
+    "tags": ["NFTs"]
+  },
+  {
+    "type": "challenge",
+    "level": 1,
+    "value": "erc1155",
+    "label": "ERC1155",
+    "tags": ["NFTs"]
+  },
+  {
+    "type": "challenge",
+    "level": 1,
+    "value": "dead-mans-switch",
+    "label": "Dead Mans Switch",
+    "tags": ["Wallets"]
+  },
+  {
+    "type": "reference",
+    "level": 1,
+    "value": "addresses-hierarchical-derivation",
+    "label": "Addresses (Hierarchical Derivation)",
+    "tags": ["Wallets"]
+  },
+  {
+    "type": "challenge",
+    "level": 2,
+    "value": "moloch-rage-quit",
+    "label": "Moloch Rage quit",
+    "tags": ["Governance"]
+  },
+  {
+    "type": "challenge",
+    "level": 2,
+    "value": "dao-governance-proposals-and-voting",
+    "label": "DAO governance proposals and Voting",
+    "tags": ["Governance"]
+  },
+  {
+    "type": "challenge",
+    "level": 2,
+    "value": "oz-governor",
+    "label": "OZ Governor",
+    "tags": ["Governance"]
+  },
+  {
+    "type": "reference",
+    "level": 2,
+    "value": "voting-types",
+    "label": "Voting types",
+    "tags": ["Governance"]
+  },
+  {
+    "type": "challenge",
+    "level": 2,
+    "value": "atomic-swaps",
+    "label": "Atomic Swaps",
+    "tags": ["DeFi"]
+  },
+  {
+    "type": "reference",
+    "level": 2,
+    "value": "oracles",
+    "label": "Oracles",
+    "tags": ["DeFi"]
+  },
+  {
+    "type": "reference",
+    "level": 2,
+    "value": "liquidity-provision",
+    "label": "Liquidity Provision",
+    "tags": ["DeFi"]
+  },
+  {
+    "type": "reference",
+    "level": 2,
+    "value": "vaults",
+    "label": "Vaults",
+    "tags": ["DeFi"]
+  },
+  {
+    "type": "challenge",
+    "level": 2,
+    "value": "contract-factory",
+    "label": "Contract Factory",
+    "tags": ["General"]
+  },
+  {
+    "type": "challenge",
+    "level": 2,
+    "value": "create2",
+    "label": "CREATE2",
+    "tags": ["General"]
+  },
+  {
+    "type": "challenge",
+    "level": 2,
+    "value": "gas-golf",
+    "label": "Gas Golf (Would be multiple challenges, maybe even a second tech tree)",
+    "tags": ["General"]
+  },
+  {
+    "type": "challenge",
+    "level": 2,
+    "value": "sign-msg-verify-ecrecover",
+    "label": "sign msg verify + ecrecover",
+    "tags": ["General"]
+  },
+  {
+    "type": "reference",
+    "level": 2,
+    "value": "evm-storage",
+    "label": "EVM Storage",
+    "tags": ["General"]
+  },
+  {
+    "type": "reference",
+    "level": 2,
+    "value": "evm-op-codes",
+    "label": "EVM OP Codes",
+    "tags": ["General"]
+  },
+  {
+    "type": "reference",
+    "level": 2,
+    "value": "digital-identity",
+    "label": "Digital Identity",
+    "tags": ["General"]
+  },
+  {
+    "type": "reference",
+    "level": 2,
+    "value": "security-study-past-hacks",
+    "label": "Security - study past hacks",
+    "tags": ["General"]
+  },
+  {
+    "type": "offchain-challenge",
+    "level": 2,
+    "value": "run-your-own-node",
+    "label": "Run your own node",
+    "tags": ["General"]
+  },
+  {
+    "type": "reference",
+    "level": 2,
+    "value": "flashbots",
+    "label": "Flashbots",
+    "tags": ["MEV"]
+  },
+  {
+    "type": "reference",
+    "level": 2,
+    "value": "dex-sandwich-attack",
+    "label": "DEX Sandwich Attack",
+    "tags": ["MEV"]
+  },
+  {
+    "type": "reference",
+    "level": 2,
+    "value": "front-running",
+    "label": "Front running",
+    "tags": ["MEV"]
+  },
+  {
+    "type": "reference",
+    "level": 2,
+    "value": "arbitrage",
+    "label": "Arbitrage",
+    "tags": ["MEV"]
+  },
+  {
+    "type": "challenge",
+    "level": 2,
+    "value": "merkle-nfts",
+    "label": "Merkle NFTs",
+    "tags": ["NFTs"]
+  },
+  {
+    "type": "challenge",
+    "level": 2,
+    "value": "nft-price-curve",
+    "label": "NFT price curve",
+    "tags": ["NFTs"]
+  },
+  {
+    "type": "challenge",
+    "level": 2,
+    "value": "nft-permissions",
+    "label": "NFT Permissions",
+    "tags": ["NFTs"]
+  },
+  {
+    "type": "offchain-challenge",
+    "level": 2,
+    "value": "ipfs-node",
+    "label": "IPFS Node",
+    "tags": ["NFTs"]
+  },
+  {
+    "type": "challenge",
+    "level": 2,
+    "value": "social-recovery",
+    "label": "Social Recovery",
+    "tags": ["Wallets"]
+  },
+  {
+    "type": "challenge",
+    "level": 3,
+    "value": "offchain-voting",
+    "label": "Offchain Voting",
+    "tags": ["Governance"]
+  },
+  {
+    "type": "challenge",
+    "level": 3,
+    "value": "lending-app",
+    "label": "Lending App",
+    "tags": ["DeFi"]
+  },
+  {
+    "type": "challenge",
+    "level": 3,
+    "value": "options",
+    "label": "Options",
+    "tags": ["DeFi"]
+  },
+  {
+    "type": "challenge",
+    "level": 3,
+    "value": "shorting",
+    "label": "Shorting",
+    "tags": ["DeFi"]
+  },
+  {
+    "type": "challenge",
+    "level": 3,
+    "value": "order-book",
+    "label": "Order book",
+    "tags": ["DeFi"]
+  },
+  {
+    "type": "challenge",
+    "level": 3,
+    "value": "prediction-market",
+    "label": "Prediction market",
+    "tags": ["DeFi"]
+  },
+  {
+    "type": "challenge",
+    "level": 3,
+    "value": "proxy-contracts",
+    "label": "Proxy contracts",
+    "tags": ["General"]
+  },
+  {
+    "type": "offchain-challenge",
+    "level": 3,
+    "value": "mev-bot",
+    "label": "MEV Bot",
+    "tags": ["MEV"]
+  },
+  {
+    "type": "challenge",
+    "level": 3,
+    "value": "multisig-extension",
+    "label": "Multisig Extension",
+    "tags": ["Wallets"]
+  },
+  {
+    "type": "reference",
+    "level": 3,
+    "value": "zk",
+    "label": "ZK",
+    "tags": ["ZK"]
+  },
+  {
+    "type": "challenge",
+    "level": 4,
+    "value": "smart-wallets-bundlers-paymasters-split-this-into-several",
+    "label": "Smart Wallets, Bundlers, Paymasters (Split this into several)",
+    "tags": ["Wallets"]
+  },
+  {
+    "type": "challenge",
+    "level": 4,
+    "value": "tornado-cash-clone",
+    "label": "Tornado Cash clone",
+    "tags": ["ZK"]
+  }
+]

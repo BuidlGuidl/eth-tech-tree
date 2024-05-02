@@ -1,18 +1,18 @@
 {
-  "name": "create-eth",
-  "version": "0.0.39",
-  "description": "Create a Scaffold-ETH-2 app",
+  "name": "eth-tech-tree",
+  "version": "0.0.1",
+  "description": "",
   "repository": {
     "type": "git",
     "url": "https://github.com/scaffold-eth/create-eth.git"
   },
   "main": "dist/cli.js",
   "type": "module",
-  "bin": "bin/create-dapp-se2.js",
+  "bin": "bin/eth-tech-tree.js",
   "scripts": {
     "build": "rollup -c rollup.config.js",
     "dev": "rollup -c rollup.config.js --watch",
-    "cli": "node bin/create-dapp-se2.js",
+    "cli": "node bin/eth-tech-tree.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "changeset:release": "yarn build && changeset publish"
   },
@@ -24,7 +24,10 @@
     "hardhat",
     "foundry",
     "viem",
-    "rainbowkit"
+    "rainbowkit",
+    "challenge",
+    "coding challenge",
+    "solidity"
   ],
   "license": "MIT",
   "devDependencies": {

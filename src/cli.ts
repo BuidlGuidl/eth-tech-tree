@@ -1,14 +1,16 @@
-import { createProject } from "./main";
-import { parseArgumentsIntoOptions } from "./utils/parse-arguments-into-options";
-import { promptForMissingOptions } from "./utils/prompt-for-missing-options";
+import { promptForMissingUserState } from "./utils/prompt-for-missing-user-state";
 import { renderIntroMessage } from "./utils/render-intro-message";
 import type { Args } from "./types";
+import { getUserState } from "./utils/user-state";
+import { startVisualization } from "./utils/tree";
 
 export async function cli(args: Args) {
   renderIntroMessage();
 
-  const rawOptions = parseArgumentsIntoOptions(args);
-  const options = await promptForMissingOptions(rawOptions);
+  let userState = await getUserState();
+  userState = await promptForMissingUserState(userState);
 
-  await createProject(options);
+  // Navigate tree
+  await startVisualization();
+  console.log(userState);
 }
