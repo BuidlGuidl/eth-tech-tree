@@ -47,7 +47,6 @@ function getNodeLabel(node: TreeNode, depth: number = 0, isMenu: boolean = false
     const depthString = "   ".repeat(depth);
 
     const treeSymbol = isMenu ? "" : "﹂";
-    const label = node.label;
   
     if (isHeader) {
         return `${depthString} ${hasParent ? treeSymbol : ""}${chalk.blue(label)}`;
