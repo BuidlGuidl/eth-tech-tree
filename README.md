@@ -1,5 +1,17 @@
 > ⚠️ Ethereum Development Tech Tree is currently under heavy construction.
 
+# ETH Development Tech Tree
+Test your skills and find some new ones by completing challenges.
+
+There are three different types of nodes on the tree:
+- Challenges: A repository that poses a problem that you must solve with Solidity. Your code is then tested to ensure your solution works, allowing you to progress.
+- References: Links to source material that will help you to master a topic that will be encountered in later challenges.
+- Personal Challenges: These are large scale projects that stretch your knowledge about the ecosystem. A description of the project is provided but it is up to you to fulfill the description.
+
+When you complete challenges you unlock new challenges.
+Debating whether to use a XP system where completed challenges give you a certain amount of XP and new challenges emerge once you reach a certain XP threshold.
+
+
 # 🏗 Scaffold-ETH 2
 
 <h4 align="center">

@@ -6,36 +6,38 @@ type Challenge = {
     label: string;
     value: string;
     tags: string[];
-    completed?: boolean;
     level: number;
-    type: "challenge" | "reference" | "offchain-challenge";
+    type: "challenge" | "reference" | "personal-challenge";
+    completed?: boolean;
+    action: () => void;
 }
 
 type TreeNode = {
     label: string;
     value: string;
-    type: "header" | "challenge" | "reference" | "offchain-challenge";
     parent?: string;
     children: TreeNode[];
+    type: "header" | "challenge" | "reference" | "personal-challenge";
     completed?: boolean;
+    action?: () => void;
 }
 
 function visualizeNode(node: TreeNode, depth: number = 0): void {
-    const hasParent = !!node.parent;
+    const hasParent = !!findParent(tree, node);
     const isHeader = node.type === "header";
     const isChallenge = node.type === "challenge";
     const isReference = node.type === "reference";
-    const isOffchainChallenge = node.type === "offchain-challenge";
+    const isPersonalChallenge = node.type === "personal-challenge";
     const depthString = "   ".repeat(depth);
     const label = node.label;
-
+    
     if (isHeader) {
         console.log(`${depthString} ${hasParent ? "﹂" : ""}${chalk.blue(label)}`);
     } else if (isChallenge) {
         console.log(`${depthString} ﹂${label}`);
     } else if (isReference) {
         console.log(`${depthString} ﹂${label}`);
-    } else if (isOffchainChallenge) {
+    } else if (isPersonalChallenge) {
         console.log(`${depthString} ﹂${label}`);
     } else {
         console.log(`${depthString}${label}`);
@@ -51,6 +53,22 @@ function visualizeTree(node: TreeNode, depth: number = 0): void {
 function selectNode(node: TreeNode): void {
     console.log(`You selected node: ${node.label}`);
     // Implement your logic here for what to do with the selected node
+
+    // IF: type === challenge
+    // Show description of challenge
+    // Show menu for the following options:
+    // download repository - Use create-eth to download repository using extensions
+    //  - Show instructions for completing the challenge including a simple command to test their code
+    // submit project, check if project passes tests then send proof of completion to the BG server, if it passes, mark the challenge as completed
+    
+    // IF: type === reference
+    // Show link to reference material
+    // Provide option to mark as completed
+
+    // IF: type === personal-challenge
+    // Show description of challenge
+
+
 }
 
 const tree = buildTree();
@@ -63,16 +81,19 @@ export async function startVisualization(currentNode?: TreeNode): Promise<void> 
     const choices = currentNode.children.map(child => child.label);
     const actions = [...currentNode.children];
     const parent = findParent(tree, currentNode) as TreeNode;
+    let defaultChoice = 0;
     // Add a back option if not at the root
     if (parent) {
         choices.unshift("⮢");
         actions.unshift(parent);
+        defaultChoice = 1;
     }
     const directionsPrompt = {
         type: "list",
         name: "selectedNodeIndex",
         message: "Which direction would you like to go?",
         choices,
+        default: defaultChoice
     };
     const answers = await inquirer.prompt([directionsPrompt]);
     const selectedIndex = choices.indexOf(answers.selectedNodeIndex);

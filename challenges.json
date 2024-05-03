@@ -77,7 +77,7 @@
     "tags": ["General"]
   },
   {
-    "type": "offchain-challenge",
+    "type": "personal-challenge",
     "level": 1,
     "value": "build-your-own-eth-cli",
     "label": "Build your own eth CLI",
@@ -91,14 +91,14 @@
     "tags": ["General", "NFTs"]
   },
   {
-    "type": "offchain-challenge",
+    "type": "personal-challenge",
     "level": 1,
     "value": "subgraphs",
     "label": "Subgraphs",
     "tags": ["General", "NFTs"]
   },
   {
-    "type": "offchain-challenge",
+    "type": "personal-challenge",
     "level": 1,
     "value": "indexer",
     "label": "Indexer",
@@ -259,7 +259,7 @@
     "tags": ["General"]
   },
   {
-    "type": "offchain-challenge",
+    "type": "personal-challenge",
     "level": 2,
     "value": "run-your-own-node",
     "label": "Run your own node",
@@ -315,7 +315,7 @@
     "tags": ["NFTs"]
   },
   {
-    "type": "offchain-challenge",
+    "type": "personal-challenge",
     "level": 2,
     "value": "ipfs-node",
     "label": "IPFS Node",
@@ -378,7 +378,7 @@
     "tags": ["General"]
   },
   {
-    "type": "offchain-challenge",
+    "type": "personal-challenge",
     "level": 3,
     "value": "mev-bot",
     "label": "MEV Bot",
