@@ -67,14 +67,14 @@
     "level": 1,
     "value": "testing-contracts-fuzzing",
     "label": "Testing contracts - fuzzing",
-    "tags": ["General"]
+    "tags": ["Security"]
   },
   {
-    "type": "reference",
+    "type": "challenge",
     "level": 1,
     "value": "reentrancy",
     "label": "Reentrancy",
-    "tags": ["General"]
+    "tags": ["Security"]
   },
   {
     "type": "personal-challenge",
@@ -408,8 +408,8 @@
   {
     "type": "challenge",
     "level": 4,
-    "value": "tornado-cash-clone",
-    "label": "Tornado Cash clone",
+    "value": "privacy-mixer",
+    "label": "Privacy Mixer",
     "tags": ["ZK"]
   }
 ]

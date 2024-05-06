@@ -15,44 +15,54 @@ type Challenge = {
 type TreeNode = {
     label: string;
     value: string;
-    parent?: string;
     children: TreeNode[];
     type: "header" | "challenge" | "reference" | "personal-challenge";
     completed?: boolean;
+    level?: number;
     action?: () => void;
 }
 
 function visualizeNode(node: TreeNode, depth: number = 0): void {
+    console.log(getNodeLabel(node, depth));
+}
+
+function getNodeLabel(node: TreeNode, depth: number = 0, isMenu: boolean = false): string {
     const hasParent = !!findParent(tree, node);
     const isHeader = node.type === "header";
     const isChallenge = node.type === "challenge";
     const isReference = node.type === "reference";
     const isPersonalChallenge = node.type === "personal-challenge";
+    const isCompleted = node.completed;
     const depthString = "   ".repeat(depth);
     const label = node.label;
-    
+    const level = node.level;
+    const treeSymbol = isMenu ? "" : "﹂";
+
     if (isHeader) {
-        console.log(`${depthString} ${hasParent ? "﹂" : ""}${chalk.blue(label)}`);
+        return `${depthString} ${hasParent ? treeSymbol : ""}${chalk.blue(label)}`;
     } else if (isChallenge) {
-        console.log(`${depthString} ﹂${label}`);
+        return `${depthString} ${treeSymbol}${label}♟️ - LVL ${level}`;
     } else if (isReference) {
-        console.log(`${depthString} ﹂${label}`);
+        return `${depthString} ${treeSymbol}${label}📖 - LVL ${level}`;
     } else if (isPersonalChallenge) {
-        console.log(`${depthString} ﹂${label}`);
+        return`${depthString} ${treeSymbol}${label}🏆 - LVL ${level}`;
     } else {
-        console.log(`${depthString}${label}`);
+        return `${depthString}${label}`;
     }
 }
 
-function visualizeTree(node: TreeNode, depth: number = 0): void {
+export function visualizeTree(node: TreeNode, depth: number = 0): void {
     visualizeNode(node, depth);
 
     node.children.forEach(child => visualizeTree(child, depth + 1));
 }
 
-function selectNode(node: TreeNode): void {
+async function selectNode(node: TreeNode): Promise<void> {
     console.log(`You selected node: ${node.label}`);
     // Implement your logic here for what to do with the selected node
+
+    // IF: type === header
+    // Do nothing
 
     // IF: type === challenge
     // Show description of challenge
@@ -60,7 +70,24 @@ function selectNode(node: TreeNode): void {
     // download repository - Use create-eth to download repository using extensions
     //  - Show instructions for completing the challenge including a simple command to test their code
     // submit project, check if project passes tests then send proof of completion to the BG server, if it passes, mark the challenge as completed
-    
+    if (node.type === "challenge") {
+        console.log("This is a challenge");
+        const actions = ["Download Repository", "Submit Project"];
+        const actionPrompt = {
+            type: "list",
+            name: "selectedAction",
+            message: "What would you like to do?",
+            choices: actions
+        };
+        const { selectedAction } = await inquirer.prompt([actionPrompt]);
+        if (selectedAction === "Download Repository") {
+            console.log("Downloading repository...");
+        } else if (selectedAction === "Submit Project") {
+            console.log("Submitting project...");
+        }
+    }
+
+
     // IF: type === reference
     // Show link to reference material
     // Provide option to mark as completed
@@ -77,19 +104,19 @@ export async function startVisualization(currentNode?: TreeNode): Promise<void> 
     if (!currentNode) {
         currentNode = tree;
     }
-    visualizeTree(currentNode);
-    const choices = currentNode.children.map(child => child.label);
+    const choices: string[] = currentNode.children.map(child => getNodeLabel(child, 0, true));
     const actions = [...currentNode.children];
     const parent = findParent(tree, currentNode) as TreeNode;
     let defaultChoice = 0;
     // Add a back option if not at the root
     if (parent) {
-        choices.unshift("⮢");
+        choices.unshift(" ⮢");
         actions.unshift(parent);
         defaultChoice = 1;
     }
     const directionsPrompt = {
         type: "list",
+        loop: false,
         name: "selectedNodeIndex",
         message: "Which direction would you like to go?",
         choices,
@@ -98,7 +125,7 @@ export async function startVisualization(currentNode?: TreeNode): Promise<void> 
     const answers = await inquirer.prompt([directionsPrompt]);
     const selectedIndex = choices.indexOf(answers.selectedNodeIndex);
     const selectedNode = actions[selectedIndex];
-    selectNode(selectedNode);
+    await selectNode(selectedNode);
     await startVisualization(selectedNode);
 }
 
@@ -134,14 +161,7 @@ export function buildTree(): TreeNode {
                     children: []
                 };
             }) as TreeNode[];
-            if (transformedChallenges.length > 0) {
-                tagLevels.push({
-                    type: "header",
-                    label: `${tag} - Level ${level}`,
-                    value: `${tag.toLowerCase()}-level-${level}`,
-                    children: transformedChallenges
-                });
-            }
+            tagLevels.push(...transformedChallenges);
         }
         tree.push({
             type: "header",
