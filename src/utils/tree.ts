@@ -54,11 +54,11 @@ function getNodeLabel(node: TreeNode, depth: number = 0, isMenu: boolean = false
     if (isHeader) {
         return `${depthString} ${hasParent ? treeSymbol : ""}${chalk.blue(label)}`;
     } else if (isChallenge) {
-        return `${depthString} ${treeSymbol}${label}♟️ - LVL ${level}`;
+        return `${depthString} ${treeSymbol}${label} ♟️ - LVL ${level}`;
     } else if (isReference) {
-        return `${depthString} ${treeSymbol}${label}📖 - LVL ${level}`;
+        return `${depthString} ${treeSymbol}${label} 📖 - LVL ${level}`;
     } else if (isPersonalChallenge) {
-        return`${depthString} ${treeSymbol}${label}🏆 - LVL ${level}`;
+        return`${depthString} ${treeSymbol}${label} 🏆 - LVL ${level}`;
     } else {
         return `${depthString}${label}`;
     }
