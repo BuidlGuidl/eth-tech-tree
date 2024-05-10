@@ -2,414 +2,419 @@
   {
     "type": "challenge",
     "level": 1,
-    "value": "token-voting",
+    "name": "token-voting",
     "label": "Token Voting",
-    "tags": ["Governance"]
+    "tags": ["Governance"],
+    "repo": "https://github.com/scaffold-eth/scaffold-eth-2",
+    "message": ""
   },
   {
     "type": "reference",
     "level": 1,
-    "value": "the-dao-for-context",
+    "name": "the-dao-for-context",
     "label": "The DAO (for context)",
     "tags": ["Governance"]
   },
   {
     "type": "challenge",
     "level": 1,
-    "value": "multisend",
+    "name": "multisend",
     "label": "Multisend",
     "tags": ["DeFi"]
   },
   {
     "type": "challenge",
     "level": 1,
-    "value": "eth-and-token-streaming",
+    "name": "eth-and-token-streaming",
     "label": "ETH and Token Streaming",
     "tags": ["DeFi"]
   },
   {
     "type": "challenge",
     "level": 1,
-    "value": "token-wrapper-weth",
+    "name": "token-wrapper-weth",
     "label": "Token Wrapper - WETH",
+    "repo": "https://github.com/escottalexander/scaffold-eth-2",
+    "testHash":"cdef2b9c0051c45a8ce2c1ec14a7446419496a018a6dc114735cce9de3a4f249",
+    "testFileName":"WrappedETH.t.sol",
     "tags": ["DeFi"]
   },
   {
     "type": "challenge",
     "level": 1,
-    "value": "rebasing-token",
+    "name": "rebasing-token",
     "label": "Rebasing token",
     "tags": ["DeFi"]
   },
   {
     "type": "reference",
     "level": 1,
-    "value": "timing-incentives",
+    "name": "timing-incentives",
     "label": "Timing + incentives",
     "tags": ["DeFi"]
   },
   {
     "type": "reference",
     "level": 1,
-    "value": "handle-tokens-in-wallet",
+    "name": "handle-tokens-in-wallet",
     "label": "Handle tokens in wallet",
     "tags": ["DeFi", "Wallets"]
   },
   {
     "type": "challenge",
     "level": 1,
-    "value": "token-curated-registry",
+    "name": "token-curated-registry",
     "label": "Token-Curated Registry",
     "tags": ["General"]
   },
   {
     "type": "reference",
     "level": 1,
-    "value": "testing-contracts-fuzzing",
+    "name": "testing-contracts-fuzzing",
     "label": "Testing contracts - fuzzing",
-    "tags": ["General"]
+    "tags": ["Security"]
   },
   {
-    "type": "reference",
+    "type": "challenge",
     "level": 1,
-    "value": "reentrancy",
+    "name": "reentrancy",
     "label": "Reentrancy",
-    "tags": ["General"]
+    "tags": ["Security"]
   },
   {
     "type": "personal-challenge",
     "level": 1,
-    "value": "build-your-own-eth-cli",
+    "name": "build-your-own-eth-cli",
     "label": "Build your own eth CLI",
     "tags": ["General"]
   },
   {
     "type": "reference",
     "level": 1,
-    "value": "merkle-trees",
+    "name": "merkle-trees",
     "label": "Merkle Trees",
     "tags": ["General", "NFTs"]
   },
   {
     "type": "personal-challenge",
     "level": 1,
-    "value": "subgraphs",
+    "name": "subgraphs",
     "label": "Subgraphs",
     "tags": ["General", "NFTs"]
   },
   {
     "type": "personal-challenge",
     "level": 1,
-    "value": "indexer",
+    "name": "indexer",
     "label": "Indexer",
     "tags": ["General", "NFTs"]
   },
   {
     "type": "challenge",
     "level": 1,
-    "value": "svg-nfts",
+    "name": "svg-nfts",
     "label": "SVG NFTs",
     "tags": ["NFTs"]
   },
   {
     "type": "challenge",
     "level": 1,
-    "value": "gated-nft",
+    "name": "gated-nft",
     "label": "Gated NFT",
     "tags": ["NFTs"]
   },
   {
     "type": "challenge",
     "level": 1,
-    "value": "name-system",
+    "name": "name-system",
     "label": "Name system",
     "tags": ["NFTs"]
   },
   {
     "type": "challenge",
     "level": 1,
-    "value": "erc1155",
+    "name": "erc1155",
     "label": "ERC1155",
     "tags": ["NFTs"]
   },
   {
     "type": "challenge",
     "level": 1,
-    "value": "dead-mans-switch",
+    "name": "dead-mans-switch",
     "label": "Dead Mans Switch",
     "tags": ["Wallets"]
   },
   {
     "type": "reference",
     "level": 1,
-    "value": "addresses-hierarchical-derivation",
+    "name": "addresses-hierarchical-derivation",
     "label": "Addresses (Hierarchical Derivation)",
     "tags": ["Wallets"]
   },
   {
     "type": "challenge",
     "level": 2,
-    "value": "moloch-rage-quit",
+    "name": "moloch-rage-quit",
     "label": "Moloch Rage quit",
     "tags": ["Governance"]
   },
   {
     "type": "challenge",
     "level": 2,
-    "value": "dao-governance-proposals-and-voting",
+    "name": "dao-governance-proposals-and-voting",
     "label": "DAO governance proposals and Voting",
     "tags": ["Governance"]
   },
   {
     "type": "challenge",
     "level": 2,
-    "value": "oz-governor",
+    "name": "oz-governor",
     "label": "OZ Governor",
     "tags": ["Governance"]
   },
   {
     "type": "reference",
     "level": 2,
-    "value": "voting-types",
+    "name": "voting-types",
     "label": "Voting types",
     "tags": ["Governance"]
   },
   {
     "type": "challenge",
     "level": 2,
-    "value": "atomic-swaps",
+    "name": "atomic-swaps",
     "label": "Atomic Swaps",
     "tags": ["DeFi"]
   },
   {
     "type": "reference",
     "level": 2,
-    "value": "oracles",
+    "name": "oracles",
     "label": "Oracles",
     "tags": ["DeFi"]
   },
   {
     "type": "reference",
     "level": 2,
-    "value": "liquidity-provision",
+    "name": "liquidity-provision",
     "label": "Liquidity Provision",
     "tags": ["DeFi"]
   },
   {
     "type": "reference",
     "level": 2,
-    "value": "vaults",
+    "name": "vaults",
     "label": "Vaults",
     "tags": ["DeFi"]
   },
   {
     "type": "challenge",
     "level": 2,
-    "value": "contract-factory",
+    "name": "contract-factory",
     "label": "Contract Factory",
     "tags": ["General"]
   },
   {
     "type": "challenge",
     "level": 2,
-    "value": "create2",
+    "name": "create2",
     "label": "CREATE2",
     "tags": ["General"]
   },
   {
     "type": "challenge",
     "level": 2,
-    "value": "gas-golf",
+    "name": "gas-golf",
     "label": "Gas Golf (Would be multiple challenges, maybe even a second tech tree)",
     "tags": ["General"]
   },
   {
     "type": "challenge",
     "level": 2,
-    "value": "sign-msg-verify-ecrecover",
+    "name": "sign-msg-verify-ecrecover",
     "label": "sign msg verify + ecrecover",
     "tags": ["General"]
   },
   {
     "type": "reference",
     "level": 2,
-    "value": "evm-storage",
+    "name": "evm-storage",
     "label": "EVM Storage",
     "tags": ["General"]
   },
   {
     "type": "reference",
     "level": 2,
-    "value": "evm-op-codes",
+    "name": "evm-op-codes",
     "label": "EVM OP Codes",
     "tags": ["General"]
   },
   {
     "type": "reference",
     "level": 2,
-    "value": "digital-identity",
+    "name": "digital-identity",
     "label": "Digital Identity",
     "tags": ["General"]
   },
   {
     "type": "reference",
     "level": 2,
-    "value": "security-study-past-hacks",
+    "name": "security-study-past-hacks",
     "label": "Security - study past hacks",
     "tags": ["General"]
   },
   {
     "type": "personal-challenge",
     "level": 2,
-    "value": "run-your-own-node",
+    "name": "run-your-own-node",
     "label": "Run your own node",
     "tags": ["General"]
   },
   {
     "type": "reference",
     "level": 2,
-    "value": "flashbots",
+    "name": "flashbots",
     "label": "Flashbots",
     "tags": ["MEV"]
   },
   {
     "type": "reference",
     "level": 2,
-    "value": "dex-sandwich-attack",
+    "name": "dex-sandwich-attack",
     "label": "DEX Sandwich Attack",
     "tags": ["MEV"]
   },
   {
     "type": "reference",
     "level": 2,
-    "value": "front-running",
+    "name": "front-running",
     "label": "Front running",
     "tags": ["MEV"]
   },
   {
     "type": "reference",
     "level": 2,
-    "value": "arbitrage",
+    "name": "arbitrage",
     "label": "Arbitrage",
     "tags": ["MEV"]
   },
   {
     "type": "challenge",
     "level": 2,
-    "value": "merkle-nfts",
+    "name": "merkle-nfts",
     "label": "Merkle NFTs",
     "tags": ["NFTs"]
   },
   {
     "type": "challenge",
     "level": 2,
-    "value": "nft-price-curve",
+    "name": "nft-price-curve",
     "label": "NFT price curve",
     "tags": ["NFTs"]
   },
   {
     "type": "challenge",
     "level": 2,
-    "value": "nft-permissions",
+    "name": "nft-permissions",
     "label": "NFT Permissions",
     "tags": ["NFTs"]
   },
   {
     "type": "personal-challenge",
     "level": 2,
-    "value": "ipfs-node",
+    "name": "ipfs-node",
     "label": "IPFS Node",
     "tags": ["NFTs"]
   },
   {
     "type": "challenge",
     "level": 2,
-    "value": "social-recovery",
+    "name": "social-recovery",
     "label": "Social Recovery",
     "tags": ["Wallets"]
   },
   {
     "type": "challenge",
     "level": 3,
-    "value": "offchain-voting",
+    "name": "offchain-voting",
     "label": "Offchain Voting",
     "tags": ["Governance"]
   },
   {
     "type": "challenge",
     "level": 3,
-    "value": "lending-app",
+    "name": "lending-app",
     "label": "Lending App",
     "tags": ["DeFi"]
   },
   {
     "type": "challenge",
     "level": 3,
-    "value": "options",
+    "name": "options",
     "label": "Options",
     "tags": ["DeFi"]
   },
   {
     "type": "challenge",
     "level": 3,
-    "value": "shorting",
+    "name": "shorting",
     "label": "Shorting",
     "tags": ["DeFi"]
   },
   {
     "type": "challenge",
     "level": 3,
-    "value": "order-book",
+    "name": "order-book",
     "label": "Order book",
     "tags": ["DeFi"]
   },
   {
     "type": "challenge",
     "level": 3,
-    "value": "prediction-market",
+    "name": "prediction-market",
     "label": "Prediction market",
     "tags": ["DeFi"]
   },
   {
     "type": "challenge",
     "level": 3,
-    "value": "proxy-contracts",
+    "name": "proxy-contracts",
     "label": "Proxy contracts",
     "tags": ["General"]
   },
   {
     "type": "personal-challenge",
     "level": 3,
-    "value": "mev-bot",
+    "name": "mev-bot",
     "label": "MEV Bot",
     "tags": ["MEV"]
   },
   {
     "type": "challenge",
     "level": 3,
-    "value": "multisig-extension",
+    "name": "multisig-extension",
     "label": "Multisig Extension",
     "tags": ["Wallets"]
   },
   {
     "type": "reference",
     "level": 3,
-    "value": "zk",
+    "name": "zk",
     "label": "ZK",
     "tags": ["ZK"]
   },
   {
     "type": "challenge",
     "level": 4,
-    "value": "smart-wallets-bundlers-paymasters-split-this-into-several",
+    "name": "smart-wallets-bundlers-paymasters-split-this-into-several",
     "label": "Smart Wallets, Bundlers, Paymasters (Split this into several)",
     "tags": ["Wallets"]
   },
   {
     "type": "challenge",
     "level": 4,
-    "value": "tornado-cash-clone",
-    "label": "Tornado Cash clone",
+    "name": "privacy-mixer",
+    "label": "Privacy Mixer",
     "tags": ["ZK"]
   }
 ]
