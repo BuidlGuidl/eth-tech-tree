@@ -27,38 +27,30 @@ type Challenge = {
 type TreeNode = {
     label: string;
     value: string;
+    parent?: string;
     children: TreeNode[];
     type: "header" | "challenge" | "reference" | "personal-challenge";
     completed?: boolean;
-    level?: number;
-    actions?: Action[];
-    repo?: string;
-    message?: string;
+    action?: () => void;
 }
 
 function visualizeNode(node: TreeNode, depth: number = 0): void {
-    console.log(getNodeLabel(node, depth));
-}
-
-function getNodeLabel(node: TreeNode, depth: number = 0, isMenu: boolean = false): string {
     const hasParent = !!findParent(tree, node);
-    const { label, level, type, completed } = node;
-    const isHeader = type === "header";
-    const isChallenge = type === "challenge";
-    const isReference = type === "reference";
-    const isPersonalChallenge = type === "personal-challenge";
+    const isHeader = node.type === "header";
+    const isChallenge = node.type === "challenge";
+    const isReference = node.type === "reference";
+    const isPersonalChallenge = node.type === "personal-challenge";
     const depthString = "   ".repeat(depth);
-    
-    const treeSymbol = isMenu ? "" : "﹂";
-
+    const label = node.label;
+  
     if (isHeader) {
         return `${depthString} ${hasParent ? treeSymbol : ""}${chalk.blue(label)}`;
     } else if (isChallenge) {
         return `${depthString} ${treeSymbol}${label} ♟️ - LVL ${level}`;
     } else if (isReference) {
-        return `${depthString} ${treeSymbol}${label} 📖 - LVL ${level}`;
+        console.log(`${depthString} ﹂${label}`);
     } else if (isPersonalChallenge) {
-        return`${depthString} ${treeSymbol}${label} 🏆 - LVL ${level}`;
+        console.log(`${depthString} ﹂${label}`);
     } else {
         return `${depthString}${label}`;
     }
@@ -72,11 +64,7 @@ export function visualizeTree(node: TreeNode, depth: number = 0): void {
 
 async function selectNode(node: TreeNode): Promise<void> {
     console.log(`You selected node: ${node.label}`);
-    // Implement your logic here for what to do with the selected node
-
-    // IF: type === header
-    // Do nothing
-
+  
     // IF: type === challenge
     // Show description of challenge
     // Show menu for the following options:
@@ -97,7 +85,6 @@ async function selectNode(node: TreeNode): Promise<void> {
             await node.actions?.[selectedActionIndex].action();
         }
     }
-
 
     // IF: type === reference
     // Show link to reference material
