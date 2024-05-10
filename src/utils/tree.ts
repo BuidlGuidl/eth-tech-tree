@@ -26,11 +26,13 @@ type Challenge = {
 type TreeNode = {
     label: string;
     name: string;
-    level?: number;
     children: TreeNode[];
     type: "header" | "challenge" | "reference" | "personal-challenge";
     completed?: boolean;
+    level?: number;
     actions?: Action[];
+    repo?: string;
+    message?: string;
 }
 
 function visualizeNode(node: TreeNode, depth: number = 0): void {
