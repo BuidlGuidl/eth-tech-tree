@@ -1122,6 +1122,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"create-eth@npm:^0.0.41":
+  version: 0.0.41
+  resolution: "create-eth@npm:0.0.41"
+  dependencies:
+    "@changesets/cli": ^2.26.2
+    arg: 5.0.2
+    chalk: 5.2.0
+    execa: 7.1.1
+    handlebars: ^4.7.7
+    inquirer: 9.2.0
+    listr: 0.14.3
+    merge-packages: ^0.1.6
+    ncp: 2.0.0
+    pkg-install: 1.0.0
+  bin:
+    create-eth: bin/create-dapp-se2.js
+  checksum: c232a4b945c32a01333ad5748a75c874b8b3c6a0660717c0b853b09f6ea8a07fdf3f11355dc0f55797b5bf0958cb54b33166b0db1d0a91ec2d6a15f4585def7f
+  languageName: node
+  linkType: hard
+
 "cross-spawn@npm:^5.1.0":
   version: 5.1.0
   resolution: "cross-spawn@npm:5.1.0"
@@ -1489,6 +1509,7 @@ __metadata:
     "@types/node": 18.16.0
     arg: 5.0.2
     chalk: 5.2.0
+    create-eth: ^0.0.41
     execa: 7.1.1
     handlebars: ^4.7.7
     inquirer: 9.2.0
@@ -1501,7 +1522,7 @@ __metadata:
     tslib: 2.5.0
     typescript: 5.0.4
   bin:
-    eth-tech-tree: bin/create-dapp-se2.js
+    eth-tech-tree: bin/eth-tech-tree.js
   languageName: unknown
   linkType: soft
 

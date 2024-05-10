@@ -1,15 +1,27 @@
 import inquirer from "inquirer";
 import fs from "fs";
 import chalk from "chalk";
+import { execa } from "execa";
+import { getUserState } from "./user-state";
+import { setupChallenge, submitChallenge } from "./actions";
+
+type Action = {
+    label: string;
+    action: () => Promise<void>;
+}
 
 type Challenge = {
     label: string;
-    value: string;
+    name: string;
     tags: string[];
     level: number;
     type: "challenge" | "reference" | "personal-challenge";
     completed?: boolean;
-    action: () => void;
+    actions: Action[];
+    repo?: string;
+    message?: string;
+    testHash?: string;
+    testFileName?: string;
 }
 
 type TreeNode = {
@@ -19,7 +31,9 @@ type TreeNode = {
     type: "header" | "challenge" | "reference" | "personal-challenge";
     completed?: boolean;
     level?: number;
-    action?: () => void;
+    actions?: Action[];
+    repo?: string;
+    message?: string;
 }
 
 function visualizeNode(node: TreeNode, depth: number = 0): void {
@@ -28,14 +42,13 @@ function visualizeNode(node: TreeNode, depth: number = 0): void {
 
 function getNodeLabel(node: TreeNode, depth: number = 0, isMenu: boolean = false): string {
     const hasParent = !!findParent(tree, node);
-    const isHeader = node.type === "header";
-    const isChallenge = node.type === "challenge";
-    const isReference = node.type === "reference";
-    const isPersonalChallenge = node.type === "personal-challenge";
-    const isCompleted = node.completed;
+    const { label, level, type, completed } = node;
+    const isHeader = type === "header";
+    const isChallenge = type === "challenge";
+    const isReference = type === "reference";
+    const isPersonalChallenge = type === "personal-challenge";
     const depthString = "   ".repeat(depth);
-    const label = node.label;
-    const level = node.level;
+    
     const treeSymbol = isMenu ? "" : "﹂";
 
     if (isHeader) {
@@ -72,18 +85,16 @@ async function selectNode(node: TreeNode): Promise<void> {
     // submit project, check if project passes tests then send proof of completion to the BG server, if it passes, mark the challenge as completed
     if (node.type === "challenge") {
         console.log("This is a challenge");
-        const actions = ["Download Repository", "Submit Project"];
         const actionPrompt = {
             type: "list",
             name: "selectedAction",
             message: "What would you like to do?",
-            choices: actions
+            choices: node.actions?.map(action => action.label)
         };
         const { selectedAction } = await inquirer.prompt([actionPrompt]);
-        if (selectedAction === "Download Repository") {
-            console.log("Downloading repository...");
-        } else if (selectedAction === "Submit Project") {
-            console.log("Submitting project...");
+        const selectedActionIndex = node.actions?.findIndex(action => action.label === selectedAction);
+        if (selectedActionIndex !== undefined && selectedActionIndex >= 0) {
+            await node.actions?.[selectedActionIndex].action();
         }
     }
 
@@ -142,6 +153,7 @@ function findParent(parentNode: TreeNode, targetNode: TreeNode): TreeNode | unde
 }
 
 export function buildTree(): TreeNode {
+    const { installLocation } = getUserState();
     const tree: TreeNode[] = [];
     const challenges = JSON.parse(fs.readFileSync("challenges.json", "utf-8"));
     const tags = challenges.reduce((acc: string[], challenge: any) => {
@@ -153,13 +165,38 @@ export function buildTree(): TreeNode {
         for (let level of levels) {
             const filteredChallenges = challenges.filter((challenge: Challenge) => challenge.tags.includes(tag) && challenge.level === level);
             const transformedChallenges = filteredChallenges.map((challenge: Challenge) => {
-                return {
-                    label: challenge.label,
-                    value: challenge.value,
-                    level: challenge.level,
-                    type: challenge.type,
-                    children: []
-                };
+                const { label, name, level, type, completed, repo, message, testHash, testFileName } = challenge;
+                // Build selection actions
+                const actions: Action[] = [];
+                if (type === "challenge") {
+                    actions.push({
+                        label: "Setup Challenge Repository",
+                        action: async () => {
+                            await setupChallenge(repo as string, name, installLocation);
+                        }
+                    });
+                    actions.push({
+                        label: "Submit Completed Challenge",
+                        action: async () => {
+                            await submitChallenge(name, testFileName as string, testHash as string);
+                        }
+                    });
+                } else if (type === "reference") {
+                    actions.push({
+                        label: "Mark as Read",
+                        action: async () => {
+                            console.log("Marking as read...");
+                        }
+                    });
+                } else if (type === "personal-challenge") {
+                    actions.push({
+                        label: "Submit Project",
+                        action: async () => {
+                            console.log("Submitting project...");
+                        }
+                    });
+                }
+                return { label, name, level, type, completed, actions, children: [] };
             }) as TreeNode[];
             tagLevels.push(...transformedChallenges);
         }
@@ -167,7 +204,7 @@ export function buildTree(): TreeNode {
             type: "header",
             label: `${tag}`,
             value: `${tag.toLowerCase()}`,
-            children: tagLevels
+            children: tagLevels,
         });
     }
     const mainMenu: TreeNode = {
