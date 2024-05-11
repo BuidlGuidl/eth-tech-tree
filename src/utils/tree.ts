@@ -26,11 +26,13 @@ type Challenge = {
 type TreeNode = {
     label: string;
     name: string;
-    level?: number;
     children: TreeNode[];
     type: "header" | "challenge" | "reference" | "personal-challenge";
     completed?: boolean;
+    level?: number;
     actions?: Action[];
+    repo?: string;
+    message?: string;
 }
 
 function visualizeNode(node: TreeNode, depth: number = 0): void {
@@ -47,7 +49,6 @@ function getNodeLabel(node: TreeNode, depth: number = 0, isMenu: boolean = false
     const depthString = "   ".repeat(depth);
 
     const treeSymbol = isMenu ? "" : "﹂";
-    const label = node.label;
   
     if (isHeader) {
         return `${depthString} ${hasParent ? treeSymbol : ""}${chalk.blue(label)}`;
