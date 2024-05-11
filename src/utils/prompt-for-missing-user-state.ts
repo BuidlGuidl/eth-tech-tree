@@ -1,9 +1,8 @@
-import config from "../config";
 import fs from "fs";
 import {
   UserState
 } from "../types";
-import inquirer, { Answers } from "inquirer";
+import inquirer from "inquirer";
 import { setUserState } from "./user-state";
 
 // default values for unspecified args
