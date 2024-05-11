@@ -1,7 +1,6 @@
 import inquirer from "inquirer";
 import fs from "fs";
 import chalk from "chalk";
-import { execa } from "execa";
 import { getUserState } from "./user-state";
 import { setupChallenge, submitChallenge } from "./actions";
 
@@ -26,31 +25,37 @@ type Challenge = {
 
 type TreeNode = {
     label: string;
-    value: string;
-    parent?: string;
+    name: string;
+    level?: number;
     children: TreeNode[];
     type: "header" | "challenge" | "reference" | "personal-challenge";
     completed?: boolean;
-    action?: () => void;
+    actions?: Action[];
 }
 
 function visualizeNode(node: TreeNode, depth: number = 0): void {
+    console.log(getNodeLabel(node, depth));
+}
+
+function getNodeLabel(node: TreeNode, depth: number = 0, isMenu: boolean = false): string {
     const hasParent = !!findParent(tree, node);
-    const isHeader = node.type === "header";
-    const isChallenge = node.type === "challenge";
-    const isReference = node.type === "reference";
-    const isPersonalChallenge = node.type === "personal-challenge";
+    const { label, level, type, completed } = node;
+    const isHeader = type === "header";
+    const isChallenge = type === "challenge";
+    const isReference = type === "reference";
+    const isPersonalChallenge = type === "personal-challenge";
     const depthString = "   ".repeat(depth);
-    const label = node.label;
-  
+    
+    const treeSymbol = isMenu ? "" : "﹂";
+
     if (isHeader) {
         return `${depthString} ${hasParent ? treeSymbol : ""}${chalk.blue(label)}`;
     } else if (isChallenge) {
         return `${depthString} ${treeSymbol}${label} ♟️ - LVL ${level}`;
     } else if (isReference) {
-        console.log(`${depthString} ﹂${label}`);
+        return `${depthString} ${treeSymbol}${label} 📖 - LVL ${level}`;
     } else if (isPersonalChallenge) {
-        console.log(`${depthString} ﹂${label}`);
+        return`${depthString} ${treeSymbol}${label} 🏆 - LVL ${level}`;
     } else {
         return `${depthString}${label}`;
     }
@@ -190,13 +195,13 @@ export function buildTree(): TreeNode {
         tree.push({
             type: "header",
             label: `${tag}`,
-            value: `${tag.toLowerCase()}`,
+            name: `${tag.toLowerCase()}`,
             children: tagLevels,
         });
     }
     const mainMenu: TreeNode = {
         label: "Main Menu",
-        value: "main-menu",
+        name: "main-menu",
         type: "header",
         children: tree,
     };
