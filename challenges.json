@@ -62,7 +62,7 @@
   },
   {
     "type": "challenge",
-    "level": 1,
+    "level": 3,
     "name": "token-curated-registry",
     "label": "Token-Curated Registry",
     "tags": ["General"]
@@ -111,7 +111,7 @@
   },
   {
     "type": "challenge",
-    "level": 1,
+    "level": 2,
     "name": "svg-nfts",
     "label": "SVG NFTs",
     "tags": ["NFTs"]
