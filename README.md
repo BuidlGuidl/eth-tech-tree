@@ -11,6 +11,15 @@ There are three different types of nodes on the tree:
 When you complete challenges you unlock new challenges.
 Debating whether to use a XP system where completed challenges give you a certain amount of XP and new challenges emerge once you reach a certain XP threshold.
 
+## Quick Start
+To run this CLI application
+- `yarn install`
+- `yarn build`
+- `yarn cli`
+
+If you are actively developing you may find it helpful to run the build and cli commands together each time since you have to build for your changes to be present.
+- `yarn build && yarn cli`
+
 
 # 🏗 Scaffold-ETH 2
 
