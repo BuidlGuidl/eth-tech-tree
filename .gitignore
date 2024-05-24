@@ -13,3 +13,7 @@ node_modules/
 
 # macos files
 .DS_Store
+
+# ETT CLI state files
+.state
+
