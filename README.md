@@ -13,6 +13,9 @@ Debating whether to use a XP system where completed challenges give you a certai
 
 ## Quick Start
 To run this CLI application
+- Edit the file .state
+  - Change the value of `address` to point to your one.
+  - Change the value of `installLocation` to point to the folder where the challenges will be downloaded.
 - `yarn install`
 - `yarn build`
 - `yarn cli`
