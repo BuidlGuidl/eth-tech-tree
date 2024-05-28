@@ -27,10 +27,16 @@ If you are actively developing you may find it helpful to run the build and cli 
 - They can submit the contract address for the challenge and get real-time feedback
 - If they pass the challenge it unlocks the next set of challenges
 - There are 5 - 10 challenges available. We will limit to a few branches at the start
+- CLI will show leaderboard
 
 ## Future Ambitions
 - Issue onchain attestation for completion of the challenge
-- Front end that shows their progress - phase 1
-- Front end that replaces ETT CLI - phase 2
+- Front end that shows their progress and a leaderboard - phase 1
+- Front end that offers full functionality outside of the ETT CLI - phase 2
 - Add the rest of challenges + add new ones + add new branches
 - Add the other challenge types ("references" which require quizzes, "personal-challenges" which are very big tasks with little instruction - hard for us to test)
+
+## Ideas
+- Add a way for users to prove they have mastered certain concepts so that they can unlock harder challenges earlier 
+- Granular testing so that a user is awarded points based on additional tests (also may need to allow users to go back and resubmit challenges)
+- Capture the flag type NFT that a user can "steal" when they are the new leader. Might consider 1st, 2nd, 3rd place NFTs. Announcing a steal on social media would be great for encouraging user engagement
