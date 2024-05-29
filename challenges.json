@@ -34,7 +34,7 @@
     "level": 1,
     "name": "token-wrapper-weth",
     "label": "Token Wrapper - WETH",
-    "repo": "https://github.com/escottalexander/scaffold-eth-2",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
     "testHash":"cdef2b9c0051c45a8ce2c1ec14a7446419496a018a6dc114735cce9de3a4f249",
     "testFileName":"WrappedETH.t.sol",
     "tags": ["DeFi"]
