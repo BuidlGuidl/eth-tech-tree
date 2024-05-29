@@ -17,20 +17,109 @@ To run this CLI application
 If you are actively developing you may find it helpful to run the build and cli commands together each time since you have to build for your changes to be present.
 - `yarn build && yarn cli`
 
+## CLI (conceptualized)
+```vbnet
+███████████████████████████████████████████████████████████████████████
+                                             ⌜ ...
+                                            /
+                                Challenge 2 —— Challenge X ——— ...
+                               /   	        \
+                              /		         ⌞ Challenge X ——— ...
+DeFi (1/10):	             /
+———————————————— Challenge 1 —— Challenge 3 —— Challenge X ——— ...
+			                 \ 
+			                  ⌞ Challenge 4 —— Challenge X 
+			                   /   	        \
+			                  /		         ⌞ Challenge X ——— ...
+Governance (0/8):            /
+———————————————— Challenge 1 —— Challenge 3 —— Challenge X ——— ...
+			                 \ 
+			                  ⌞ Challenge 4 —— Challenge X
+
+				              ⌜ Challenge 2
+Wallet (1/6):          	     /
+———————————————— Challenge 1 —— Challenge 3 —— Challenge X ——— ...
+			                 \ 
+			                  ⌞ Challenge 4 —— Challenge X 
+					                        \ 
+					                         ⌞ ...
+					      
+←↑→↓ - Navigate, d - Download Challenge, s - Submit Challenge, x - Exit
+███████████████████████████████████████████████████████████████████████
+```
+ChatGPT Riff (some of the paths don't make sense but you get the idea):
+```vbnet
+███████████████████████████████████████████████████████████████████████
+
+DeFi (0/10):
+╔═══════════════╗   ╔═════════════╗   ╔═════════════╗
+║▶Challenge 1◀║───║ Challenge 2 ║───║ Challenge X ║─── ...
+╚═══════════════╝   ╚═════════════╝   ╚═════════════╝
+            │                │
+            ├───────────┐    ├───────────┐
+            │           │    │           │
+    ╔═════════════╗   ╔═════════════╗  ╔═════════════╗
+    ║ Challenge 3 ║───║ Challenge 4 ║  ║ Challenge X ║─── ...
+    ╚═════════════╝   ╚═════════════╝  ╚═════════════╝
+            │
+            └───┐
+                │
+    ╔═════════════╗
+    ║ Challenge X ║─── ...
+    ╚═════════════╝
+
+Governance (1/12):
+╔═════════════╗   ╔═════════════╗   ╔═════════════╗
+║ Challenge 1 ║───║ Challenge 2 ║───║ Challenge X ║─── ...
+╚═════════════╝   ╚═════════════╝   ╚═════════════╝
+                     │                │
+                     ├───────────┐    ├───────────┐
+                     │           │    │           │
+              ╔═════════════╗   ╔═════════════╗  ╔═════════════╗
+              ║ Challenge 3 ║───║ Challenge 4 ║  ║ Challenge X ║─── ...
+              ╚═════════════╝   ╚═════════════╝  ╚═════════════╝
+                     │
+                     └───┐
+                         │
+              ╔═════════════╗
+              ║ Challenge X ║─── ...
+              ╚═════════════╝
+
+Wallet (0/10):
+╔═════════════╗   ╔═════════════╗   ╔═════════════╗
+║ Challenge 1 ║───║ Challenge 2 ║───║ Challenge X ║─── ...
+╚═════════════╝   ╚═════════════╝   ╚═════════════╝
+                     │                │
+                     ├───────────┐    ├───────────┐
+                     │           │    │           │
+              ╔═════════════╗   ╔═════════════╗  ╔═════════════╗
+              ║ Challenge 3 ║───║ Challenge 4 ║  ║ Challenge X ║─── ...
+              ╚═════════════╝   ╚═════════════╝  ╚═════════════╝
+                     │
+                     └───┐
+                         │
+              ╔═════════════╗
+              ║ Challenge X ║─── ...
+              ╚═════════════╝
+
+←↑→↓ - Navigate, d - Download Challenge, s - Submit Challenge, x - Exit
+███████████████████████████████████████████████████████████████████████
+
+```
+
 ## MVP
 - ETT CLI enables users to see the full scope of the tech tree
-- They can see clearly which ones are unlocked and which ones are still locked
-- It only allows them to interact with the challenges that are unlocked
-- It shows them their progress/general score on each challenge and total score on each branch of the tree
+- Challenges are locked/unlocked based on a users progress
+- It shows them their proficiency in each branch of the tree based on challenges completed.
 - They can download a challenge locally
 - They can deploy and verify their contract with very few steps
 - They can submit the contract address for the challenge and get real-time feedback
-- If they pass the challenge it unlocks the next set of challenges
 - There are 5 - 10 challenges available. We will limit to a few branches at the start
 - CLI will show leaderboard
 
 ## Future Ambitions
 - Issue onchain attestation for completion of the challenge
+- Integrate with BuidlGuidl app to show their completed challenges
 - Front end that shows their progress and a leaderboard - phase 1
 - Front end that offers full functionality outside of the ETT CLI - phase 2
 - Add the rest of challenges + add new ones + add new branches
