@@ -5,8 +5,9 @@
     "name": "token-voting",
     "label": "Token Voting",
     "tags": ["Governance"],
-    "repo": "https://github.com/scaffold-eth/scaffold-eth-2",
-    "message": ""
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "testHash":"7203688d53c01e58c3c064818093395f338f735d70602ecb4086a497f15ad190",
+    "testFileName":"Voting.t.sol"
   },
   {
     "type": "reference",
@@ -34,9 +35,15 @@
     "level": 1,
     "name": "token-wrapper-weth",
     "label": "Token Wrapper - WETH",
+<<<<<<< main
     "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
     "testHash":"cdef2b9c0051c45a8ce2c1ec14a7446419496a018a6dc114735cce9de3a4f249",
     "testFileName":"WrappedETH.t.sol",
+=======
+    "repo": "https://github.com/escottalexander/scaffold-eth-2",
+    "testHash": "cdef2b9c0051c45a8ce2c1ec14a7446419496a018a6dc114735cce9de3a4f249",
+    "testFileName": "WrappedETH.t.sol",
+>>>>>>> main
     "tags": ["DeFi"]
   },
   {
@@ -142,6 +149,9 @@
     "level": 1,
     "name": "dead-mans-switch",
     "label": "Dead Mans Switch",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "testFileName": "DeadMansSwitchTest.t.sol",
+    "testHash": "17796d00702971de71e4d8eafb88bc9641e372f5be20c1382a898213182d40e3",
     "tags": ["Wallets"]
   },
   {
