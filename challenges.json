@@ -6,7 +6,7 @@
     "label": "Token Voting",
     "tags": ["Governance"],
     "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
-    "testHash":"3775d08999476db9b90289993dbf3946e1584eb24ffe82eba573560ae30cb245",
+    "testHash":"7203688d53c01e58c3c064818093395f338f735d70602ecb4086a497f15ad190",
     "testFileName":"Voting.t.sol"
   },
   {
