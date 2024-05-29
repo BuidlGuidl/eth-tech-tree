@@ -5,8 +5,9 @@
     "name": "token-voting",
     "label": "Token Voting",
     "tags": ["Governance"],
-    "repo": "https://github.com/scaffold-eth/scaffold-eth-2",
-    "message": ""
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "testHash":"7203688d53c01e58c3c064818093395f338f735d70602ecb4086a497f15ad190",
+    "testFileName":"Voting.t.sol"
   },
   {
     "type": "reference",
