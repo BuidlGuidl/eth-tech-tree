@@ -38,38 +38,24 @@ type TreeNode = {
     recursive?: boolean;
 }
 
-function visualizeNode(node: TreeNode, depth: number = 0): void {
-    console.log(getNodeLabel(node, depth));
-}
-
-function getNodeLabel(node: TreeNode, depth: number = 0): string {
-    const parent = findParent(tree, node);
+function getNodeLabel(node: TreeNode, depth: string = ""): string {
     const { label, level, type, completed } = node;
     const isHeader = type === "header";
     const isChallenge = type === "challenge";
     const isReference = type === "reference";
     const isPersonalChallenge = type === "personal-challenge";
-    const depthString = "           ".repeat(depth);
-
-    const treeSymbol = parent && parent.type === "header" ? "" : "﹂";
   
     if (isHeader) {
-        return `${depthString} ${treeSymbol}${chalk.blue(label)}`;
+        return `${depth} ${chalk.blue(label)}`;
     } else if (isChallenge) {
-        return `${depthString} ${treeSymbol}${label} ♟️ - LVL ${level}`;
+        return `${depth} ${label} ♟️ - LVL ${level}`;
     } else if (isReference) {
-        return `${depthString} ${treeSymbol}${label} 📖 - LVL ${level}`;
+        return `${depth} ${label} 📖 - LVL ${level}`;
     } else if (isPersonalChallenge) {
-        return`${depthString} ${treeSymbol}${label} 🏆 - LVL ${level}`;
+        return`${depth} ${label} 🏆 - LVL ${level}`;
     } else {
-        return `${depthString}${label}`;
+        return `${depth}${label}`;
     }
-}
-
-export function visualizeTree(node: TreeNode, depth: number = 0): void {
-    visualizeNode(node, depth);
-
-    node.children.forEach(child => visualizeTree(child, depth + 1));
 }
 
 async function selectNode(node: TreeNode): Promise<void> {
@@ -118,21 +104,32 @@ export async function startVisualization(currentNode?: TreeNode): Promise<void> 
         const actions: TreeNode[] = [];
 
         if (!node.recursive) {
-            choices.push(...node.children.map(child => getNodeLabel(child, 0)));
+            choices.push(...node.children.map(child => getNodeLabel(child)));
             actions.push(...node.children);
             return { choices, actions };
         }
 
-        const getChoicesAndActionsRecursive = (node: TreeNode, depth: number) => {
-            if (node.actions) {
+        const getChoicesAndActionsRecursive = (node: TreeNode, isLast: boolean = false, depth: string = "") => {
+            if (node.type !== "header") {
+                if (!isLast) {
+                    depth += "├─";
+                } else {
+                    depth += "└─";
+                }
+            }
                 choices.push(getNodeLabel(node, depth));
                 actions.push(node);
-                depth ++;
-            } 
-            node.children.forEach(child => getChoicesAndActionsRecursive(child, depth));
+                // Replace characters in the continuing pattern
+                if (depth.length) {
+                    depth = depth.replace(/├─/g, "│ ");
+                    depth = depth.replace(/└─/g, "  ");
+                }
+                // Add spaces so that the labels are spaced out
+                depth += Array(Math.floor(node.label.length/2)).fill(" ").join("");
+            node.children.forEach((child, i, siblings) => getChoicesAndActionsRecursive(child, i === siblings.length - 1, depth));
         };
 
-        getChoicesAndActionsRecursive(node, 0);
+        getChoicesAndActionsRecursive(node);
 
         return { choices, actions };
     }
