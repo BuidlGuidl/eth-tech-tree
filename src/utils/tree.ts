@@ -17,6 +17,8 @@ type Challenge = {
     type: "challenge" | "reference" | "personal-challenge";
     completed?: boolean;
     actions: Action[];
+    childrenNames?: string[];
+    parentName?: string;
     repo?: string;
     message?: string;
     testHash?: string;
@@ -33,40 +35,27 @@ type TreeNode = {
     actions?: Action[];
     repo?: string;
     message?: string;
+    recursive?: boolean;
 }
 
-function visualizeNode(node: TreeNode, depth: number = 0): void {
-    console.log(getNodeLabel(node, depth));
-}
-
-function getNodeLabel(node: TreeNode, depth: number = 0, isMenu: boolean = false): string {
-    const hasParent = !!findParent(tree, node);
+function getNodeLabel(node: TreeNode, depth: string = ""): string {
     const { label, level, type, completed } = node;
     const isHeader = type === "header";
     const isChallenge = type === "challenge";
     const isReference = type === "reference";
     const isPersonalChallenge = type === "personal-challenge";
-    const depthString = "   ".repeat(depth);
-
-    const treeSymbol = isMenu ? "" : "﹂";
   
     if (isHeader) {
-        return `${depthString} ${hasParent ? treeSymbol : ""}${chalk.blue(label)}`;
+        return `${depth} ${chalk.blue(label)}`;
     } else if (isChallenge) {
-        return `${depthString} ${treeSymbol}${label} ♟️ - LVL ${level}`;
+        return `${depth} ${label} ♟️ - LVL ${level}`;
     } else if (isReference) {
-        return `${depthString} ${treeSymbol}${label} 📖 - LVL ${level}`;
+        return `${depth} ${label} 📖 - LVL ${level}`;
     } else if (isPersonalChallenge) {
-        return`${depthString} ${treeSymbol}${label} 🏆 - LVL ${level}`;
+        return`${depth} ${label} 🏆 - LVL ${level}`;
     } else {
-        return `${depthString}${label}`;
+        return `${depth}${label}`;
     }
-}
-
-export function visualizeTree(node: TreeNode, depth: number = 0): void {
-    visualizeNode(node, depth);
-
-    node.children.forEach(child => visualizeTree(child, depth + 1));
 }
 
 async function selectNode(node: TreeNode): Promise<void> {
@@ -109,8 +98,43 @@ export async function startVisualization(currentNode?: TreeNode): Promise<void> 
     if (!currentNode) {
         currentNode = tree;
     }
-    const choices: string[] = currentNode.children.map(child => getNodeLabel(child, 0, true));
-    const actions = [...currentNode.children];
+
+    function getChoicesAndActions(node: TreeNode): { choices: string[], actions: TreeNode[] } {
+        const choices: string[] = [];
+        const actions: TreeNode[] = [];
+
+        if (!node.recursive) {
+            choices.push(...node.children.map(child => getNodeLabel(child)));
+            actions.push(...node.children);
+            return { choices, actions };
+        }
+
+        const getChoicesAndActionsRecursive = (node: TreeNode, isLast: boolean = false, depth: string = "") => {
+            if (node.type !== "header") {
+                if (!isLast) {
+                    depth += "├─";
+                } else {
+                    depth += "└─";
+                }
+            }
+                choices.push(getNodeLabel(node, depth));
+                actions.push(node);
+                // Replace characters in the continuing pattern
+                if (depth.length) {
+                    depth = depth.replace(/├─/g, "│ ");
+                    depth = depth.replace(/└─/g, "  ");
+                }
+                // Add spaces so that the labels are spaced out
+                depth += Array(Math.floor(node.label.length/2)).fill(" ").join("");
+            node.children.forEach((child, i, siblings) => getChoicesAndActionsRecursive(child, i === siblings.length - 1, depth));
+        };
+
+        getChoicesAndActionsRecursive(node);
+
+        return { choices, actions };
+    }
+
+    const { choices, actions } = getChoicesAndActions(currentNode);
     const parent = findParent(tree, currentNode) as TreeNode;
     let defaultChoice = 0;
     // Add a back option if not at the root
@@ -131,6 +155,7 @@ export async function startVisualization(currentNode?: TreeNode): Promise<void> 
     const selectedIndex = choices.indexOf(answers.selectedNodeIndex);
     const selectedNode = actions[selectedIndex];
     await selectNode(selectedNode);
+    // visualizeTree(selectedNode);
     await startVisualization(selectedNode);
 }
 
@@ -146,20 +171,32 @@ function findParent(parentNode: TreeNode, targetNode: TreeNode): TreeNode | unde
     }
 }
 
+// Matryoshka Magic - Recursive function to build nested tree structure
+function matryoshkaMagic(challenges: any[], parentName: string | undefined = undefined): TreeNode[] {
+    const tree: TreeNode[] = [];
+    for (let challenge of challenges) {
+        if (challenge.parentName === parentName) {
+            // Recursively call matryoshkaMagic for each child
+            challenge.children = matryoshkaMagic(challenges, challenge.name);
+            tree.push(challenge);
+        }
+    }
+    return tree;
+}
+
 export function buildTree(): TreeNode {
     const { installLocation } = getUserState();
     const tree: TreeNode[] = [];
-    const challenges = JSON.parse(fs.readFileSync("challenges.json", "utf-8"));
+    const challenges: Challenge[] = JSON.parse(fs.readFileSync("challenges.json", "utf-8"));
     const tags = challenges.reduce((acc: string[], challenge: any) => {
         return Array.from(new Set(acc.concat(challenge.tags)));
     }, []);
-    const levels = [1, 2, 3, 4];
     for (let tag of tags) {
-        const tagLevels: TreeNode[] = [];
-        for (let level of levels) {
-            const filteredChallenges = challenges.filter((challenge: Challenge) => challenge.tags.includes(tag) && challenge.level === level);
+            const filteredChallenges = challenges.filter((challenge: Challenge) => challenge.tags.includes(tag));
             const transformedChallenges = filteredChallenges.map((challenge: Challenge) => {
-                const { label, name, level, type, completed, repo, message, testHash, testFileName } = challenge;
+                const { label, name, level, type, completed, repo, message, testHash, testFileName, childrenNames} = challenge;
+                const parentName = challenges.find((c: any) => c.childrenNames?.includes(name))?.name;
+
                 // Build selection actions
                 const actions: Action[] = [];
                 if (type === "challenge") {
@@ -190,15 +227,15 @@ export function buildTree(): TreeNode {
                         }
                     });
                 }
-                return { label, name, level, type, completed, actions, children: [] };
-            }) as TreeNode[];
-            tagLevels.push(...transformedChallenges);
-        }
+                return { label, name, level, type, completed, actions, childrenNames, parentName };
+            });
+            const matryoshkaChallenges = matryoshkaMagic(transformedChallenges);
         tree.push({
             type: "header",
             label: `${tag}`,
             name: `${tag.toLowerCase()}`,
-            children: tagLevels,
+            children: matryoshkaChallenges,
+            recursive: true
         });
     }
     const mainMenu: TreeNode = {

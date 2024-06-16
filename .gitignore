@@ -14,6 +14,11 @@ node_modules/
 # macos files
 .DS_Store
 
+# editor files
+.vscode/*
+
 # ETT CLI state files
 .state
 
+
+.vscode/settings.json
