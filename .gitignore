@@ -18,7 +18,7 @@ node_modules/
 .vscode/*
 
 # ETT CLI state files
-.state
+storage/*
 
 
 .vscode/settings.json
