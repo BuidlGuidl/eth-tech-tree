@@ -1,0 +1,911 @@
+[
+  {
+    "type": "challenge",
+    "level": 1,
+    "name": "token-voting",
+    "label": "Token Voting",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "Governance"
+    ],
+    "contractName": "Voting.sol",
+    "testFileName": "Voting.t.sol",
+    "childrenNames": [
+      "dao-governance-proposals-and-voting"
+    ],
+    "enabled": true,
+    "description": ""
+  },
+  {
+    "type": "quiz",
+    "level": 1,
+    "name": "the-dao-for-context",
+    "label": "The DAO (for context)",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "Governance"
+    ],
+    "childrenNames": [],
+    "enabled": false,
+    "description": ""
+  },
+  {
+    "type": "challenge",
+    "level": 1,
+    "name": "multisend",
+    "label": "Multisend",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "DeFi"
+    ],
+    "contractName": "Multisend.sol",
+    "testFileName": "Multisend.t.sol",
+    "childrenNames": [
+      "eth-streaming"
+    ],
+    "enabled": true,
+    "description": ""
+  },
+  {
+    "type": "challenge",
+    "level": 1,
+    "name": "eth-streaming",
+    "label": "ETH Stream",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "DeFi"
+    ],
+    "contractName": "EthStreaming.sol",
+    "testFileName": "EthStreaming.sol",
+    "childrenNames": [
+      "custom-stream"
+    ],
+    "enabled": true,
+    "description": ""
+  },
+  {
+    "type": "challenge",
+    "level": 1,
+    "name": "custom-stream",
+    "label": "Advanced Streams",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "DeFi"
+    ],
+    "childrenNames": [],
+    "enabled": false,
+    "description": ""
+  },
+  {
+    "type": "challenge",
+    "level": 1,
+    "name": "token-wrapper-weth",
+    "label": "Token Wrapper - WETH",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "DeFi"
+    ],
+    "contractName": "WrappedETH.sol",
+    "testFileName": "WrappedETH.t.sol",
+    "childrenNames": [
+      "rebasing-token"
+    ],
+    "enabled": true,
+    "description": ""
+  },
+  {
+    "type": "challenge",
+    "level": 1,
+    "name": "rebasing-token",
+    "label": "Rebasing token",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "DeFi"
+    ],
+    "childrenNames": [
+      "multisend"
+    ],
+    "enabled": true,
+    "description": ""
+  },
+  {
+    "type": "quiz",
+    "level": 1,
+    "name": "timing-incentives",
+    "label": "Timing + incentives",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "DeFi"
+    ],
+    "childrenNames": [],
+    "enabled": false,
+    "description": ""
+  },
+  {
+    "type": "quiz",
+    "level": 1,
+    "name": "handle-tokens-in-wallet",
+    "label": "Handle tokens in wallet",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "DeFi",
+      "Wallets"
+    ],
+    "childrenNames": [],
+    "enabled": false,
+    "description": ""
+  },
+  {
+    "type": "challenge",
+    "level": 3,
+    "name": "token-curated-registry",
+    "label": "Token-Curated Registry",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "General"
+    ],
+    "childrenNames": [],
+    "enabled": false,
+    "description": ""
+  },
+  {
+    "type": "quiz",
+    "level": 1,
+    "name": "testing-contracts-fuzzing",
+    "label": "Testing contracts - fuzzing",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "Security"
+    ],
+    "childrenNames": [],
+    "enabled": false,
+    "description": ""
+  },
+  {
+    "type": "challenge",
+    "level": 1,
+    "name": "reentrancy",
+    "label": "Reentrancy",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "Security"
+    ],
+    "childrenNames": [],
+    "enabled": false,
+    "description": ""
+  },
+  {
+    "type": "capstone-project",
+    "level": 1,
+    "name": "build-your-own-eth-cli",
+    "label": "Build your own eth CLI",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "General"
+    ],
+    "childrenNames": [],
+    "enabled": false,
+    "description": ""
+  },
+  {
+    "type": "quiz",
+    "level": 1,
+    "name": "merkle-trees",
+    "label": "Merkle Trees",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "General",
+      "NFTs"
+    ],
+    "childrenNames": [],
+    "enabled": false,
+    "description": ""
+  },
+  {
+    "type": "capstone-project",
+    "level": 1,
+    "name": "subgraphs",
+    "label": "Subgraphs",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "General",
+      "NFTs"
+    ],
+    "childrenNames": [],
+    "enabled": false,
+    "description": ""
+  },
+  {
+    "type": "capstone-project",
+    "level": 1,
+    "name": "indexer",
+    "label": "Indexer",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "General",
+      "NFTs"
+    ],
+    "childrenNames": [],
+    "enabled": false,
+    "description": ""
+  },
+  {
+    "type": "challenge",
+    "level": 2,
+    "name": "svg-nfts",
+    "label": "SVG NFTs",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "NFTs"
+    ],
+    "childrenNames": [],
+    "enabled": false,
+    "description": ""
+  },
+  {
+    "type": "challenge",
+    "level": 1,
+    "name": "gated-nft",
+    "label": "Gated NFT",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "NFTs"
+    ],
+    "childrenNames": [],
+    "enabled": false,
+    "description": ""
+  },
+  {
+    "type": "challenge",
+    "level": 1,
+    "name": "name-system",
+    "label": "Name system",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "NFTs"
+    ],
+    "childrenNames": [],
+    "enabled": false,
+    "description": ""
+  },
+  {
+    "type": "challenge",
+    "level": 1,
+    "name": "erc1155",
+    "label": "ERC1155",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "NFTs"
+    ],
+    "childrenNames": [],
+    "enabled": false,
+    "description": ""
+  },
+  {
+    "type": "challenge",
+    "level": 1,
+    "name": "dead-mans-switch",
+    "label": "Dead Mans Switch",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "Wallets"
+    ],
+    "contractName": "DeadMansSwitch.sol",
+    "testFileName": "DeadMansSwitchTest.t.sol",
+    "childrenNames": [
+      "social-recovery"
+    ],
+    "enabled": true,
+    "description": ""
+  },
+  {
+    "type": "quiz",
+    "level": 1,
+    "name": "addresses-hierarchical-derivation",
+    "label": "Addresses (Hierarchical Derivation)",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "Wallets"
+    ],
+    "childrenNames": [],
+    "enabled": false,
+    "description": ""
+  },
+  {
+    "type": "challenge",
+    "level": 2,
+    "name": "moloch-rage-quit",
+    "label": "Moloch Rage quit",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "Governance"
+    ],
+    "childrenNames": [
+      "oz-governor"
+    ],
+    "enabled": false,
+    "description": ""
+  },
+  {
+    "type": "challenge",
+    "level": 2,
+    "name": "dao-governance-proposals-and-voting",
+    "label": "DAO governance proposals and Voting",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "Governance"
+    ],
+    "contractName": "Governance.sol",
+    "testFileName": "Governance.t.sol",
+    "childrenNames": [
+      "moloch-rage-quit",
+      "offchain-voting"
+    ],
+    "enabled": true,
+    "description": ""
+  },
+  {
+    "type": "challenge",
+    "level": 2,
+    "name": "oz-governor",
+    "label": "OZ Governor",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "Governance"
+    ],
+    "childrenNames": [],
+    "enabled": false,
+    "description": ""
+  },
+  {
+    "type": "quiz",
+    "level": 2,
+    "name": "voting-types",
+    "label": "Voting types",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "Governance"
+    ],
+    "childrenNames": [],
+    "enabled": false,
+    "description": ""
+  },
+  {
+    "type": "challenge",
+    "level": 2,
+    "name": "atomic-swaps",
+    "label": "Atomic Swaps",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "DeFi"
+    ],
+    "childrenNames": [],
+    "enabled": false,
+    "description": ""
+  },
+  {
+    "type": "quiz",
+    "level": 2,
+    "name": "oracles",
+    "label": "Oracles",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "DeFi"
+    ],
+    "childrenNames": [],
+    "enabled": false,
+    "description": ""
+  },
+  {
+    "type": "quiz",
+    "level": 2,
+    "name": "liquidity-provision",
+    "label": "Liquidity Provision",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "DeFi"
+    ],
+    "childrenNames": [],
+    "enabled": false,
+    "description": ""
+  },
+  {
+    "type": "quiz",
+    "level": 2,
+    "name": "vaults",
+    "label": "Vaults",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "DeFi"
+    ],
+    "childrenNames": [],
+    "enabled": false,
+    "description": ""
+  },
+  {
+    "type": "challenge",
+    "level": 2,
+    "name": "contract-factory",
+    "label": "Contract Factory",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "General"
+    ],
+    "childrenNames": [],
+    "enabled": false,
+    "description": ""
+  },
+  {
+    "type": "challenge",
+    "level": 2,
+    "name": "create2",
+    "label": "CREATE2",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "General"
+    ],
+    "childrenNames": [],
+    "enabled": false,
+    "description": ""
+  },
+  {
+    "type": "challenge",
+    "level": 2,
+    "name": "gas-golf",
+    "label": "Gas Golf (Would be multiple challenges, maybe even a second tech tree)",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "General"
+    ],
+    "childrenNames": [],
+    "enabled": false,
+    "description": ""
+  },
+  {
+    "type": "challenge",
+    "level": 2,
+    "name": "signature-voting",
+    "label": "Signature Voting (ECRECOVER)",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "Governance"
+    ],
+    "childrenNames": [],
+    "enabled": false,
+    "description": ""
+  },
+  {
+    "type": "quiz",
+    "level": 2,
+    "name": "evm-storage",
+    "label": "EVM Storage",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "General"
+    ],
+    "childrenNames": [],
+    "enabled": false,
+    "description": ""
+  },
+  {
+    "type": "quiz",
+    "level": 2,
+    "name": "evm-op-codes",
+    "label": "EVM OP Codes",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "General"
+    ],
+    "childrenNames": [],
+    "enabled": false,
+    "description": ""
+  },
+  {
+    "type": "quiz",
+    "level": 2,
+    "name": "digital-identity",
+    "label": "Digital Identity",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "General"
+    ],
+    "childrenNames": [],
+    "enabled": false,
+    "description": ""
+  },
+  {
+    "type": "quiz",
+    "level": 2,
+    "name": "security-study-past-hacks",
+    "label": "Security - study past hacks",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "General"
+    ],
+    "childrenNames": [],
+    "enabled": false,
+    "description": ""
+  },
+  {
+    "type": "capstone-project",
+    "level": 2,
+    "name": "run-your-own-node",
+    "label": "Run your own node",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "General"
+    ],
+    "childrenNames": [],
+    "enabled": false,
+    "description": ""
+  },
+  {
+    "type": "quiz",
+    "level": 2,
+    "name": "flashbots",
+    "label": "Flashbots",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "MEV"
+    ],
+    "childrenNames": [],
+    "enabled": false,
+    "description": ""
+  },
+  {
+    "type": "quiz",
+    "level": 2,
+    "name": "dex-sandwich-attack",
+    "label": "DEX Sandwich Attack",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "MEV"
+    ],
+    "childrenNames": [],
+    "enabled": false,
+    "description": ""
+  },
+  {
+    "type": "quiz",
+    "level": 2,
+    "name": "front-running",
+    "label": "Front running",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "MEV"
+    ],
+    "childrenNames": [],
+    "enabled": false,
+    "description": ""
+  },
+  {
+    "type": "quiz",
+    "level": 2,
+    "name": "arbitrage",
+    "label": "Arbitrage",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "MEV"
+    ],
+    "childrenNames": [],
+    "enabled": false,
+    "description": ""
+  },
+  {
+    "type": "challenge",
+    "level": 2,
+    "name": "merkle-nfts",
+    "label": "Merkle NFTs",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "NFTs"
+    ],
+    "childrenNames": [],
+    "enabled": false,
+    "description": ""
+  },
+  {
+    "type": "challenge",
+    "level": 2,
+    "name": "nft-price-curve",
+    "label": "NFT price curve",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "NFTs"
+    ],
+    "childrenNames": [],
+    "enabled": false,
+    "description": ""
+  },
+  {
+    "type": "challenge",
+    "level": 2,
+    "name": "nft-permissions",
+    "label": "NFT Permissions",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "NFTs"
+    ],
+    "childrenNames": [],
+    "enabled": false,
+    "description": ""
+  },
+  {
+    "type": "capstone-project",
+    "level": 2,
+    "name": "ipfs-node",
+    "label": "IPFS Node",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "NFTs"
+    ],
+    "childrenNames": [],
+    "enabled": false,
+    "description": ""
+  },
+  {
+    "type": "challenge",
+    "level": 2,
+    "name": "social-recovery",
+    "label": "Social Recovery",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "Wallets"
+    ],
+    "contractName": "SocialRecovery.sol",
+    "testFileName": "SocialRecovery.t.sol",
+    "childrenNames": [
+      "multisig-extension"
+    ],
+    "enabled": true,
+    "description": ""
+  },
+  {
+    "type": "challenge",
+    "level": 3,
+    "name": "offchain-voting",
+    "label": "Offchain Voting",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "Governance"
+    ],
+    "childrenNames": [],
+    "enabled": false,
+    "description": ""
+  },
+  {
+    "type": "challenge",
+    "level": 3,
+    "name": "lending-app",
+    "label": "Lending App",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "DeFi"
+    ],
+    "childrenNames": [],
+    "enabled": false,
+    "description": ""
+  },
+  {
+    "type": "challenge",
+    "level": 3,
+    "name": "options",
+    "label": "Options",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "DeFi"
+    ],
+    "childrenNames": [],
+    "enabled": false,
+    "description": ""
+  },
+  {
+    "type": "challenge",
+    "level": 3,
+    "name": "shorting",
+    "label": "Shorting",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "DeFi"
+    ],
+    "childrenNames": [],
+    "enabled": false,
+    "description": ""
+  },
+  {
+    "type": "challenge",
+    "level": 3,
+    "name": "order-book",
+    "label": "Order book",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "DeFi"
+    ],
+    "childrenNames": [],
+    "enabled": false,
+    "description": ""
+  },
+  {
+    "type": "challenge",
+    "level": 3,
+    "name": "prediction-market",
+    "label": "Prediction market",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "DeFi"
+    ],
+    "childrenNames": [],
+    "enabled": false,
+    "description": ""
+  },
+  {
+    "type": "challenge",
+    "level": 3,
+    "name": "proxy-contracts",
+    "label": "Proxy contracts",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "General"
+    ],
+    "childrenNames": [],
+    "enabled": false,
+    "description": ""
+  },
+  {
+    "type": "capstone-project",
+    "level": 3,
+    "name": "mev-bot",
+    "label": "MEV Bot",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "MEV"
+    ],
+    "childrenNames": [],
+    "enabled": false,
+    "description": ""
+  },
+  {
+    "type": "challenge",
+    "level": 3,
+    "name": "multisig-extension",
+    "label": "Multisig Extension",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "Wallets"
+    ],
+    "childrenNames": [],
+    "enabled": false,
+    "description": ""
+  },
+  {
+    "type": "quiz",
+    "level": 3,
+    "name": "zk",
+    "label": "ZK",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "ZK"
+    ],
+    "childrenNames": [],
+    "enabled": false,
+    "description": ""
+  },
+  {
+    "type": "challenge",
+    "level": 4,
+    "name": "smart-wallets-bundlers-paymasters-split-this-into-several",
+    "label": "Smart Wallets, Bundlers, Paymasters (Split this into several)",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "Wallets"
+    ],
+    "childrenNames": [],
+    "enabled": false,
+    "description": ""
+  },
+  {
+    "type": "challenge",
+    "level": 4,
+    "name": "privacy-mixer",
+    "label": "Privacy Mixer",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "ZK"
+    ],
+    "childrenNames": [],
+    "enabled": false,
+    "description": ""
+  },
+  {
+    "type": "quiz",
+    "level": 0,
+    "name": "randomness-onchain",
+    "label": "Randomness Onchain",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "General"
+    ],
+    "childrenNames": [],
+    "enabled": false,
+    "description": ""
+  },
+  {
+    "type": "challenge",
+    "level": 0,
+    "name": "randao",
+    "label": "RANDAO",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "General"
+    ],
+    "childrenNames": [],
+    "enabled": false,
+    "description": ""
+  },
+  {
+    "type": "challenge",
+    "level": 0,
+    "name": "liquid-share-nft",
+    "label": "Liquid Share NFT",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "NFT",
+      "DeFi"
+    ],
+    "childrenNames": [],
+    "enabled": false,
+    "description": "https://splits.org/help/liquid-split-contract/"
+  },
+  {
+    "type": "challenge",
+    "level": 0,
+    "name": "liquidation-system",
+    "label": "Liquidation System",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "DeFi"
+    ],
+    "childrenNames": [],
+    "enabled": false,
+    "description": ""
+  },
+  {
+    "type": "challenge",
+    "level": 0,
+    "name": "fractional-nfts",
+    "label": "Fractional NFTs",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "NFTs"
+    ],
+    "childrenNames": [],
+    "enabled": false,
+    "description": ""
+  },
+  {
+    "type": "challenge",
+    "level": 0,
+    "name": "meta-transactions",
+    "label": "Meta-Transactions",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "General"
+    ],
+    "childrenNames": [],
+    "enabled": false,
+    "description": ""
+  },
+  {
+    "type": "challenge",
+    "level": 0,
+    "name": "permit2",
+    "label": "Permit2",
+    "repo": "https://github.com/BuidlGuidl/eth-tech-tree-challenges",
+    "tags": [
+      "DeFi"
+    ],
+    "childrenNames": [],
+    "enabled": false,
+    "description": ""
+  }
+]

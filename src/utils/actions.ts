@@ -2,19 +2,12 @@ import fs from "fs";
 import crypto from "crypto";
 import { execa } from "execa";
 
-export async function submitChallenge(name: string, testFileName: string, testHash: string) {
+export async function testChallenge(name: string, testFileName: string) {
     console.log("Submitting challenge...");
     const targetDir = `challenges/${name}`;
     // Check hash of test cases to make sure tests haven't been adjusted
     const fileBuffer = fs.readFileSync(`${targetDir}/packages/foundry/test/${testFileName}`);
-    const hashSum = crypto.createHash('sha256');
-    hashSum.update(fileBuffer);
-
-    const hex = hashSum.digest('hex');
-    if (hex !== testHash) {
-        console.log("It appears that the test cases have been modified, please revert to the original test cases and run again.");
-        return;
-    }
+   
     await execa("yarn", ["install"], { cwd: targetDir });
     const { failed } = await execa("yarn", ["run", "foundry:test"], { cwd: targetDir, all: true }).pipeAll!(process.stdout);
     if (failed) {
