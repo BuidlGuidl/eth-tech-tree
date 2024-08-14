@@ -1,28 +1,13 @@
 import inquirer from "inquirer";
 import fs from "fs";
 import chalk from "chalk";
-import { getUserState } from "./user-state";
-import { setupChallenge, submitChallenge } from "./actions";
+import { loadChallenges, loadUserState } from "./stateManager";
+import { setupChallenge, testChallenge } from "./actions";
+import { IChallenge } from "../types";
 
 type Action = {
     label: string;
     action: () => Promise<void>;
-}
-
-type Challenge = {
-    label: string;
-    name: string;
-    tags: string[];
-    level: number;
-    type: "challenge" | "reference" | "personal-challenge";
-    completed?: boolean;
-    actions: Action[];
-    childrenNames?: string[];
-    parentName?: string;
-    repo?: string;
-    message?: string;
-    testHash?: string;
-    testFileName?: string;
 }
 
 type TreeNode = {
@@ -185,16 +170,16 @@ function matryoshkaMagic(challenges: any[], parentName: string | undefined = und
 }
 
 export function buildTree(): TreeNode {
-    const { installLocation } = getUserState();
+    const { installLocation } = loadUserState();
     const tree: TreeNode[] = [];
-    const challenges: Challenge[] = JSON.parse(fs.readFileSync("challenges.json", "utf-8"));
+    const challenges = loadChallenges();
     const tags = challenges.reduce((acc: string[], challenge: any) => {
         return Array.from(new Set(acc.concat(challenge.tags)));
     }, []);
     for (let tag of tags) {
-            const filteredChallenges = challenges.filter((challenge: Challenge) => challenge.tags.includes(tag));
-            const transformedChallenges = filteredChallenges.map((challenge: Challenge) => {
-                const { label, name, level, type, completed, repo, message, testHash, testFileName, childrenNames} = challenge;
+            const filteredChallenges = challenges.filter((challenge: IChallenge) => challenge.tags.includes(tag));
+            const transformedChallenges = filteredChallenges.map((challenge: IChallenge) => {
+                const { label, name, level, type, repo, testFileName, childrenNames} = challenge;
                 const parentName = challenges.find((c: any) => c.childrenNames?.includes(name))?.name;
 
                 // Build selection actions
@@ -207,9 +192,17 @@ export function buildTree(): TreeNode {
                         }
                     });
                     actions.push({
-                        label: "Submit Completed Challenge",
+                        label: "Test Challenge",
                         action: async () => {
-                            await submitChallenge(name, testFileName as string, testHash as string);
+                            await testChallenge(name, testFileName);
+                        }
+                    });
+                    actions.push({
+                        label: "Deploy Completed Contract",
+                        action: async () => {
+                            console.log("Testing contract before attempting to deploy...")
+                            await testChallenge(name, testFileName);
+                            console.log("TODO: NEED TO IMPLEMENT DEPLOYING CONTRACT");
                         }
                     });
                 } else if (type === "reference") {
@@ -227,7 +220,7 @@ export function buildTree(): TreeNode {
                         }
                     });
                 }
-                return { label, name, level, type, completed, actions, childrenNames, parentName };
+                return { label, name, level, type, actions, childrenNames, parentName };
             });
             const matryoshkaChallenges = matryoshkaMagic(transformedChallenges);
         tree.push({

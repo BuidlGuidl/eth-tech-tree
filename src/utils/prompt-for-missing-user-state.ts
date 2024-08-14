@@ -1,9 +1,10 @@
 import fs from "fs";
+import { createUser } from "../modules/api";
 import {
   UserState
 } from "../types";
 import inquirer from "inquirer";
-import { setUserState } from "./user-state";
+import { saveUserState } from "./stateManager";
 
 // default values for unspecified args
 const defaultOptions: Partial<UserState> = {
@@ -22,8 +23,8 @@ export async function promptForMissingUserState(
     questions.push({
       type: "input",
       name: "address",
-      message: "Your wallet address:",
-      validate: (value: string) => /^0x[a-fA-F0-9]{40}$/.test(value),
+      message: "Your wallet address (or ENS):",
+      validate: isValidAddressOrENS,
     });
   }
   
@@ -31,7 +32,7 @@ export async function promptForMissingUserState(
     questions.push({
       type: "input",
       name: "installLocation",
-      message: "To which directory would you like to download the challenges?",
+      message: "Where would you like to download the challenges?",
       default: defaultOptions.installLocation,
       validate: (value: string) => fs.lstatSync(value).isDirectory() 
       ,
@@ -40,10 +41,28 @@ export async function promptForMissingUserState(
 
   const answers = await inquirer.prompt(questions, cliAnswers);
 
-  if (JSON.stringify(userState) !== JSON.stringify(answers)) {
-    // Save the new state
-    setUserState(answers);
+  // Fetch the user data from the server (create a new user if it doesn't exist) - also handles ens resolution
+  const body: { address?: string, ens?: string } = {};
+  if (isValidAddress(answers.address)) {
+    body["address"] = answers.address;
+  } else {
+    body["ens"] = answers.address;
+  }
+  // TODO: handle no returned data (no connection or error)
+  const user = await createUser(body);
+  const newState = { ...answers, ...user };
+  if (JSON.stringify(userState) !== JSON.stringify(newState)) {
+    // Save the new state locally
+    saveUserState(newState);
   }
 
-  return answers;
+  return newState;
 }
+
+const isValidAddress = (value: string): boolean => {
+  return /^0x[a-fA-F0-9]{40}$/.test(value)
+};
+
+const isValidAddressOrENS = (value: string): boolean => {
+  return /^(0x[a-fA-F0-9]{40}|.+\.eth)$/.test(value);
+};

@@ -88,4 +88,36 @@ export type UserState = {
   lastCompletedChallenge?: string;
   lastTreeNode?: string;
 }
+export interface IChallenge {
+  type: string;
+  level: number;
+  name: string;
+  label: string;
+  repo: string;
+  tags: string[];
+  contractName: string;
+  testFileName: string;
+  childrenNames: string[];
+  enabled: boolean;
+  description: string;
+}
 
+export interface IUserChallenge {
+  status: string;
+  lastFeedback: string;
+  timestamp: number;
+  contractAddress: string;
+  network: string;
+  gasReport?: {
+    [key: string]: number;
+  };
+}
+
+export interface IUser {
+  address: string;
+  ens: string;
+  creationTimestamp: number;
+  challenges: {
+    [key: string]: IUserChallenge;
+  };
+}
