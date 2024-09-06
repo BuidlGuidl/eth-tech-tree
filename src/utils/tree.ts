@@ -1,5 +1,4 @@
 import inquirer from "inquirer";
-import fs from "fs";
 import chalk from "chalk";
 import { loadChallenges, loadUserState } from "./stateManager";
 import { setupChallenge, testChallenge } from "./actions";
@@ -14,7 +13,7 @@ type TreeNode = {
     label: string;
     name: string;
     children: TreeNode[];
-    type: "header" | "challenge" | "reference" | "personal-challenge";
+    type: "header" | "challenge" | "quiz" | "capstone-project";
     completed?: boolean;
     level?: number;
     actions?: Action[];
@@ -27,25 +26,26 @@ function getNodeLabel(node: TreeNode, depth: string = ""): string {
     const { label, level, type, completed } = node;
     const isHeader = type === "header";
     const isChallenge = type === "challenge";
-    const isReference = type === "reference";
-    const isPersonalChallenge = type === "personal-challenge";
+    const isQuiz = type === "quiz";
+    const isCapstoneProject = type === "capstone-project";
   
     if (isHeader) {
         return `${depth} ${chalk.blue(label)}`;
     } else if (isChallenge) {
         return `${depth} ${label} ♟️ - LVL ${level}`;
-    } else if (isReference) {
+    } else if (isQuiz) {
         return `${depth} ${label} 📖 - LVL ${level}`;
-    } else if (isPersonalChallenge) {
+    } else if (isCapstoneProject) {
         return`${depth} ${label} 🏆 - LVL ${level}`;
     } else {
-        return `${depth}${label}`;
+        return `${depth} ${label}`;
     }
 }
 
 async function selectNode(node: TreeNode): Promise<void> {
-    console.log(`You selected node: ${node.label}`);
-  
+    console.clear();
+    
+    const header = findHeader(globalTree, node) as TreeNode;
     // IF: type === challenge
     // Show description of challenge
     // Show menu for the following options:
@@ -53,17 +53,24 @@ async function selectNode(node: TreeNode): Promise<void> {
     //  - Show instructions for completing the challenge including a simple command to test their code
     // submit project, check if project passes tests then send proof of completion to the BG server, if it passes, mark the challenge as completed
     if (node.type === "challenge") {
+        const backAction: Action = {
+            label: " ⮢",
+            action: async () => { await startVisualization(header) }
+        }
+        const actions = [backAction].concat((node.actions as Action[]).map(action => action));
+        const choices = actions.map(action => action.label);
         console.log("This is a challenge");
         const actionPrompt = {
             type: "list",
             name: "selectedAction",
             message: "What would you like to do?",
-            choices: node.actions?.map(action => action.label)
+            choices,
+            default: 1
         };
         const { selectedAction } = await inquirer.prompt([actionPrompt]);
-        const selectedActionIndex = node.actions?.findIndex(action => action.label === selectedAction);
+        const selectedActionIndex = actions.findIndex(action => action.label === selectedAction);
         if (selectedActionIndex !== undefined && selectedActionIndex >= 0) {
-            await node.actions?.[selectedActionIndex].action();
+            await actions[selectedActionIndex].action();
         }
     }
 
@@ -73,15 +80,15 @@ async function selectNode(node: TreeNode): Promise<void> {
 
     // IF: type === personal-challenge
     // Show description of challenge
-
+    
 
 }
 
-const tree = buildTree();
+const globalTree = buildTree();
 
 export async function startVisualization(currentNode?: TreeNode): Promise<void> {
     if (!currentNode) {
-        currentNode = tree;
+        currentNode = Object.assign({}, globalTree);
     }
 
     function getChoicesAndActions(node: TreeNode): { choices: string[], actions: TreeNode[] } {
@@ -120,7 +127,7 @@ export async function startVisualization(currentNode?: TreeNode): Promise<void> 
     }
 
     const { choices, actions } = getChoicesAndActions(currentNode);
-    const parent = findParent(tree, currentNode) as TreeNode;
+    const parent = findParent(globalTree, currentNode) as TreeNode;
     let defaultChoice = 0;
     // Add a back option if not at the root
     if (parent) {
@@ -140,15 +147,16 @@ export async function startVisualization(currentNode?: TreeNode): Promise<void> 
     const selectedIndex = choices.indexOf(answers.selectedNodeIndex);
     const selectedNode = actions[selectedIndex];
     await selectNode(selectedNode);
-    // visualizeTree(selectedNode);
-    await startVisualization(selectedNode);
+    if (selectedNode.recursive) {
+        await startVisualization(selectedNode);
+    }
 }
 
-function findParent(parentNode: TreeNode, targetNode: TreeNode): TreeNode | undefined {
-    if (parentNode.children.includes(targetNode)) {
-        return parentNode;
+function findParent(allNodes: TreeNode, targetNode: TreeNode): TreeNode | undefined {
+    if (allNodes.children.includes(targetNode)) {
+        return allNodes;
     } else {
-        for (const childNode of parentNode.children) {
+        for (const childNode of allNodes.children) {
             const parent = findParent(childNode, targetNode);
             if (parent) return parent;
         }
@@ -156,13 +164,26 @@ function findParent(parentNode: TreeNode, targetNode: TreeNode): TreeNode | unde
     }
 }
 
-// Matryoshka Magic - Recursive function to build nested tree structure
-function matryoshkaMagic(challenges: any[], parentName: string | undefined = undefined): TreeNode[] {
+function findHeader(allNodes: TreeNode, targetNode: TreeNode): TreeNode | undefined {
+        let parent = findParent(allNodes, targetNode);
+        while (true) {
+            if (!parent) {
+                return allNodes;
+            }
+            if (parent?.type === "header") {
+                return parent;
+            }
+            parent = findParent(allNodes, parent);
+        }    
+}
+
+// Nesting Magic - Recursive function to build nested tree structure
+function NestingMagic(challenges: any[], parentName: string | undefined = undefined): TreeNode[] {
     const tree: TreeNode[] = [];
     for (let challenge of challenges) {
         if (challenge.parentName === parentName) {
-            // Recursively call matryoshkaMagic for each child
-            challenge.children = matryoshkaMagic(challenges, challenge.name);
+            // Recursively call NestingMagic for each child
+            challenge.children = NestingMagic(challenges, challenge.name);
             tree.push(challenge);
         }
     }
@@ -177,7 +198,7 @@ export function buildTree(): TreeNode {
         return Array.from(new Set(acc.concat(challenge.tags)));
     }, []);
     for (let tag of tags) {
-            const filteredChallenges = challenges.filter((challenge: IChallenge) => challenge.tags.includes(tag));
+            const filteredChallenges = challenges.filter((challenge: IChallenge) => challenge.tags.includes(tag) && challenge.enabled);
             const transformedChallenges = filteredChallenges.map((challenge: IChallenge) => {
                 const { label, name, level, type, repo, testFileName, childrenNames} = challenge;
                 const parentName = challenges.find((c: any) => c.childrenNames?.includes(name))?.name;
@@ -189,12 +210,16 @@ export function buildTree(): TreeNode {
                         label: "Setup Challenge Repository",
                         action: async () => {
                             await setupChallenge(repo as string, name, installLocation);
+                            // Return to top?
+                            await startVisualization(globalTree);
                         }
                     });
                     actions.push({
                         label: "Test Challenge",
                         action: async () => {
                             await testChallenge(name, testFileName);
+                            // Return to top?
+                            await startVisualization(globalTree);
                         }
                     });
                     actions.push({
@@ -203,6 +228,8 @@ export function buildTree(): TreeNode {
                             console.log("Testing contract before attempting to deploy...")
                             await testChallenge(name, testFileName);
                             console.log("TODO: NEED TO IMPLEMENT DEPLOYING CONTRACT");
+                            // Return to top?
+                            await startVisualization(globalTree);
                         }
                     });
                 } else if (type === "reference") {
@@ -220,14 +247,15 @@ export function buildTree(): TreeNode {
                         }
                     });
                 }
+
                 return { label, name, level, type, actions, childrenNames, parentName };
             });
-            const matryoshkaChallenges = matryoshkaMagic(transformedChallenges);
+            const NestingChallenges = NestingMagic(transformedChallenges);
         tree.push({
             type: "header",
             label: `${tag}`,
             name: `${tag.toLowerCase()}`,
-            children: matryoshkaChallenges,
+            children: NestingChallenges,
             recursive: true
         });
     }
