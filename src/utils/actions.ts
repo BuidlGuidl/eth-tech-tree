@@ -1,13 +1,14 @@
 import fs from "fs";
-import crypto from "crypto";
 import { execa } from "execa";
 
 export async function testChallenge(name: string, testFileName: string) {
     console.log("Submitting challenge...");
     const targetDir = `challenges/${name}`;
-    // Check hash of test cases to make sure tests haven't been adjusted
-    const fileBuffer = fs.readFileSync(`${targetDir}/packages/foundry/test/${testFileName}`);
-   
+    // Check if challenge exists
+    if (!fs.existsSync(targetDir)) {
+        console.log("Challenge does not exist. Please setup the challenge first.");
+        return;
+    }
     await execa("yarn", ["install"], { cwd: targetDir });
     const { failed } = await execa("yarn", ["run", "foundry:test"], { cwd: targetDir, all: true }).pipeAll!(process.stdout);
     if (failed) {
