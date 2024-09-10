@@ -1,7 +1,11 @@
 import chalk from "chalk";
+import { wait } from "./helpers";
 
-export function renderIntroMessage() {
+export async function renderIntroMessage() {
+  console.clear();
   console.log(TITLE_TEXT);
+  await wait(1500);
+  console.clear();
 }
 
 export const TITLE_TEXT = `
