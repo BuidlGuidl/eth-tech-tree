@@ -147,7 +147,7 @@ export async function startVisualization(currentNode?: TreeNode): Promise<void> 
     const selectedIndex = choices.indexOf(answers.selectedNodeIndex);
     const selectedNode = actions[selectedIndex];
     await selectNode(selectedNode);
-    if (selectedNode.recursive) {
+    if (selectedNode.type === "header") {
         await startVisualization(selectedNode);
     }
 }
@@ -232,14 +232,14 @@ export function buildTree(): TreeNode {
                             await startVisualization(globalTree);
                         }
                     });
-                } else if (type === "reference") {
+                } else if (type === "quiz") {
                     actions.push({
                         label: "Mark as Read",
                         action: async () => {
                             console.log("Marking as read...");
                         }
                     });
-                } else if (type === "personal-challenge") {
+                } else if (type === "capstone-project") {
                     actions.push({
                         label: "Submit Project",
                         action: async () => {
