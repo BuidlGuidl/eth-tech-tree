@@ -1,8 +1,11 @@
 import inquirer from "inquirer";
 import chalk from "chalk";
 import { loadChallenges, loadUserState } from "./stateManager";
-import { setupChallenge, testChallenge } from "./actions";
+import { testChallenge } from "./actions";
 import { IChallenge } from "../types";
+import fs from "fs";
+import { pressEnterToContinue } from "./helpers";
+import { setupChallenge } from "./setupChallenge";
 
 type Action = {
     label: string;
@@ -55,7 +58,10 @@ async function selectNode(node: TreeNode): Promise<void> {
     if (node.type === "challenge") {
         const backAction: Action = {
             label: " ⮢",
-            action: async () => { await startVisualization(header) }
+            action: async () => { 
+                console.clear();
+                await startVisualization(header);
+            }
         }
         const actions = [backAction].concat((node.actions as Action[]).map(action => action));
         const choices = actions.map(action => action.label);
@@ -84,7 +90,7 @@ async function selectNode(node: TreeNode): Promise<void> {
 
 }
 
-const globalTree = buildTree();
+let globalTree = buildTree();
 
 export async function startVisualization(currentNode?: TreeNode): Promise<void> {
     if (!currentNode) {
@@ -198,40 +204,57 @@ export function buildTree(): TreeNode {
         return Array.from(new Set(acc.concat(challenge.tags)));
     }, []);
     for (let tag of tags) {
-            const filteredChallenges = challenges.filter((challenge: IChallenge) => challenge.tags.includes(tag) && challenge.enabled);
+            const filteredChallenges = challenges.filter((challenge: IChallenge) => challenge.tags.includes(tag) /*&& challenge.enabled*/);
             const transformedChallenges = filteredChallenges.map((challenge: IChallenge) => {
-                const { label, name, level, type, repo, testFileName, childrenNames} = challenge;
+                const { label, name, level, type, repo, childrenNames} = challenge;
                 const parentName = challenges.find((c: any) => c.childrenNames?.includes(name))?.name;
 
                 // Build selection actions
                 const actions: Action[] = [];
                 if (type === "challenge") {
-                    actions.push({
-                        label: "Setup Challenge Repository",
-                        action: async () => {
-                            await setupChallenge(repo as string, name, installLocation);
-                            // Return to top?
-                            await startVisualization(globalTree);
-                        }
-                    });
-                    actions.push({
-                        label: "Test Challenge",
-                        action: async () => {
-                            await testChallenge(name, testFileName);
-                            // Return to top?
-                            await startVisualization(globalTree);
-                        }
-                    });
-                    actions.push({
-                        label: "Deploy Completed Contract",
-                        action: async () => {
-                            console.log("Testing contract before attempting to deploy...")
-                            await testChallenge(name, testFileName);
-                            console.log("TODO: NEED TO IMPLEMENT DEPLOYING CONTRACT");
-                            // Return to top?
-                            await startVisualization(globalTree);
-                        }
-                    });
+                    const targetDir = `${installLocation}/${name}`;
+                    if (!fs.existsSync(targetDir)) {
+                        actions.push({
+                            label: "Setup Challenge Repository",
+                            action: async () => {
+                                await setupChallenge(repo as string, name, installLocation);
+                                // Rebuild the tree
+                                globalTree = buildTree();
+                                // Wait for enter key
+                                await pressEnterToContinue();
+                                // Return to challenge menu
+                                const challengeNode = findNode(globalTree, name) as TreeNode;
+                                await selectNode(challengeNode);
+                            }
+                        });
+                    } else {
+                        actions.push({
+                            label: "Test Challenge",
+                            action: async () => {
+                                await testChallenge(name);
+                                // Wait for enter key
+                                await pressEnterToContinue();
+                                // Return to challenge menu
+                                const challengeNode = findNode(globalTree, name) as TreeNode;
+                                await selectNode(challengeNode);
+                            }
+                        });
+                        actions.push({
+                            label: "Deploy Completed Contract",
+                            action: async () => {
+                                console.log("Testing contract before attempting to deploy...")
+                                await testChallenge(name);
+                                console.log("TODO: NEED TO IMPLEMENT DEPLOYING CONTRACT");
+                                // Rebuild the tree
+                                globalTree = buildTree();
+                                // Wait for enter key
+                                await pressEnterToContinue();
+                                // Return to challenge menu
+                                const challengeNode = findNode(globalTree, name) as TreeNode;
+                                await selectNode(challengeNode);
+                            }
+                        });
+                    }                    
                 } else if (type === "quiz") {
                     actions.push({
                         label: "Mark as Read",
@@ -267,4 +290,17 @@ export function buildTree(): TreeNode {
     };
     
     return mainMenu;
+}
+
+function findNode(globalTree: TreeNode, name: string): TreeNode | undefined {
+    // Descend the tree until the node is found
+    if (globalTree.name === name) {
+        return globalTree;
+    }
+    for (const child of globalTree.children) {
+        const node = findNode(child, name);
+        if (node) {
+            return node;
+        }
+    }
 }
