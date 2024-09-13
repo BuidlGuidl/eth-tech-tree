@@ -40,6 +40,7 @@ export const setupChallenge = async (challengeRepo: string, name: string, instal
         return;
     }
 
+    console.log("Downloading challenge...");
     // Setup base repository
     await setupBaseRepo(targetDir);
 
@@ -60,14 +61,13 @@ export const setupChallenge = async (challengeRepo: string, name: string, instal
 }
 
 const setupBaseRepo = async (targetDir: string) => {
-    console.log("Cloning base repository...");
+    // Clone base repository
     const { failed: cloneFailed } = await execa("git", ["clone", "--branch", branch, "--single-branch", "--recurse-submodules", "-j8", repo, targetDir]);
     if (cloneFailed) {
         console.log("Failed to clone base repository.");
         return;
     }
-    console.log("Base repository cloned successfully.");
-    console.log("Checking out commit...");
+    // Checkout specific commit
     const { failed: checkoutFailed } = await execa("git", ["checkout", commit], { cwd: targetDir });
     if (checkoutFailed) {
         console.log("Failed to checkout commit.");
@@ -77,16 +77,9 @@ const setupBaseRepo = async (targetDir: string) => {
     for (const file of filesToRemove) {
         await execa("rm", [path.join(targetDir, file)]);
     }
-    // // Update the package.json file to install forge deps on postinstall
-    // const packageJson = fs.readFileSync(path.join(targetDir, "package.json"), "utf8");
-    // const updatedPackageJson = packageJson.replace("husky install", "husky install && forge install --root packages/foundry");
-    // fs.writeFileSync(path.join(targetDir, "package.json"), updatedPackageJson);
-
-    console.log("Base repository is ready for merging challenge");
 }
 
 const mergeChallenge = async (challengeRepo: string, name: string, targetDir: string) => {
-    console.log("Downloading challenge repository...");
     // Copy challenge files to temporary directory
     const tempDir = path.join("temp_" + Math.random().toString(36).substring(2));
     const { failed: copyFailed } = await execa("git", ["clone", "--branch", name, "--single-branch", challengeRepo, tempDir]);
@@ -94,14 +87,10 @@ const mergeChallenge = async (challengeRepo: string, name: string, targetDir: st
         console.log("Failed to copy challenge repository.");
         return;
     }
-    console.log("Challenge repository downloaded successfully.");
-    console.log("Merging challenge files...");
     // Merge challenge files
     await copy(tempDir, targetDir);
     // Delete temporary directory
     await execa("rm", ["-rf", tempDir]);
-    console.log("Challenge files merged successfully.");
-    console.log("Filling in README");
     // Fill in README
     const readmePath = path.join(targetDir, "README.md");
     const readmeContent = fs.readFileSync(readmePath, "utf8");
