@@ -1373,6 +1373,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"dotenv@npm:^16.4.5":
+  version: 16.4.5
+  resolution: "dotenv@npm:16.4.5"
+  checksum: 301a12c3d44fd49888b74eb9ccf9f07a1f5df43f489e7fcb89647a2edcd84c42d6bc349dc8df099cd18f07c35c7b04685c1a4f3e6a6a9e6b30f8d48c15b7f49c
+  languageName: node
+  linkType: hard
+
 "eastasianwidth@npm:^0.2.0":
   version: 0.2.0
   resolution: "eastasianwidth@npm:0.2.0"
@@ -1590,13 +1597,14 @@ __metadata:
     arg: 5.0.2
     chalk: ^5.3.0
     create-eth: ^0.0.41
+    dotenv: ^16.4.5
     execa: 7.1.1
     handlebars: ^4.7.7
     inquirer: 9.2.0
     inquirer-tree-prompt: ^1.1.2
     listr: 0.14.3
     merge-packages: ^0.1.6
-    ncp: 2.0.0
+    ncp: ^2.0.0
     pkg-install: 1.0.0
     rollup: 3.21.0
     rollup-plugin-auto-external: 2.0.0
@@ -3174,7 +3182,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ncp@npm:2.0.0":
+"ncp@npm:2.0.0, ncp@npm:^2.0.0":
   version: 2.0.0
   resolution: "ncp@npm:2.0.0"
   bin:

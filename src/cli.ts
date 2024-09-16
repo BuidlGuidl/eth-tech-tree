@@ -4,9 +4,12 @@ import type { Args } from "./types";
 import { startVisualization } from "./utils/tree";
 import { loadUserState, saveChallenges } from "./utils/stateManager";
 import { fetchChallenges } from "./modules/api";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 export async function cli(args: Args) {
-  renderIntroMessage();
+  await renderIntroMessage();
   await init();
   // Navigate tree
   await startVisualization();
