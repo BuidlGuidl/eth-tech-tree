@@ -1,5 +1,5 @@
 import chalk from "chalk";
-import { wait } from "./helpers";
+import { wait } from "../utils/helpers";
 
 export async function renderIntroMessage() {
   console.clear();

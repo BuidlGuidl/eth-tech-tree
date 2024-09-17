@@ -1,5 +1,5 @@
-import { promptForMissingUserState } from "./utils/prompt-for-missing-user-state";
-import { renderIntroMessage } from "./utils/render-intro-message";
+import { promptForMissingUserState } from "./tasks/prompt-for-missing-user-state";
+import { renderIntroMessage } from "./tasks/render-intro-message";
 import type { Args } from "./types";
 import { startVisualization } from "./utils/tree";
 import { loadUserState, saveChallenges } from "./utils/stateManager";

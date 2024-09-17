@@ -4,7 +4,7 @@ import {
   UserState
 } from "../types";
 import inquirer from "inquirer";
-import { saveUserState } from "./stateManager";
+import { saveUserState } from "../utils/stateManager";
 
 // default values for unspecified args
 const defaultOptions: Partial<UserState> = {
