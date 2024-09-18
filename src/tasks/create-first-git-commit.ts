@@ -5,6 +5,9 @@ const foundryLibraries = ["foundry-rs/forge-std", "OpenZeppelin/openzeppelin-con
 
 export async function createFirstGitCommit(targetDir: string) {
   try {
+    // Remove remote
+    await execa("git", ["remote", "remove", "origin"], { cwd: targetDir });
+    // Add and commit all changes
     await execa("git", ["add", "-A"], { cwd: targetDir });
     await execa("git", ["commit", "-m", "Initial commit with 🏗️ Scaffold-ETH 2", "--no-verify"], { cwd: targetDir });
     const foundryWorkSpacePath = path.resolve(targetDir, "packages", "foundry");
