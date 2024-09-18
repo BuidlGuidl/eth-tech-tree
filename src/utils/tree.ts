@@ -1,7 +1,7 @@
 import inquirer from "inquirer";
 import chalk from "chalk";
 import { loadChallenges, loadUserState } from "./stateManager";
-import { testChallenge } from "./actions";
+import { testChallenge, submitChallenge } from "./actions";
 import { IChallenge } from "../types";
 import fs from "fs";
 import { pressEnterToContinue } from "./helpers";
@@ -145,7 +145,7 @@ export async function startVisualization(currentNode?: TreeNode): Promise<void> 
         type: "list",
         loop: false,
         name: "selectedNodeIndex",
-        message: "Which direction would you like to go?",
+        message: "Select an option",
         choices,
         default: defaultChoice
     };
@@ -204,7 +204,7 @@ export function buildTree(): TreeNode {
         return Array.from(new Set(acc.concat(challenge.tags)));
     }, []);
     for (let tag of tags) {
-            const filteredChallenges = challenges.filter((challenge: IChallenge) => challenge.tags.includes(tag) /*&& challenge.enabled*/);
+            const filteredChallenges = challenges.filter((challenge: IChallenge) => challenge.tags.includes(tag) && challenge.enabled);
             const transformedChallenges = filteredChallenges.map((challenge: IChallenge) => {
                 const { label, name, level, type, repo, childrenNames} = challenge;
                 const parentName = challenges.find((c: any) => c.childrenNames?.includes(name))?.name;
@@ -240,11 +240,10 @@ export function buildTree(): TreeNode {
                             }
                         });
                         actions.push({
-                            label: "Deploy Completed Contract",
+                            label: "Submit Completed Challenge",
                             action: async () => {
-                                console.log("Testing contract before attempting to deploy...")
-                                await testChallenge(name);
-                                console.log("TODO: NEED TO IMPLEMENT DEPLOYING CONTRACT");
+                                // Submit the challenge
+                                await submitChallenge(name);
                                 // Rebuild the tree
                                 globalTree = buildTree();
                                 // Wait for enter key
@@ -274,6 +273,7 @@ export function buildTree(): TreeNode {
                 return { label, name, level, type, actions, childrenNames, parentName };
             });
             const NestingChallenges = NestingMagic(transformedChallenges);
+            
         tree.push({
             type: "header",
             label: `${tag}`,
@@ -282,11 +282,13 @@ export function buildTree(): TreeNode {
             recursive: true
         });
     }
+    // Remove any categories without challenges
+    const enabledCategories = tree.filter((category: TreeNode) => category.children.length > 0);
     const mainMenu: TreeNode = {
         label: "Main Menu",
         name: "main-menu",
         type: "header",
-        children: tree,
+        children: enabledCategories,
     };
     
     return mainMenu;

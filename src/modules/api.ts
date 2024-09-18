@@ -33,3 +33,23 @@ export const createUser = async (userData: { address?: string, ens?: string }) =
     return {};
   }
 };
+
+/**
+ * Submit Challenge
+ */
+export const submitChallengeToServer = async (userAddress: string, network: string, challengeName: string, contractAddress: string) => {
+  try {
+    const response = await fetch(`${api_url}/submit`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ challengeName, contractAddress, network, userAddress }),
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error:', error);
+    return {};
+  }
+};
