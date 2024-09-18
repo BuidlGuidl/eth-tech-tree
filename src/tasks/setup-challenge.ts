@@ -2,6 +2,7 @@ import { execa } from "execa";
 import ncp from "ncp";
 import path from "path";
 import fs from "fs";
+import { createFirstGitCommit } from "./create-first-git-commit";
 
 // Sidestep for ncp issue https://github.com/AvianFlu/ncp/issues/127
 const copy = (source: string, destination: string, options?: ncp.Options) => new Promise((resolve, reject) => {
@@ -55,6 +56,7 @@ export const setupChallenge = async (challengeRepo: string, name: string, instal
         console.log("Failed to install dependencies.");
         return;
     }
+    await createFirstGitCommit(targetDir);
     console.log("Dependencies installed successfully.");
     console.log("");
     console.log(`Now open this repository in your favorite code editor and look at the readme for instructions: ${targetDir}`);
@@ -62,7 +64,7 @@ export const setupChallenge = async (challengeRepo: string, name: string, instal
 
 const setupBaseRepo = async (targetDir: string) => {
     // Clone base repository
-    const { failed: cloneFailed } = await execa("git", ["clone", "--branch", branch, "--single-branch", "--recurse-submodules", "-j8", repo, targetDir]);
+    const { failed: cloneFailed } = await execa("git", ["clone", "--branch", branch, "--single-branch", /*"--recurse-submodules", "-j8",*/ repo, targetDir]);
     if (cloneFailed) {
         console.log("Failed to clone base repository.");
         return;

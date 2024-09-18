@@ -5,7 +5,7 @@ import { testChallenge } from "./actions";
 import { IChallenge } from "../types";
 import fs from "fs";
 import { pressEnterToContinue } from "./helpers";
-import { setupChallenge } from "./setupChallenge";
+import { setupChallenge } from "../tasks/setup-challenge";
 
 type Action = {
     label: string;
