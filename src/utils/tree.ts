@@ -1,11 +1,10 @@
 import inquirer from "inquirer";
 import chalk from "chalk";
 import { loadChallenges, loadUserState } from "./stateManager";
-import { testChallenge, submitChallenge } from "./actions";
+import { testChallenge, submitChallenge, setupChallenge } from "../actions";
 import { IChallenge } from "../types";
 import fs from "fs";
 import { pressEnterToContinue } from "./helpers";
-import { setupChallenge } from "../tasks/setup-challenge";
 
 type Action = {
     label: string;
@@ -217,7 +216,7 @@ export function buildTree(): TreeNode {
                         actions.push({
                             label: "Setup Challenge Repository",
                             action: async () => {
-                                await setupChallenge(repo as string, name, installLocation);
+                                await setupChallenge(name, installLocation);
                                 // Rebuild the tree
                                 globalTree = buildTree();
                                 // Wait for enter key

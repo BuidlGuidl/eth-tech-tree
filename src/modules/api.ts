@@ -1,4 +1,5 @@
-const api_url = process.env.API_URL || "http://localhost:3000" ||"https://eth-tech-tree-backend-production.up.railway.app";
+// Override the url with the environment variable API_URL if provided
+const api_url = process.env.API_URL ||"https://eth-tech-tree-backend-production.up.railway.app";
 
 /**
  * Fetch Challenges

@@ -5,6 +5,7 @@ import {
 } from "../types";
 import inquirer from "inquirer";
 import { saveUserState } from "../utils/stateManager";
+import { isValidAddress, isValidAddressOrENS } from "../utils/helpers";
 
 // default values for unspecified args
 const defaultOptions: Partial<UserState> = {
@@ -42,14 +43,7 @@ export async function promptForMissingUserState(
   const answers = await inquirer.prompt(questions, cliAnswers);
 
   // Fetch the user data from the server (create a new user if it doesn't exist) - also handles ens resolution
-  const body: { address?: string, ens?: string } = {};
-  if (isValidAddress(answers.address)) {
-    body["address"] = answers.address;
-  } else {
-    body["ens"] = answers.address;
-  }
-  // TODO: handle no returned data (no connection or error)
-  const user = await createUser(body);
+  const user = await fetchUser(answers.address);
   const newState = { ...answers, ...user };
   if (JSON.stringify(userState) !== JSON.stringify(newState)) {
     // Save the new state locally
@@ -59,10 +53,15 @@ export async function promptForMissingUserState(
   return newState;
 }
 
-const isValidAddress = (value: string): boolean => {
-  return /^0x[a-fA-F0-9]{40}$/.test(value)
-};
+export async function fetchUser(userResponse: string): Promise<UserState> {
+  const body: { address?: string, ens?: string } = {};
+  if (isValidAddress(userResponse)) {
+    body["address"] = userResponse;
+  } else {
+    body["ens"] = userResponse;
+  }
+  // TODO: handle no returned data (no connection or error)
+  const user = await createUser(body);
 
-const isValidAddressOrENS = (value: string): boolean => {
-  return /^(0x[a-fA-F0-9]{40}|.+\.eth)$/.test(value);
+  return user;
 };
