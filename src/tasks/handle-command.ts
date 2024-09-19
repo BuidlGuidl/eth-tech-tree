@@ -2,7 +2,6 @@ import { CommandOptions } from "./parse-command-arguments-and-options";
 import { setupChallenge, submitChallenge } from "../actions";
 
 export async function handleCommand(commands: CommandOptions) {
-    console.log("Fulfilling command", commands);
     const { command, installLocation, challenge, contractAddress, dev, help } = commands;
     if (help) {
         // TODO: Show help menu based on command
