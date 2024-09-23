@@ -4,11 +4,10 @@ import type { Args, UserState } from "./types";
 import { startVisualization } from "./utils/tree";
 import { loadUserState, saveChallenges } from "./utils/stateManager";
 import { fetchChallenges } from "./modules/api";
-import dotenv from "dotenv";
 import { parseCommandArgumentsAndOptions, promptForMissingCommandArgs } from "./tasks/parse-command-arguments-and-options";
 import { handleCommand } from "./tasks/handle-command";
 
-dotenv.config();
+
 
 export async function cli(args: Args) {
   const commands = await parseCommandArgumentsAndOptions(args);
@@ -30,5 +29,5 @@ async function init(userState: UserState) {
 
   // Get Challenges
   const challenges = await fetchChallenges();
-  saveChallenges(challenges);
+  await saveChallenges(challenges);
 }

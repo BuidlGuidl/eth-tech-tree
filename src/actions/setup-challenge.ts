@@ -6,6 +6,7 @@ import { createFirstGitCommit } from "../tasks/create-first-git-commit";
 import { fetchChallenges } from "../modules/api";
 import { loadChallenges } from "../utils/stateManager";
 import { IChallenge } from "../types";
+import { BASE_REPO, BASE_BRANCH, BASE_COMMIT } from "../modules/config";
 
 // Sidestep for ncp issue https://github.com/AvianFlu/ncp/issues/127
 const copy = (source: string, destination: string, options?: ncp.Options) => new Promise((resolve, reject) => {
@@ -17,10 +18,6 @@ const copy = (source: string, destination: string, options?: ncp.Options) => new
         }
     });
 });
-
-const repo = process.env.BASE_REPO || "https://github.com/scaffold-eth/scaffold-eth-2.git";
-const branch = process.env.BASE_BRANCH || "foundry";
-const commit = process.env.BASE_COMMIT || "f079ac706b29d18740c79ff0c78f82c3bd7cd385";
 
 const filesToRemove = [
     "packages/foundry/contracts/YourContract.sol",
@@ -80,13 +77,13 @@ export const setupChallenge = async (name: string, installLocation: string) => {
 
 const setupBaseRepo = async (targetDir: string) => {
     // Clone base repository
-    const { failed: cloneFailed } = await execa("git", ["clone", "--branch", branch, "--single-branch", /*"--recurse-submodules", "-j8",*/ repo, targetDir]);
+    const { failed: cloneFailed } = await execa("git", ["clone", "--branch", BASE_BRANCH, "--single-branch", BASE_REPO, targetDir]);
     if (cloneFailed) {
         console.log("Failed to clone base repository.");
         return;
     }
     // Checkout specific commit
-    const { failed: checkoutFailed } = await execa("git", ["checkout", commit], { cwd: targetDir });
+    const { failed: checkoutFailed } = await execa("git", ["checkout", BASE_COMMIT], { cwd: targetDir });
     if (checkoutFailed) {
         console.log("Failed to checkout commit.");
         return;
