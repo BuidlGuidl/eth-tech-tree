@@ -1,4 +1,5 @@
 import fs from 'fs';
+import fsPromises from 'fs/promises';
 import path from 'path';
 import { IChallenge, UserState } from '../types';
 
@@ -24,14 +25,14 @@ export function loadUserState(): UserState {
   }
 }
 
-export function saveChallenges(challenges: IChallenge[]) {
+export async function saveChallenges(challenges: IChallenge[]) {
   const configPath = path.join(process.cwd(), "storage");
 
   if (!fs.existsSync(configPath)) {
     fs.mkdirSync(configPath);
   }
   const filePath = path.join(configPath, "challenges.json");
-  fs.writeFileSync(filePath, JSON.stringify(challenges, null, 2));
+  await fsPromises.writeFile(filePath, JSON.stringify(challenges, null, 2));
 }
 
 export function loadChallenges(): IChallenge[] {

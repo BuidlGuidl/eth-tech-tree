@@ -89,10 +89,11 @@ async function selectNode(node: TreeNode): Promise<void> {
 
 }
 
-let globalTree = buildTree();
+let globalTree: TreeNode;
 
 export async function startVisualization(currentNode?: TreeNode): Promise<void> {
     if (!currentNode) {
+        globalTree = buildTree();
         currentNode = Object.assign({}, globalTree);
     }
 
@@ -216,6 +217,7 @@ export function buildTree(): TreeNode {
                         actions.push({
                             label: "Setup Challenge Repository",
                             action: async () => {
+                                console.clear();
                                 await setupChallenge(name, installLocation);
                                 // Rebuild the tree
                                 globalTree = buildTree();
@@ -230,6 +232,7 @@ export function buildTree(): TreeNode {
                         actions.push({
                             label: "Test Challenge",
                             action: async () => {
+                                console.clear();
                                 await testChallenge(name);
                                 // Wait for enter key
                                 await pressEnterToContinue();
@@ -241,6 +244,7 @@ export function buildTree(): TreeNode {
                         actions.push({
                             label: "Submit Completed Challenge",
                             action: async () => {
+                                console.clear();
                                 // Submit the challenge
                                 await submitChallenge(name);
                                 // Rebuild the tree
