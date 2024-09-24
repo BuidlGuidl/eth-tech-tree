@@ -47,7 +47,7 @@ export async function promptForMissingUserState(
   const newState = { ...answers, ...user };
   if (JSON.stringify(userState) !== JSON.stringify(newState)) {
     // Save the new state locally
-    saveUserState(newState);
+    await saveUserState(newState);
   }
 
   return newState;
