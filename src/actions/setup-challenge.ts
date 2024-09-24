@@ -6,7 +6,7 @@ import { createFirstGitCommit } from "../tasks/create-first-git-commit";
 import { fetchChallenges } from "../modules/api";
 import { loadChallenges } from "../utils/stateManager";
 import { IChallenge } from "../types";
-import { BASE_REPO, BASE_BRANCH, BASE_COMMIT } from "../modules/config";
+import { BASE_REPO, BASE_BRANCH, BASE_COMMIT } from "../config";
 
 // Sidestep for ncp issue https://github.com/AvianFlu/ncp/issues/127
 const copy = (source: string, destination: string, options?: ncp.Options) => new Promise((resolve, reject) => {
