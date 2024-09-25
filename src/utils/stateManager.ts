@@ -1,14 +1,17 @@
 import fs from 'fs';
+import { promisify } from 'util';
 import path from 'path';
 import { IChallenge, UserState } from '../types';
 
-export function saveUserState(state: UserState) {
+const writeFile = promisify(fs.writeFile);
+
+export async function saveUserState(state: UserState) {
   const configPath = path.join(process.cwd(), "storage");
   if (!fs.existsSync(configPath)) {
     fs.mkdirSync(configPath);
   }
   const filePath = path.join(configPath, "user.json");
-  fs.writeFileSync(filePath, JSON.stringify(state, null, 2));
+  await writeFile(filePath, JSON.stringify(state, null, 2));
 }
 
 export function loadUserState(): UserState {
@@ -24,14 +27,14 @@ export function loadUserState(): UserState {
   }
 }
 
-export function saveChallenges(challenges: IChallenge[]) {
+export async function saveChallenges(challenges: IChallenge[]) {
   const configPath = path.join(process.cwd(), "storage");
 
   if (!fs.existsSync(configPath)) {
     fs.mkdirSync(configPath);
   }
   const filePath = path.join(configPath, "challenges.json");
-  fs.writeFileSync(filePath, JSON.stringify(challenges, null, 2));
+  await writeFile(filePath, JSON.stringify(challenges, null, 2));
 }
 
 export function loadChallenges(): IChallenge[] {

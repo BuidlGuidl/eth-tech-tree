@@ -1,6 +1,6 @@
 # Developer Guide
 
-This project is aimed to be consumed via `npx create`. The code in this repo is the source used to generate the consumable script.
+This project is aimed to be consumed via `npx eth-tech-tree`. The code in this repo is the source used to generate the consumable script.
 
 The steps you should follow to make changes to the code are the following:
 
@@ -25,35 +25,7 @@ This command will run the compiled script inside `bin/`.
 
 You can send any option or flag to the CLI command. For example, a handy command is `yarn cli -s` to tell the CLI to skip installing dependencies or `yarn cli [project_path]` example `yarn cli ../test-cli` this will skip the "Project Name" prompt and use the provided path where project instance will be created in.
 
-## Changes to the Resulting Project
-
-The source files for the instance projects can be found under `templates/`. You'll see there are two folders there: `base/` and `extensions/`. The `base/` folder has the source files that will be present in all instances, whereas `extensions/` hold the source files that will be added or not to the instances based on the user choices within the CLI tool.
-
-It's highly recommended that you go through [RFC-extensions.md](RFC-extensions.md) to understand the template API to create extensions. We use a custom template API to allow extensions to modify any file inside the `templates/` folder. While flexible and powerful, it requires developers to understand how it works. It's JS based, so there's no new technology needed to understand and use it.
-
-While you might be tempted to change files straight in the source, we've created a better way to do it with the dev mode. We feel this is worth a separate section in this document.
-
-## Dev Mode
-
-The dev mode creates a special instance linked to the `templates/` folder. You can enable it by adding the `--dev` flag when using the CLI.
-
-```bash
-yarn cli --dev # or the alternative version using node proposed earlier
-```
-
-This is great because you can run your instance project as any other project, make changes there and see your instance project update in real time. Without this utility you'd need to change the source file, call the CLI, and run the instance project every time you changed something.
-
-Because the files are linked, changes in your instance project will also modify the source files in this projects `template/` folder.
-
-There's a caveat: special files.
-
-### Special Files
-
-There are some files that are not just copied, but generated from the CLI using multiple source files. With those files you can still make changes to the instance project and see how they affect it, but they won't automatically show up in this project's `template/` folder.
-
-Once you're happy with the file contents, you'd need to reverse-engineer the changes needed in this project's `template/` folder. To make it easier to figure out what to change, we generate sibling files to any of these special ones, with the exact same name but adding `*.dev` to them.
-
-For example, `generated.txt` would have a sibling `generated.txt.dev` file with information about the "template" and "args" files that contributed to the current result.
+You may find it helpful to set environment variables that can be found in `src/config.ts` to use a local [backend](https://github.com/BuidlGuidl/eth-tech-tree-backend) or point to a different repository for setting up challenges.
 
 ## Back-merging main branch / Publishing to NPM (TODO: Update to main branch workflow)
 

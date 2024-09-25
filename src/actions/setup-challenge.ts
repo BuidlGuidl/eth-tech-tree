@@ -2,7 +2,11 @@ import { execa } from "execa";
 import ncp from "ncp";
 import path from "path";
 import fs from "fs";
-import { createFirstGitCommit } from "./create-first-git-commit";
+import { createFirstGitCommit } from "../tasks/create-first-git-commit";
+import { fetchChallenges } from "../modules/api";
+import { loadChallenges } from "../utils/stateManager";
+import { IChallenge } from "../types";
+import { BASE_REPO, BASE_BRANCH, BASE_COMMIT } from "../config";
 
 // Sidestep for ncp issue https://github.com/AvianFlu/ncp/issues/127
 const copy = (source: string, destination: string, options?: ncp.Options) => new Promise((resolve, reject) => {
@@ -15,19 +19,28 @@ const copy = (source: string, destination: string, options?: ncp.Options) => new
     });
 });
 
-const repo = process.env.BASE_REPO || "https://github.com/scaffold-eth/scaffold-eth-2.git";
-const branch = process.env.BASE_BRANCH || "foundry";
-const commit = process.env.BASE_COMMIT || "f079ac706b29d18740c79ff0c78f82c3bd7cd385";
-
 const filesToRemove = [
     "packages/foundry/contracts/YourContract.sol",
     "packages/foundry/script/00_deploy_your_contract.s.sol",
     "packages/foundry/test/YourContract.t.sol"
 ];
 
-export const setupChallenge = async (challengeRepo: string, name: string, installLocation: string) => {
-    // TEMP: Hardcoded values for testing
-     challengeRepo = process.env.CHALLENGE_REPO || challengeRepo;
+export const setupChallenge = async (name: string, installLocation: string) => {
+    let challengeRepo = loadChallenges().find(challenge => challenge.name === name)?.repo;
+    if (!challengeRepo) {
+        // Fetch challenges from server if not locally available
+        const challenges = await fetchChallenges();
+        challengeRepo = challenges.find((challenge: IChallenge) => challenge.name === name)?.repo;
+    }
+
+    // Check if challenge repository was found
+    if (!challengeRepo) {
+        console.log("A challenge repository was not found with that name.");
+        return;
+    }
+    
+    // Use environment variable as override if provided
+    challengeRepo = process.env.CHALLENGE_REPO || challengeRepo;
 
     const targetDir = path.join(`${installLocation}/${name}`);
     // Make sure the install location exists
@@ -64,13 +77,13 @@ export const setupChallenge = async (challengeRepo: string, name: string, instal
 
 const setupBaseRepo = async (targetDir: string) => {
     // Clone base repository
-    const { failed: cloneFailed } = await execa("git", ["clone", "--branch", branch, "--single-branch", /*"--recurse-submodules", "-j8",*/ repo, targetDir]);
+    const { failed: cloneFailed } = await execa("git", ["clone", "--branch", BASE_BRANCH, "--single-branch", BASE_REPO, targetDir]);
     if (cloneFailed) {
         console.log("Failed to clone base repository.");
         return;
     }
     // Checkout specific commit
-    const { failed: checkoutFailed } = await execa("git", ["checkout", commit], { cwd: targetDir });
+    const { failed: checkoutFailed } = await execa("git", ["checkout", BASE_COMMIT], { cwd: targetDir });
     if (checkoutFailed) {
         console.log("Failed to checkout commit.");
         return;

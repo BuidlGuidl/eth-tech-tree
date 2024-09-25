@@ -11,3 +11,11 @@ export async function pressEnterToContinue(customMessage?: string) {
         message: customMessage || 'Press Enter to continue...',
       });
 }
+
+export const isValidAddress = (value: string): boolean => {
+    return /^0x[a-fA-F0-9]{40}$/.test(value)
+  };
+  
+export const isValidAddressOrENS = (value: string): boolean => {
+    return /^(0x[a-fA-F0-9]{40}|.+\.eth)$/.test(value);
+  };
