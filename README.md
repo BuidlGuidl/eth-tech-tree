@@ -4,9 +4,9 @@
 Test your skills and find some new ones by completing challenges.
 
 There are three different types of nodes on the tree:
-- Challenges: A repository that poses a problem that you must solve with Solidity. Your code is then tested to ensure your solution works, allowing you to progress.
-- References: Links to source material that will help you to master a topic that will be encountered in later challenges.
-- Personal Challenges: These are large scale projects that stretch your knowledge about the ecosystem. A description of the project is provided but it is up to you to fulfill the description.
+- Challenges: A repository that poses a problem that you must solve with Solidity. You deploy your contract and submit your contract address so we can test it to ensure your solution works, allowing you to progress.
+- Quizzes: Links to source material that will help you to master a topic that will be encountered in later challenges.
+- Capstone Projects: These are large scale projects that stretch your knowledge about the ecosystem. A description of the project is provided but it is up to you to fulfill the description.
 
 ## Quick Start
 To run this CLI application
