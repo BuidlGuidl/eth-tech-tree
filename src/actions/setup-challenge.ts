@@ -21,7 +21,7 @@ const copy = (source: string, destination: string, options?: ncp.Options) => new
 
 const filesToRemove = [
     "packages/foundry/contracts/YourContract.sol",
-    "packages/foundry/script/00_deploy_your_contract.s.sol",
+    "packages/foundry/script/DeployYourContract.s.sol",
     "packages/foundry/test/YourContract.t.sol"
 ];
 

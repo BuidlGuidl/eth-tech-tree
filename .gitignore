@@ -25,3 +25,4 @@ storage/*
 
 .env*
 temp_*
+.vscode/settings.json
