@@ -15,9 +15,28 @@ export const fetchChallenges = async () => {
 };
 
 /**
+ * Get User
+ */
+export const getUser = async (identifier: string) => {
+  try {
+    const response = await fetch(`${API_URL}/user/${identifier}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    const data = await response.json();
+    return data.user;
+  } catch (error) {
+    console.error('Error:', error);
+    return {};
+  }
+};
+
+/**
  * Create User
  */
-export const createUser = async (userData: { address?: string, ens?: string }) => {
+export const upsertUser = async (userData: { address: string, ens?: string, deviceInstallLocation: { [device: string]: string } }) => {
   try {
     const response = await fetch(`${API_URL}/user`, {
       method: 'POST',
