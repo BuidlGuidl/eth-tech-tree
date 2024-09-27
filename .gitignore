@@ -21,7 +21,7 @@ node_modules/
 storage/*
 
 
-.vscode/settings.json
+.vscode/*
 
 .env*
 temp_*
