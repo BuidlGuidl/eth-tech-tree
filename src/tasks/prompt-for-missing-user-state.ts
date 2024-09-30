@@ -4,7 +4,7 @@ import {
 } from "../types";
 import inquirer from "inquirer";
 import { saveUserState } from "../utils/stateManager";
-import { isValidAddressOrENS, getDevice, checkValidPathOrCreate } from "../utils/helpers";
+import { isValidAddressOrENS, getDevice, checkValidPathOrCreate, isValidAddress } from "../utils/helpers";
 
 // default values for unspecified args
 const defaultOptions: Partial<UserState> = {
@@ -15,24 +15,34 @@ export async function promptForMissingUserState(
   userState: UserState
 ): Promise<UserState> {
   const userDevice = getDevice();
-  let userAddress = userState.address;
+  let identifier = userState.address;
 
   if (!userState.address) {
     const answer = await inquirer.prompt({
       type: "input",
-      name: "address",
+      name: "identifier",
       message: "Your wallet address (or ENS):",
       validate: isValidAddressOrENS,
     });
 
-    userAddress = answer.address;
+    identifier = answer.identifier;
   }
 
   // Fetch the user data from the server - also handles ens resolution
-  let user = await getUser(userAddress as string);
-  
+  let user = await getUser(identifier as string);
+  const newUser = !user?.address;
   const existingInstallLocation = user?.installLocations?.find((loc: {location: string, device: string}) => loc.device === userDevice);
+  
   // New user
+  if (newUser) {
+    if (isValidAddress(identifier as string)) {
+      user.address = identifier as string;
+    } else {
+      user.ens = identifier as string;
+    }
+  }
+
+  // Prompt for install location if it doesn't exist on device
   if (!existingInstallLocation) {
     const answer = await inquirer.prompt({
       type: "input",

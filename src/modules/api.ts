@@ -36,7 +36,7 @@ export const getUser = async (identifier: string) => {
 /**
  * Create User
  */
-export const upsertUser = async (userData: { address: string, ens?: string, deviceInstallLocation: { [device: string]: string } }) => {
+export const upsertUser = async (userData: { address?: string, ens?: string, deviceInstallLocation: { [device: string]: string } }) => {
   try {
     const response = await fetch(`${API_URL}/user`, {
       method: 'POST',
