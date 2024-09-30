@@ -1,5 +1,11 @@
 # eth-tech-tree
 
+## 0.1.2
+
+### Patch Changes
+
+- 33aad84: updated the new user workflow and added possiblity for same user to run on multiple devices
+
 ## 0.1.1
 
 ### Patch Changes
