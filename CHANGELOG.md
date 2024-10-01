@@ -1,5 +1,11 @@
 # eth-tech-tree
 
+## 0.1.7
+
+### Patch Changes
+
+- d4918a5: increasing the timeout for ncp operation
+
 ## 0.1.6
 
 ### Patch Changes
