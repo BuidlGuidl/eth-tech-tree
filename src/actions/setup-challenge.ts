@@ -14,7 +14,7 @@ const copy = (source: string, destination: string, options?: ncp.Options) => new
         if (err) {
             reject(err);
         } else {
-            setTimeout(resolve, 10);
+            setTimeout(resolve, 100);
         }
     });
 });
