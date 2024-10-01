@@ -1,5 +1,11 @@
 # eth-tech-tree
 
+## 0.1.4
+
+### Patch Changes
+
+- 63fa5ff: added logging to the git commit script
+
 ## 0.1.3
 
 ### Patch Changes
