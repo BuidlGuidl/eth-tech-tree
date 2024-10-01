@@ -1,5 +1,11 @@
 # eth-tech-tree
 
+## 0.1.5
+
+### Patch Changes
+
+- d6f8a29: adjusted forge install script
+
 ## 0.1.4
 
 ### Patch Changes
