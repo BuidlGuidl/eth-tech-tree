@@ -1,5 +1,11 @@
 # eth-tech-tree
 
+## 0.1.6
+
+### Patch Changes
+
+- 673a916: add new reset command
+
 ## 0.1.5
 
 ### Patch Changes
