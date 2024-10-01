@@ -5,8 +5,6 @@ import inquirer from "inquirer";
 import { isValidAddress } from "../utils/helpers";
 import { promptForMissingUserState } from "./prompt-for-missing-user-state";
 
-// End goal it to be able to trigger tasks based on the commands and options sent in.
-// eth-tech-tree setup token-wrapper-weth
 type Commands = {
   setup: SetupCommand;
   submit: SubmitCommand;
