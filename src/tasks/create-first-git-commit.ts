@@ -14,7 +14,7 @@ export async function createFirstGitCommit(targetDir: string) {
 
     errorLog = "Installing forge dependencies";
     // forge install foundry libraries
-    await execa("forge", ["install", ...foundryLibraries, "--no-commit"], { cwd: foundryWorkSpacePath });
+    await execa("forge", ["install", ...foundryLibraries, "--no-git"], { cwd: foundryWorkSpacePath });
 
     errorLog = "git add -A";
     // Add and commit all changes
