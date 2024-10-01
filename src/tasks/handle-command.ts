@@ -1,5 +1,5 @@
 import { CommandOptions } from "./parse-command-arguments-and-options";
-import { setupChallenge, submitChallenge } from "../actions";
+import { removeStorage, setupChallenge, submitChallenge } from "../actions";
 
 export async function handleCommand(commands: CommandOptions) {
     const { command, installLocation, challenge, contractAddress, dev, help } = commands;
@@ -15,6 +15,11 @@ export async function handleCommand(commands: CommandOptions) {
 
     if (command === "submit") {
         await submitChallenge(challenge as string, contractAddress as string);
+    }
+
+    if (command === "reset") {
+        // Delete the storage files
+        removeStorage();
     }
 
 }
