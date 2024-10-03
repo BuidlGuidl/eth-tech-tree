@@ -1,5 +1,11 @@
 # eth-tech-tree
 
+## 0.1.8
+
+### Patch Changes
+
+- 6c317e1: ui improvements
+
 ## 0.1.7
 
 ### Patch Changes
