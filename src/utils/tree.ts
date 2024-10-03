@@ -19,6 +19,7 @@ type TreeNode = {
     type: "header" | "challenge" | "quiz" | "capstone-project";
     completed?: boolean;
     level?: number;
+    unlocked?: boolean;
     actions?: Action[];
     repo?: string;
     message?: string;
@@ -26,14 +27,17 @@ type TreeNode = {
 }
 
 function getNodeLabel(node: TreeNode, depth: string = ""): string {
-    const { label, level, type, completed } = node;
+    const { label, level, type, completed, unlocked } = node;
     const isHeader = type === "header";
     const isChallenge = type === "challenge";
     const isQuiz = type === "quiz";
     const isCapstoneProject = type === "capstone-project";
-  
+
+
     if (isHeader) {
         return `${depth} ${chalk.blue(label)}`;
+    } else if (!unlocked) {
+        return `${depth} ${label} 🔒`;
     } else if (isChallenge) {
         return `${depth} ${label} ${completed ? "🏆" : "🗝️"}`;
     } else if (isQuiz) {
@@ -55,7 +59,12 @@ async function selectNode(node: TreeNode): Promise<void> {
     // download repository - Use create-eth to download repository using extensions
     //  - Show instructions for completing the challenge including a simple command to test their code
     // submit project, check if project passes tests then send proof of completion to the BG server, if it passes, mark the challenge as completed
-    if (node.type === "challenge") {
+    if (node.type !== "header" && !node.unlocked) {
+        console.log("This challenge is locked because it doesn't exist yet... 😅");
+        await pressEnterToContinue();
+        console.clear();
+        await startVisualization(header);
+    } else if (node.type === "challenge") {
         const backAction: Action = {
             label: "⤴️",
             action: async () => { 
@@ -85,7 +94,6 @@ async function selectNode(node: TreeNode): Promise<void> {
 
     // IF: type === personal-challenge
     // Show description of challenge
-    
 
 }
 
@@ -207,10 +215,10 @@ export function buildTree(): TreeNode {
     }, []);
 
     for (let tag of tags) {
-            const filteredChallenges = challenges.filter((challenge: IChallenge) => challenge.tags.includes(tag) && challenge.enabled);
+            const filteredChallenges = challenges.filter((challenge: IChallenge) => challenge.tags.includes(tag));
             let completedCount = 0;
             const transformedChallenges = filteredChallenges.map((challenge: IChallenge) => {
-                const { label, name, level, type, repo, childrenNames} = challenge;
+                const { label, name, level, type, repo, childrenNames, enabled: unlocked } = challenge;
                 const parentName = challenges.find((c: any) => c.childrenNames?.includes(name))?.name;
                 const completed = userChallenges.find((c: IUserChallenge) => c.challengeName === name)?.status === "success";
                 if (completed) {
@@ -285,7 +293,7 @@ export function buildTree(): TreeNode {
                     });
                 }
 
-                return { label, name, level, type, actions, completed, childrenNames, parentName };
+                return { label, name, level, type, actions, completed, childrenNames, parentName, unlocked };
             });
             const NestingChallenges = NestingMagic(transformedChallenges);
             
