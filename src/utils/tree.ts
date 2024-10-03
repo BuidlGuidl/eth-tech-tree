@@ -123,7 +123,8 @@ export async function startVisualization(currentNode?: TreeNode): Promise<void> 
                     depth = depth.replace(/└─/g, "  ");
                 }
                 // Add spaces so that the labels are spaced out
-                depth += Array(Math.floor(node.label.length/2)).fill(" ").join("");
+                const depthDivisor = node.type === "header" ? 5 : 2;
+                depth += Array(Math.floor(node.label.length / depthDivisor)).fill(" ").join("");
             node.children.forEach((child, i, siblings) => getChoicesAndActionsRecursive(child, i === siblings.length - 1, depth));
         };
 
