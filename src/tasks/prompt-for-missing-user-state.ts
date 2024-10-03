@@ -1,19 +1,17 @@
 import { getUser, upsertUser } from "../modules/api";
-import {
-  UserState
-} from "../types";
+import { IUser } from "../types";
 import inquirer from "inquirer";
 import { saveUserState } from "../utils/stateManager";
 import { isValidAddressOrENS, getDevice, checkValidPathOrCreate, isValidAddress } from "../utils/helpers";
 
 // default values for unspecified args
-const defaultOptions: Partial<UserState> = {
+const defaultOptions: Partial<IUser> = {
   installLocation: process.cwd() + '/challenges',
 };
 
 export async function promptForMissingUserState(
-  userState: UserState
-): Promise<UserState> {
+  userState: IUser
+): Promise<IUser> {
   const userDevice = getDevice();
   let identifier = userState.address;
 
@@ -58,9 +56,9 @@ export async function promptForMissingUserState(
     user = await upsertUser(user);
   }
   
-  const { address, ens, installLocations } = user;
+  const { address, ens, installLocations, challenges, creationTimestamp } = user;
   const thisDeviceLocation = installLocations.find((loc: {location: string, device: string}) => loc.device === userDevice);
-  const newState = { address, ens, installLocation: thisDeviceLocation.location };
+  const newState = { address, ens, installLocation: thisDeviceLocation.location, challenges, creationTimestamp };
   if (JSON.stringify(userState) !== JSON.stringify(newState)) {
     // Save the new state locally
     await saveUserState(newState);

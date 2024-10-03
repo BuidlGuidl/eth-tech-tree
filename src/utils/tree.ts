@@ -1,10 +1,11 @@
 import inquirer from "inquirer";
 import chalk from "chalk";
-import { loadChallenges, loadUserState } from "./stateManager";
+import { loadChallenges, loadUserState, saveUserState } from "./stateManager";
 import { testChallenge, submitChallenge, setupChallenge } from "../actions";
-import { IChallenge } from "../types";
+import { IChallenge, IUserChallenge } from "../types";
 import fs from "fs";
 import { pressEnterToContinue } from "./helpers";
+import { getUser } from "../modules/api";
 
 type Action = {
     label: string;
@@ -18,6 +19,7 @@ type TreeNode = {
     type: "header" | "challenge" | "quiz" | "capstone-project";
     completed?: boolean;
     level?: number;
+    unlocked?: boolean;
     actions?: Action[];
     repo?: string;
     message?: string;
@@ -25,20 +27,23 @@ type TreeNode = {
 }
 
 function getNodeLabel(node: TreeNode, depth: string = ""): string {
-    const { label, level, type, completed } = node;
+    const { label, level, type, completed, unlocked } = node;
     const isHeader = type === "header";
     const isChallenge = type === "challenge";
     const isQuiz = type === "quiz";
     const isCapstoneProject = type === "capstone-project";
-  
+
+
     if (isHeader) {
         return `${depth} ${chalk.blue(label)}`;
+    } else if (!unlocked) {
+        return `${depth} ${label} 🔒`;
     } else if (isChallenge) {
-        return `${depth} ${label} ♟️ - LVL ${level}`;
+        return `${depth} ${label} ${completed ? "🏆" : "🗝️"}`;
     } else if (isQuiz) {
-        return `${depth} ${label} 📖 - LVL ${level}`;
+        return `${depth} ${label} 📜`;
     } else if (isCapstoneProject) {
-        return`${depth} ${label} 🏆 - LVL ${level}`;
+        return`${depth} ${label} 💻`;
     } else {
         return `${depth} ${label}`;
     }
@@ -54,9 +59,14 @@ async function selectNode(node: TreeNode): Promise<void> {
     // download repository - Use create-eth to download repository using extensions
     //  - Show instructions for completing the challenge including a simple command to test their code
     // submit project, check if project passes tests then send proof of completion to the BG server, if it passes, mark the challenge as completed
-    if (node.type === "challenge") {
+    if (node.type !== "header" && !node.unlocked) {
+        console.log("This challenge is locked because it doesn't exist yet... 😅");
+        await pressEnterToContinue();
+        console.clear();
+        await startVisualization(header);
+    } else if (node.type === "challenge") {
         const backAction: Action = {
-            label: " ⮢",
+            label: "⤴️",
             action: async () => { 
                 console.clear();
                 await startVisualization(header);
@@ -64,7 +74,6 @@ async function selectNode(node: TreeNode): Promise<void> {
         }
         const actions = [backAction].concat((node.actions as Action[]).map(action => action));
         const choices = actions.map(action => action.label);
-        console.log("This is a challenge");
         const actionPrompt = {
             type: "list",
             name: "selectedAction",
@@ -85,7 +94,6 @@ async function selectNode(node: TreeNode): Promise<void> {
 
     // IF: type === personal-challenge
     // Show description of challenge
-    
 
 }
 
@@ -123,7 +131,8 @@ export async function startVisualization(currentNode?: TreeNode): Promise<void> 
                     depth = depth.replace(/└─/g, "  ");
                 }
                 // Add spaces so that the labels are spaced out
-                depth += Array(Math.floor(node.label.length/2)).fill(" ").join("");
+                const depthDivisor = node.type === "header" ? 5 : 2;
+                depth += Array(Math.floor(node.label.length / depthDivisor)).fill(" ").join("");
             node.children.forEach((child, i, siblings) => getChoicesAndActionsRecursive(child, i === siblings.length - 1, depth));
         };
 
@@ -137,7 +146,7 @@ export async function startVisualization(currentNode?: TreeNode): Promise<void> 
     let defaultChoice = 0;
     // Add a back option if not at the root
     if (parent) {
-        choices.unshift(" ⮢");
+        choices.unshift(" ⤴️");
         actions.unshift(parent);
         defaultChoice = 1;
     }
@@ -145,7 +154,7 @@ export async function startVisualization(currentNode?: TreeNode): Promise<void> 
         type: "list",
         loop: false,
         name: "selectedNodeIndex",
-        message: "Select an option",
+        message: parent ? "Select a challenge" : "Select a category",
         choices,
         default: defaultChoice
     };
@@ -197,18 +206,24 @@ function NestingMagic(challenges: any[], parentName: string | undefined = undefi
 }
 
 export function buildTree(): TreeNode {
-    const { installLocation } = loadUserState();
+    const userState = loadUserState();
+    const { address, installLocation, challenges: userChallenges } = userState;
     const tree: TreeNode[] = [];
     const challenges = loadChallenges();
     const tags = challenges.reduce((acc: string[], challenge: any) => {
         return Array.from(new Set(acc.concat(challenge.tags)));
     }, []);
-    for (let tag of tags) {
-            const filteredChallenges = challenges.filter((challenge: IChallenge) => challenge.tags.includes(tag) && challenge.enabled);
-            const transformedChallenges = filteredChallenges.map((challenge: IChallenge) => {
-                const { label, name, level, type, repo, childrenNames} = challenge;
-                const parentName = challenges.find((c: any) => c.childrenNames?.includes(name))?.name;
 
+    for (let tag of tags) {
+            const filteredChallenges = challenges.filter((challenge: IChallenge) => challenge.tags.includes(tag));
+            let completedCount = 0;
+            const transformedChallenges = filteredChallenges.map((challenge: IChallenge) => {
+                const { label, name, level, type, repo, childrenNames, enabled: unlocked } = challenge;
+                const parentName = challenges.find((c: any) => c.childrenNames?.includes(name))?.name;
+                const completed = userChallenges.find((c: IUserChallenge) => c.challengeName === name)?.status === "success";
+                if (completed) {
+                    completedCount++;
+                }
                 // Build selection actions
                 const actions: Action[] = [];
                 if (type === "challenge") {
@@ -247,6 +262,11 @@ export function buildTree(): TreeNode {
                                 console.clear();
                                 // Submit the challenge
                                 await submitChallenge(name);
+                                // Fetch users challenge state from the server
+                                const newUserState = await getUser(address);
+                                userState.challenges = newUserState.challenges;
+                                // Save the new user state locally
+                                await saveUserState(userState);
                                 // Rebuild the tree
                                 globalTree = buildTree();
                                 // Wait for enter key
@@ -273,13 +293,13 @@ export function buildTree(): TreeNode {
                     });
                 }
 
-                return { label, name, level, type, actions, childrenNames, parentName };
+                return { label, name, level, type, actions, completed, childrenNames, parentName, unlocked };
             });
             const NestingChallenges = NestingMagic(transformedChallenges);
             
         tree.push({
             type: "header",
-            label: `${tag}`,
+            label: `${tag} ${chalk.green(`(${completedCount}/${filteredChallenges.length})`)}`,
             name: `${tag.toLowerCase()}`,
             children: NestingChallenges,
             recursive: true

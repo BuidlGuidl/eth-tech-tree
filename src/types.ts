@@ -82,12 +82,21 @@ export type TemplateDescriptor = {
   source: string;
 };
 
-export type UserState = {
-  address?: `0x${string}`;
-  installLocation: string;
-  lastCompletedChallenge?: string;
-  lastTreeNode?: string;
+export interface IUserChallenge {
+  challengeName: string
+  status: string;
+  lastFeedback: string;
+  timestamp: Date;
+  contractAddress: string;
+  network: string;
+  gasReport?: IGasReport[];
 }
+
+export interface IGasReport {
+  functionName: string;
+  gasUsed: number;
+}
+
 export interface IChallenge {
   type: string;
   level: number;
@@ -102,22 +111,10 @@ export interface IChallenge {
   description: string;
 }
 
-export interface IUserChallenge {
-  status: string;
-  lastFeedback: string;
-  timestamp: number;
-  contractAddress: string;
-  network: string;
-  gasReport?: {
-    [key: string]: number;
-  };
-}
-
 export interface IUser {
   address: string;
   ens: string;
+  installLocation: string;
   creationTimestamp: number;
-  challenges: {
-    [key: string]: IUserChallenge;
-  };
+  challenges: IUserChallenge[];
 }

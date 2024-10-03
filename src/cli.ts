@@ -1,6 +1,6 @@
 import { promptForMissingUserState } from "./tasks/prompt-for-missing-user-state";
 import { renderIntroMessage } from "./tasks/render-intro-message";
-import type { Args, UserState } from "./types";
+import type { Args, IUser } from "./types";
 import { startVisualization } from "./utils/tree";
 import { loadUserState, saveChallenges } from "./utils/stateManager";
 import { fetchChallenges } from "./modules/api";
@@ -23,7 +23,7 @@ export async function cli(args: Args) {
   }
 }
 
-async function init(userState: UserState) {
+async function init(userState: IUser) {
   // Use local user state or prompt to retrieve user from server
   await promptForMissingUserState(userState);
 
