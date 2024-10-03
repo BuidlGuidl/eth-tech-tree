@@ -35,11 +35,11 @@ function getNodeLabel(node: TreeNode, depth: string = ""): string {
     if (isHeader) {
         return `${depth} ${chalk.blue(label)}`;
     } else if (isChallenge) {
-        return `${depth} ${label} ${completed ? "👑" : "♟️"}`;
+        return `${depth} ${label} ${completed ? "🏆" : "🗝️"}`;
     } else if (isQuiz) {
-        return `${depth} ${label} 📖`;
+        return `${depth} ${label} 📜`;
     } else if (isCapstoneProject) {
-        return`${depth} ${label} 🏆`;
+        return`${depth} ${label} 💻`;
     } else {
         return `${depth} ${label}`;
     }
