@@ -1,10 +1,11 @@
 import inquirer from "inquirer";
 import chalk from "chalk";
-import { loadChallenges, loadUserState } from "./stateManager";
+import { loadChallenges, loadUserState, saveUserState } from "./stateManager";
 import { testChallenge, submitChallenge, setupChallenge } from "../actions";
 import { IChallenge, IUserChallenge } from "../types";
 import fs from "fs";
 import { pressEnterToContinue } from "./helpers";
+import { getUser } from "../modules/api";
 
 type Action = {
     label: string;
@@ -196,11 +197,10 @@ function NestingMagic(challenges: any[], parentName: string | undefined = undefi
 }
 
 export function buildTree(): TreeNode {
-    const { installLocation } = loadUserState();
+    const userState = loadUserState();
+    const { address, installLocation, challenges: userChallenges } = userState;
     const tree: TreeNode[] = [];
     const challenges = loadChallenges();
-    const userState = loadUserState();
-    const userChallenges = userState.challenges;
     const tags = challenges.reduce((acc: string[], challenge: any) => {
         return Array.from(new Set(acc.concat(challenge.tags)));
     }, []);
@@ -253,6 +253,11 @@ export function buildTree(): TreeNode {
                                 console.clear();
                                 // Submit the challenge
                                 await submitChallenge(name);
+                                // Fetch users challenge state from the server
+                                const newUserState = await getUser(address);
+                                userState.challenges = newUserState.challenges;
+                                // Save the new user state locally
+                                await saveUserState(userState);
                                 // Rebuild the tree
                                 globalTree = buildTree();
                                 // Wait for enter key
