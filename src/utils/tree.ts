@@ -2,7 +2,7 @@ import inquirer from "inquirer";
 import chalk from "chalk";
 import { loadChallenges, loadUserState } from "./stateManager";
 import { testChallenge, submitChallenge, setupChallenge } from "../actions";
-import { IChallenge } from "../types";
+import { IChallenge, IUserChallenge } from "../types";
 import fs from "fs";
 import { pressEnterToContinue } from "./helpers";
 
@@ -34,11 +34,11 @@ function getNodeLabel(node: TreeNode, depth: string = ""): string {
     if (isHeader) {
         return `${depth} ${chalk.blue(label)}`;
     } else if (isChallenge) {
-        return `${depth} ${label} ♟️ - LVL ${level}`;
+        return `${depth} ${label} ${completed ? "👑" : "♟️"}`;
     } else if (isQuiz) {
-        return `${depth} ${label} 📖 - LVL ${level}`;
+        return `${depth} ${label} 📖`;
     } else if (isCapstoneProject) {
-        return`${depth} ${label} 🏆 - LVL ${level}`;
+        return`${depth} ${label} 🏆`;
     } else {
         return `${depth} ${label}`;
     }
@@ -56,7 +56,7 @@ async function selectNode(node: TreeNode): Promise<void> {
     // submit project, check if project passes tests then send proof of completion to the BG server, if it passes, mark the challenge as completed
     if (node.type === "challenge") {
         const backAction: Action = {
-            label: " ⮢",
+            label: "⤴️",
             action: async () => { 
                 console.clear();
                 await startVisualization(header);
@@ -64,7 +64,6 @@ async function selectNode(node: TreeNode): Promise<void> {
         }
         const actions = [backAction].concat((node.actions as Action[]).map(action => action));
         const choices = actions.map(action => action.label);
-        console.log("This is a challenge");
         const actionPrompt = {
             type: "list",
             name: "selectedAction",
@@ -137,7 +136,7 @@ export async function startVisualization(currentNode?: TreeNode): Promise<void> 
     let defaultChoice = 0;
     // Add a back option if not at the root
     if (parent) {
-        choices.unshift(" ⮢");
+        choices.unshift(" ⤴️");
         actions.unshift(parent);
         defaultChoice = 1;
     }
@@ -200,15 +199,22 @@ export function buildTree(): TreeNode {
     const { installLocation } = loadUserState();
     const tree: TreeNode[] = [];
     const challenges = loadChallenges();
+    const userState = loadUserState();
+    const userChallenges = userState.challenges;
     const tags = challenges.reduce((acc: string[], challenge: any) => {
         return Array.from(new Set(acc.concat(challenge.tags)));
     }, []);
+
     for (let tag of tags) {
             const filteredChallenges = challenges.filter((challenge: IChallenge) => challenge.tags.includes(tag) && challenge.enabled);
+            let completedCount = 0;
             const transformedChallenges = filteredChallenges.map((challenge: IChallenge) => {
                 const { label, name, level, type, repo, childrenNames} = challenge;
                 const parentName = challenges.find((c: any) => c.childrenNames?.includes(name))?.name;
-
+                const completed = userChallenges.find((c: IUserChallenge) => c.challengeName === name)?.status === "success";
+                if (completed) {
+                    completedCount++;
+                }
                 // Build selection actions
                 const actions: Action[] = [];
                 if (type === "challenge") {
@@ -273,13 +279,13 @@ export function buildTree(): TreeNode {
                     });
                 }
 
-                return { label, name, level, type, actions, childrenNames, parentName };
+                return { label, name, level, type, actions, completed, childrenNames, parentName };
             });
             const NestingChallenges = NestingMagic(transformedChallenges);
             
         tree.push({
             type: "header",
-            label: `${tag}`,
+            label: `${tag} ${chalk.green(`(${completedCount}/${filteredChallenges.length})`)}`,
             name: `${tag.toLowerCase()}`,
             children: NestingChallenges,
             recursive: true

@@ -1,5 +1,5 @@
 import arg from "arg";
-import { UserState } from "../types";
+import { IUser } from "../types";
 import fs from "fs";
 import inquirer from "inquirer";
 import { isValidAddress } from "../utils/helpers";
@@ -75,7 +75,7 @@ export async function parseCommandArgumentsAndOptions(
     return argumentObject as CommandOptions;
 }
 
-export async function promptForMissingCommandArgs(commands: CommandOptions, userState: UserState): Promise<CommandOptions> {
+export async function promptForMissingCommandArgs(commands: CommandOptions, userState: IUser): Promise<CommandOptions> {
   const cliAnswers = Object.fromEntries(
     Object.entries(commands).filter(([key, value]) => value !== null)
   );
