@@ -145,7 +145,7 @@ export async function startVisualization(currentNode?: TreeNode): Promise<void> 
         type: "list",
         loop: false,
         name: "selectedNodeIndex",
-        message: "Select an option",
+        message: parent ? "Select a challenge" : "Select a category",
         choices,
         default: defaultChoice
     };
