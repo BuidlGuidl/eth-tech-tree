@@ -7,6 +7,8 @@ import { fetchChallenges } from "../modules/api";
 import { loadChallenges } from "../utils/stateManager";
 import { IChallenge } from "../types";
 import { BASE_REPO, BASE_BRANCH, BASE_COMMIT } from "../config";
+import Listr, { ListrTaskWrapper } from "listr";
+import chalk from "chalk";
 
 // Sidestep for ncp issue https://github.com/AvianFlu/ncp/issues/127
 const copy = (source: string, destination: string, options?: ncp.Options) => new Promise((resolve, reject) => {
@@ -38,7 +40,7 @@ export const setupChallenge = async (name: string, installLocation: string) => {
         console.log("A challenge repository was not found with that name.");
         return;
     }
-    
+
     // Use environment variable as override if provided
     challengeRepo = process.env.CHALLENGE_REPO || challengeRepo;
 
@@ -54,59 +56,48 @@ export const setupChallenge = async (name: string, installLocation: string) => {
         return;
     }
 
-    console.log("Downloading challenge...");
-    // Setup base repository
-    await setupBaseRepo(targetDir);
+    const tasks = new Listr([
+        {
+            title: 'Setting up base repository',
+            task: () => setupBaseRepo(targetDir)
+        },
+        {
+            title: 'Merging challenge files',
+            task: () => mergeChallenge(challengeRepo as string, name, targetDir)
+        },
+        {
+            title: 'Installing dependencies',
+            task: (_, task) => installPackages(targetDir, task)
+        },
+        {
+            title: 'Initializing Git repository',
+            task: () => createFirstGitCommit(targetDir)
+        }
+    ]);
 
-    // Merge challenge files into base repository
-    await mergeChallenge(challengeRepo, name, targetDir);
-
-    // Install dependencies
-    console.log("Installing dependencies...");
-    // Would be better to display loading bar here...
-    const { failed: installFailedFailed } = await execa("yarn", ["install"], { cwd: targetDir });
-    if (installFailedFailed) {
-        console.log("Failed to install dependencies.");
-        return;
+    try {
+        await tasks.run();
+        console.log(chalk.green("Challenge setup completed successfully."));
+        console.log("");
+        console.log(chalk.cyan(`Now open this repository in your favorite code editor and look at the readme for instructions: ${targetDir}`));
+    } catch (error) {
+        console.error(chalk.red("An error occurred during challenge setup:"), error);
     }
-    await createFirstGitCommit(targetDir);
-    console.log("Dependencies installed successfully.");
-    console.log("");
-    console.log(`Now open this repository in your favorite code editor and look at the readme for instructions: ${targetDir}`);
 }
 
-const setupBaseRepo = async (targetDir: string) => {
-    // Clone base repository
-    const { failed: cloneFailed } = await execa("git", ["clone", "--branch", BASE_BRANCH, "--single-branch", BASE_REPO, targetDir]);
-    if (cloneFailed) {
-        console.log("Failed to clone base repository.");
-        return;
-    }
-    // Checkout specific commit
-    const { failed: checkoutFailed } = await execa("git", ["checkout", BASE_COMMIT], { cwd: targetDir });
-    if (checkoutFailed) {
-        console.log("Failed to checkout commit.");
-        return;
-    }
-    // Remove any files that are not needed
+const setupBaseRepo = async (targetDir: string): Promise<void> => {
+    await execa("git", ["clone", "--branch", BASE_BRANCH, "--single-branch", BASE_REPO, targetDir]);
+    await execa("git", ["checkout", BASE_COMMIT], { cwd: targetDir });
     for (const file of filesToRemove) {
         await execa("rm", [path.join(targetDir, file)]);
     }
 }
 
-const mergeChallenge = async (challengeRepo: string, name: string, targetDir: string) => {
-    // Copy challenge files to temporary directory
+const mergeChallenge = async (challengeRepo: string, name: string, targetDir: string): Promise<void> => {
     const tempDir = path.join("temp_" + Math.random().toString(36).substring(2));
-    const { failed: copyFailed } = await execa("git", ["clone", "--branch", name, "--single-branch", challengeRepo, tempDir]);
-    if (copyFailed) {
-        console.log("Failed to copy challenge repository.");
-        return;
-    }
-    // Merge challenge files
+    await execa("git", ["clone", "--branch", name, "--single-branch", challengeRepo, tempDir]);
     await copy(tempDir, targetDir);
-    // Delete temporary directory
     await execa("rm", ["-rf", tempDir]);
-    // Fill in README
     const readmePath = path.join(targetDir, "README.md");
     const readmeContent = fs.readFileSync(readmePath, "utf8");
     const modifiedReadme = readmeContent
@@ -114,6 +105,51 @@ const mergeChallenge = async (challengeRepo: string, name: string, targetDir: st
         .replace("@@BOTTOM_CONTENT@@", README_CONTENT.BOTTOM_CONTENT);
     fs.writeFileSync(readmePath, modifiedReadme);
 }
+
+const installPackages = async (targetDir: string, task: ListrTaskWrapper<any>): Promise<void> => {
+    const execute = execa("yarn", ["install"], { cwd: targetDir });
+    let outputBuffer: string = "";
+
+    const chunkSize = 1024;
+    execute?.stdout?.on("data", (data: Buffer) => {
+        outputBuffer += data.toString();
+
+        if (outputBuffer.length > chunkSize) {
+            outputBuffer = outputBuffer.slice(-1 * chunkSize);
+        }
+
+        const visibleOutput =
+            outputBuffer
+                .match(new RegExp(`.{1,${chunkSize}}`, "g"))
+                ?.slice(-1)
+                .map(chunk => chunk.trimEnd() + "\n")
+                .join("") ?? outputBuffer;
+
+        task.output = visibleOutput;
+        if (visibleOutput.includes("Link step")) {
+            task.output = chalk.yellow(`starting link step, this might take a little time...`);
+        }
+    });
+
+    execute?.stderr?.on("data", (data: Buffer) => {
+        outputBuffer += data.toString();
+
+        if (outputBuffer.length > chunkSize) {
+            outputBuffer = outputBuffer.slice(-1 * chunkSize);
+        }
+
+        const visibleOutput =
+            outputBuffer
+                .match(new RegExp(`.{1,${chunkSize}}`, "g"))
+                ?.slice(-1)
+                .map(chunk => chunk.trimEnd() + "\n")
+                .join("") ?? outputBuffer;
+
+        task.output = visibleOutput;
+    });
+
+    await execute;
+};
 
 const README_CONTENT = {
     TOP_CONTENT: `## Contents
