@@ -1,5 +1,11 @@
 # eth-tech-tree
 
+## 0.1.9
+
+### Patch Changes
+
+- 49d1dc2: added better feedback during challenge setup
+
 ## 0.1.8
 
 ### Patch Changes
