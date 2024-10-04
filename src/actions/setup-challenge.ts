@@ -7,7 +7,7 @@ import { fetchChallenges } from "../modules/api";
 import { loadChallenges } from "../utils/stateManager";
 import { IChallenge } from "../types";
 import { BASE_REPO, BASE_BRANCH, BASE_COMMIT } from "../config";
-import Listr, { ListrTaskWrapper } from "listr";
+import { DefaultRenderer, Listr, ListrTaskWrapper, SimpleRenderer } from "listr2";
 import chalk from "chalk";
 
 // Sidestep for ncp issue https://github.com/AvianFlu/ncp/issues/127
@@ -67,7 +67,11 @@ export const setupChallenge = async (name: string, installLocation: string) => {
         },
         {
             title: 'Installing dependencies',
-            task: (_, task) => installPackages(targetDir, task)
+            task: (_, task) => installPackages(targetDir, task),
+            rendererOptions: {
+                outputBar: 8,
+                persistentOutput: false,
+            },
         },
         {
             title: 'Initializing Git repository',
@@ -106,7 +110,7 @@ const mergeChallenge = async (challengeRepo: string, name: string, targetDir: st
     fs.writeFileSync(readmePath, modifiedReadme);
 }
 
-const installPackages = async (targetDir: string, task: ListrTaskWrapper<any>): Promise<void> => {
+const installPackages = async (targetDir: string, task: ListrTaskWrapper<any, typeof DefaultRenderer, typeof SimpleRenderer>): Promise<void> => {
     const execute = execa("yarn", ["install"], { cwd: targetDir });
     let outputBuffer: string = "";
 
