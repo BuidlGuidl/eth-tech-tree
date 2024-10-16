@@ -2,7 +2,7 @@ import inquirer from "inquirer";
 import chalk from "chalk";
 import { loadChallenges, loadUserState, saveUserState } from "./stateManager";
 import { testChallenge, submitChallenge, setupChallenge } from "../actions";
-import { IChallenge, IUserChallenge } from "../types";
+import { IChallenge, IUser, IUserChallenge } from "../types";
 import fs from "fs";
 import { pressEnterToContinue } from "./helpers";
 import { getUser } from "../modules/api";
@@ -74,10 +74,13 @@ async function selectNode(node: TreeNode): Promise<void> {
         }
         const actions = [backAction].concat((node.actions as Action[]).map(action => action));
         const choices = actions.map(action => action.label);
+        const message = `${chalk.red(node.label)}
+${node.message}
+`;
         const actionPrompt = {
             type: "list",
             name: "selectedAction",
-            message: "What would you like to do?",
+            message,
             choices,
             default: 1
         };
@@ -193,12 +196,12 @@ function findHeader(allNodes: TreeNode, targetNode: TreeNode): TreeNode | undefi
 }
 
 // Nesting Magic - Recursive function to build nested tree structure
-function NestingMagic(challenges: any[], parentName: string | undefined = undefined): TreeNode[] {
+function nestingMagic(challenges: any[], parentName: string | undefined = undefined): TreeNode[] {
     const tree: TreeNode[] = [];
     for (let challenge of challenges) {
         if (challenge.parentName === parentName) {
             // Recursively call NestingMagic for each child
-            challenge.children = NestingMagic(challenges, challenge.name);
+            challenge.children = nestingMagic(challenges, challenge.name);
             tree.push(challenge);
         }
     }
@@ -207,7 +210,7 @@ function NestingMagic(challenges: any[], parentName: string | undefined = undefi
 
 export function buildTree(): TreeNode {
     const userState = loadUserState();
-    const { address, installLocation, challenges: userChallenges } = userState;
+    const { challenges: userChallenges } = userState;
     const tree: TreeNode[] = [];
     const challenges = loadChallenges();
     const tags = challenges.reduce((acc: string[], challenge: any) => {
@@ -218,90 +221,24 @@ export function buildTree(): TreeNode {
             const filteredChallenges = challenges.filter((challenge: IChallenge) => challenge.tags.includes(tag));
             let completedCount = 0;
             const transformedChallenges = filteredChallenges.map((challenge: IChallenge) => {
-                const { label, name, level, type, repo, childrenNames, enabled: unlocked } = challenge;
+                const { label, name, level, type, childrenNames, enabled: unlocked, description } = challenge;
                 const parentName = challenges.find((c: any) => c.childrenNames?.includes(name))?.name;
                 const completed = userChallenges.find((c: IUserChallenge) => c.challengeName === name)?.status === "success";
                 if (completed) {
                     completedCount++;
                 }
                 // Build selection actions
-                const actions: Action[] = [];
-                if (type === "challenge") {
-                    const targetDir = `${installLocation}/${name}`;
-                    if (!fs.existsSync(targetDir)) {
-                        actions.push({
-                            label: "Setup Challenge Repository",
-                            action: async () => {
-                                console.clear();
-                                await setupChallenge(name, installLocation);
-                                // Rebuild the tree
-                                globalTree = buildTree();
-                                // Wait for enter key
-                                await pressEnterToContinue();
-                                // Return to challenge menu
-                                const challengeNode = findNode(globalTree, name) as TreeNode;
-                                await selectNode(challengeNode);
-                            }
-                        });
-                    } else {
-                        actions.push({
-                            label: "Test Challenge",
-                            action: async () => {
-                                console.clear();
-                                await testChallenge(name);
-                                // Wait for enter key
-                                await pressEnterToContinue();
-                                // Return to challenge menu
-                                const challengeNode = findNode(globalTree, name) as TreeNode;
-                                await selectNode(challengeNode);
-                            }
-                        });
-                        actions.push({
-                            label: "Submit Completed Challenge",
-                            action: async () => {
-                                console.clear();
-                                // Submit the challenge
-                                await submitChallenge(name);
-                                // Fetch users challenge state from the server
-                                const newUserState = await getUser(address);
-                                userState.challenges = newUserState.challenges;
-                                // Save the new user state locally
-                                await saveUserState(userState);
-                                // Rebuild the tree
-                                globalTree = buildTree();
-                                // Wait for enter key
-                                await pressEnterToContinue();
-                                // Return to challenge menu
-                                const challengeNode = findNode(globalTree, name) as TreeNode;
-                                await selectNode(challengeNode);
-                            }
-                        });
-                    }                    
-                } else if (type === "quiz") {
-                    actions.push({
-                        label: "Mark as Read",
-                        action: async () => {
-                            console.log("Marking as read...");
-                        }
-                    });
-                } else if (type === "capstone-project") {
-                    actions.push({
-                        label: "Submit Project",
-                        action: async () => {
-                            console.log("Submitting project...");
-                        }
-                    });
-                }
+                const actions: Action[] = getActions(userState, challenge);
 
-                return { label, name, level, type, actions, completed, childrenNames, parentName, unlocked };
+                return { label, name, level, type, actions, completed, childrenNames, parentName, unlocked, message: description };
             });
-            const NestingChallenges = NestingMagic(transformedChallenges);
+            const nestedChallenges = nestingMagic(transformedChallenges);
             
         tree.push({
             type: "header",
             label: `${tag} ${chalk.green(`(${completedCount}/${filteredChallenges.length})`)}`,
             name: `${tag.toLowerCase()}`,
-            children: NestingChallenges,
+            children: nestedChallenges,
             recursive: true
         });
     }
@@ -316,6 +253,79 @@ export function buildTree(): TreeNode {
     
     return mainMenu;
 }
+
+function getActions(userState: IUser, challenge: IChallenge): Action[] {
+    const actions: Action[] = [];
+    const { address, installLocation } = userState;
+    const { type, name } = challenge;
+    if (type === "challenge") {
+        const targetDir = `${installLocation}/${name}`;
+        if (!fs.existsSync(targetDir)) {
+            actions.push({
+                label: "Setup Challenge Repository",
+                action: async () => {
+                    console.clear();
+                    await setupChallenge(name, installLocation);
+                    // Rebuild the tree
+                    globalTree = buildTree();
+                    // Wait for enter key
+                    await pressEnterToContinue();
+                    // Return to challenge menu
+                    const challengeNode = findNode(globalTree, name) as TreeNode;
+                    await selectNode(challengeNode);
+                }
+            });
+        } else {
+            actions.push({
+                label: "Test Challenge",
+                action: async () => {
+                    console.clear();
+                    await testChallenge(name);
+                    // Wait for enter key
+                    await pressEnterToContinue();
+                    // Return to challenge menu
+                    const challengeNode = findNode(globalTree, name) as TreeNode;
+                    await selectNode(challengeNode);
+                }
+            });
+            actions.push({
+                label: "Submit Completed Challenge",
+                action: async () => {
+                    console.clear();
+                    // Submit the challenge
+                    await submitChallenge(name);
+                    // Fetch users challenge state from the server
+                    const newUserState = await getUser(address);
+                    userState.challenges = newUserState.challenges;
+                    // Save the new user state locally
+                    await saveUserState(userState);
+                    // Rebuild the tree
+                    globalTree = buildTree();
+                    // Wait for enter key
+                    await pressEnterToContinue();
+                    // Return to challenge menu
+                    const challengeNode = findNode(globalTree, name) as TreeNode;
+                    await selectNode(challengeNode);
+                }
+            });
+        }                    
+    } else if (type === "quiz") {
+        actions.push({
+            label: "Mark as Read",
+            action: async () => {
+                console.log("Marking as read...");
+            }
+        });
+    } else if (type === "capstone-project") {
+        actions.push({
+            label: "Submit Project",
+            action: async () => {
+                console.log("Submitting project...");
+            }
+        });
+    }
+    return actions;
+};
 
 function findNode(globalTree: TreeNode, name: string): TreeNode | undefined {
     // Descend the tree until the node is found
