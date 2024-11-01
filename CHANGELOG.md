@@ -1,5 +1,11 @@
 # eth-tech-tree
 
+## 0.1.10
+
+### Patch Changes
+
+- 4ca3d09: Readme adjustments, Challenge formats revised
+
 ## 0.1.9
 
 ### Patch Changes
