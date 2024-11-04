@@ -1,5 +1,11 @@
 # eth-tech-tree
 
+## 0.1.11
+
+### Patch Changes
+
+- 60c2f42: sort challenges, grey out challenges that don't exist, other styling changes
+
 ## 0.1.10
 
 ### Patch Changes
