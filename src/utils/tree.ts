@@ -37,9 +37,9 @@ function getNodeLabel(node: TreeNode, depth: string = ""): string {
     if (isHeader) {
         return `${depth} ${chalk.blue(label)}`;
     } else if (!unlocked) {
-        return `${depth} ${label} 🔒`;
+        return `${depth} ${chalk.dim(label)}`;
     } else if (isChallenge) {
-        return `${depth} ${label} ${completed ? "🏆" : "🗝️"}`;
+        return `${depth} ${label} ${completed ? "🏆" : ""}`;
     } else if (isQuiz) {
         return `${depth} ${label} 📜`;
     } else if (isCapstoneProject) {
@@ -60,7 +60,7 @@ async function selectNode(node: TreeNode): Promise<void> {
     //  - Show instructions for completing the challenge including a simple command to test their code
     // submit project, check if project passes tests then send proof of completion to the BG server, if it passes, mark the challenge as completed
     if (node.type !== "header" && !node.unlocked) {
-        console.log("This challenge is locked because it doesn't exist yet... 😅");
+        console.log("This challenge doesn't exist yet. 🤔 Consider contributing to the project here: https://github.com/BuidlGuidl/eth-tech-tree-challenges");
         await pressEnterToContinue();
         console.clear();
         await startVisualization(header);
@@ -233,12 +233,14 @@ export function buildTree(): TreeNode {
                 return { label, name, level, type, actions, completed, childrenNames, parentName, unlocked, message: description };
             });
             const nestedChallenges = nestingMagic(transformedChallenges);
+
+            const sortedByUnlocked = nestedChallenges.sort((a: TreeNode, b: TreeNode) => {return a.unlocked ? -1 : 1});
             
         tree.push({
             type: "header",
             label: `${tag} ${chalk.green(`(${completedCount}/${filteredChallenges.length})`)}`,
             name: `${tag.toLowerCase()}`,
-            children: nestedChallenges,
+            children: sortedByUnlocked,
             recursive: true
         });
     }
