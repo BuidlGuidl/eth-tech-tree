@@ -6,7 +6,19 @@ Run the following command to use the NPM package
 ```bash
        npx eth-tech-tree
 ```
-The CLI visualizes several categories which contain challenges. Navigate with your arrow keys and hit enter to view options for a challenge. Follow the instructions in your CLI to complete challenges and fill out your Ethereum development tech tree.
+The CLI visualizes several categories which contain challenges. Navigate with your arrow keys and hit enter to view the challenge description and see options. Follow the instructions in your CLI to complete challenges and fill out your Ethereum development tech tree.
+
+You can also run individual commands without the tree visualization.
+
+Set up a challenge:
+```bash
+       npx eth-tech-tree setup CHALLENGE_NAME INSTALL_LOCATION
+```
+
+Submit a challenge:
+```bash
+       npx eth-tech-tree submit CHALLENGE_NAME CONTRACT_ADDRESS
+```
 
 ## Development
 Clone and `cd` into the repo then run this CLI application with the following commands
