@@ -1,4 +1,5 @@
 import { execa } from "execa";
+import semver, { Range } from 'semver';
 import ncp from "ncp";
 import path from "path";
 import fs from "fs";
@@ -9,6 +10,8 @@ import { IChallenge } from "../types";
 import { BASE_REPO, BASE_BRANCH, BASE_COMMIT } from "../config";
 import { DefaultRenderer, Listr, ListrTaskWrapper, SimpleRenderer } from "listr2";
 import chalk from "chalk";
+
+type RequiredSoftware = "node" | "git" | "yarn" | "foundryup";
 
 // Sidestep for ncp issue https://github.com/AvianFlu/ncp/issues/127
 const copy = (source: string, destination: string, options?: ncp.Options) => new Promise((resolve, reject) => {
@@ -87,6 +90,34 @@ export const setupChallenge = async (name: string, installLocation: string) => {
     } catch (error) {
         console.error(chalk.red("An error occurred during challenge setup:"), error);
     }
+}
+
+const checkDependencyInstalled = async (name: RequiredSoftware) => {
+    try {
+        await execa(name, ["--help"]);
+    } catch(_) {
+        throw new Error(`${name} is required. Please install to continue.`);
+    }
+}
+
+const checkDependencyVersion = async (name: RequiredSoftware, requiredVersion: string | Range) => {
+    try {
+        const userVersion = (await execa(name, ["--version"])).stdout;
+        if (!semver.satisfies(userVersion, requiredVersion)) {
+            throw new Error(`${name} version requirement of ${requiredVersion} not met. Please update to continue.`);
+        }
+    } catch(_) {
+        throw new Error(`${name} ${requiredVersion} is required. Please install to continue.`);
+    }
+}
+
+export const checkUserDependencies = async () => {
+    await Promise.all([
+        checkDependencyVersion("node", ">=18.17.0"),
+        checkDependencyInstalled("git"),
+        checkDependencyInstalled("yarn"),
+        checkDependencyInstalled("foundryup"),
+    ])
 }
 
 const setupBaseRepo = async (targetDir: string): Promise<void> => {
