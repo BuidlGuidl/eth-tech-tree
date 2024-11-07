@@ -91,8 +91,8 @@ export const setupChallenge = async (name: string, installLocation: string) => {
         console.log(chalk.green("Challenge setup completed successfully."));
         console.log("");
         console.log(chalk.cyan(`Now open this repository in your favorite code editor and look at the readme for instructions: ${targetDir}`));
-    } catch (error) {
-        console.error(chalk.red("An error occurred during challenge setup:"), error);
+    } catch (error: any) {
+        console.error(chalk.red("An error occurred during challenge setup:"), error.message);
     }
 }
 
