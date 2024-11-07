@@ -11,7 +11,7 @@ import { BASE_REPO, BASE_BRANCH, BASE_COMMIT } from "../config";
 import { DefaultRenderer, Listr, ListrTaskWrapper, SimpleRenderer } from "listr2";
 import chalk from "chalk";
 
-type RequiredSoftware = "node" | "git" | "yarn" | "foundryup";
+type RequiredDependency = "node" | "git" | "yarn" | "foundryup";
 
 // Sidestep for ncp issue https://github.com/AvianFlu/ncp/issues/127
 const copy = (source: string, destination: string, options?: ncp.Options) => new Promise((resolve, reject) => {
@@ -61,6 +61,10 @@ export const setupChallenge = async (name: string, installLocation: string) => {
 
     const tasks = new Listr([
         {
+            title: 'Checking for required dependencies',
+            task: () => checkUserDependencies()
+        },
+        {
             title: 'Setting up base repository',
             task: () => setupBaseRepo(targetDir)
         },
@@ -92,7 +96,7 @@ export const setupChallenge = async (name: string, installLocation: string) => {
     }
 }
 
-const checkDependencyInstalled = async (name: RequiredSoftware) => {
+const checkDependencyInstalled = async (name: RequiredDependency) => {
     try {
         await execa(name, ["--help"]);
     } catch(_) {
@@ -100,7 +104,7 @@ const checkDependencyInstalled = async (name: RequiredSoftware) => {
     }
 }
 
-const checkDependencyVersion = async (name: RequiredSoftware, requiredVersion: string | Range) => {
+const checkDependencyVersion = async (name: RequiredDependency, requiredVersion: string | Range) => {
     try {
         const userVersion = (await execa(name, ["--version"])).stdout;
         if (!semver.satisfies(userVersion, requiredVersion)) {
