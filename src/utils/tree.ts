@@ -18,6 +18,7 @@ type TreeNode = {
     children: TreeNode[];
     type: "header" | "challenge" | "quiz" | "capstone-project";
     completed?: boolean;
+    installed?: boolean;
     level?: number;
     unlocked?: boolean;
     actions?: Action[];
@@ -37,7 +38,7 @@ function getNodeLabel(node: TreeNode, depth: string = ""): string {
     if (isHeader) {
         return `${depth} ${chalk.blue(label)}`;
     } else if (!unlocked) {
-        return `${depth} ${chalk.dim(label)}`;
+        return `${depth} ${chalk.dim(chalk.dim(label))}`;
     } else if (isChallenge) {
         return `${depth} ${label} ${completed ? "🏆" : ""}`;
     } else if (isQuiz) {
@@ -74,8 +75,15 @@ async function selectNode(node: TreeNode): Promise<void> {
         }
         const actions = [backAction].concat((node.actions as Action[]).map(action => action));
         const choices = actions.map(action => action.label);
+        const { installLocation } = loadUserState();
         const message = `${chalk.red(node.label)}
 ${node.message}
+${node.completed ? `
+🏆 Challenge Completed` : node.installed ? `
+Open up the challenge in your favorite code editor and follow the instructions in the README:
+
+📂 Challenge Location: ${installLocation}/${node.name}` : ""}
+
 `;
         const actionPrompt = {
             type: "list",
@@ -218,7 +226,7 @@ export function buildTree(): TreeNode {
     }, []);
 
     for (let tag of tags) {
-            const filteredChallenges = challenges.filter((challenge: IChallenge) => challenge.tags.includes(tag));
+            const filteredChallenges = challenges.filter((challenge: IChallenge) => challenge.tags.includes(tag) /*&& challenge.enabled*/);
             let completedCount = 0;
             const transformedChallenges = filteredChallenges.map((challenge: IChallenge) => {
                 const { label, name, level, type, childrenNames, enabled: unlocked, description } = challenge;
@@ -230,7 +238,7 @@ export function buildTree(): TreeNode {
                 // Build selection actions
                 const actions: Action[] = getActions(userState, challenge);
 
-                return { label, name, level, type, actions, completed, childrenNames, parentName, unlocked, message: description };
+                return { label, name, level, type, actions, completed, installed: challengeIsInstalled(userState, challenge), childrenNames, parentName, unlocked, message: description };
             });
             const nestedChallenges = nestingMagic(transformedChallenges);
 
@@ -256,13 +264,18 @@ export function buildTree(): TreeNode {
     return mainMenu;
 }
 
+function challengeIsInstalled(userState: IUser, challenge: IChallenge): boolean {
+    const { installLocation } = userState;
+    const targetDir = `${installLocation}/${challenge.name}`;
+    return fs.existsSync(targetDir);
+}
+
 function getActions(userState: IUser, challenge: IChallenge): Action[] {
     const actions: Action[] = [];
     const { address, installLocation } = userState;
     const { type, name } = challenge;
     if (type === "challenge") {
-        const targetDir = `${installLocation}/${name}`;
-        if (!fs.existsSync(targetDir)) {
+        if (!challengeIsInstalled(userState, challenge)) {
             actions.push({
                 label: "Setup Challenge Repository",
                 action: async () => {
