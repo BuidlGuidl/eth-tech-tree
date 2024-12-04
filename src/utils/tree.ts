@@ -292,11 +292,15 @@ function getActions(userState: IUser, challenge: IChallenge): Action[] {
             });
         } else {
             actions.push({
-                label: "Test Challenge",
+                label: "Reset Challenge",
                 action: async () => {
                     console.clear();
-                    await testChallenge(name);
-                    // Wait for enter key
+                    const targetDir = `${installLocation}/${name}`;
+                    console.log(`Removing ${targetDir}...`);
+                    fs.rmSync(targetDir, { recursive: true, force: true });
+                    console.log(`Installing fresh copy of challenge...`);
+                    await setupChallenge(name, installLocation);
+                    globalTree = buildTree();
                     await pressEnterToContinue();
                     // Return to challenge menu
                     const challengeNode = findNode(globalTree, name) as TreeNode;
