@@ -32,11 +32,29 @@ export class StdInInterceptor {
 
         // Handle keypress events
         process.stdin.on('keypress', async (str, key) => {
+            if (key.ctrl && key.name === 'c') {
+                this.cleanExit();
+            }
             await this.treeRef.handleKeyPress(key);
         });
 
         // By default, pipe stdin to output stream
         process.stdin.pipe(this.outputStream);
+    }
+
+    private cleanExit(): void {
+        // Clear the screen
+        console.clear();
+        // Move cursor to top
+        process.stdout.cursorTo(0, 0);
+        // Reset terminal
+        process.stdout.write('\x1b[0m');
+        // Show cursor
+        process.stdout.write('\x1B[?25h');
+        // Close streams
+        this.close();
+        // Exit process
+        process.exit(0);
     }
 
     write(data: Buffer): void {
