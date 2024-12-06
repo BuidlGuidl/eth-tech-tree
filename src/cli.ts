@@ -1,11 +1,11 @@
 import { promptForMissingUserState } from "./tasks/prompt-for-missing-user-state";
 import { renderIntroMessage } from "./tasks/render-intro-message";
 import type { Args, IUser } from "./types";
-import { startVisualization } from "./utils/tree";
-import { loadUserState, saveChallenges } from "./utils/stateManager";
+import { loadUserState, saveChallenges } from "./utils/state-manager";
 import { fetchChallenges } from "./modules/api";
 import { parseCommandArgumentsAndOptions, promptForMissingCommandArgs } from "./tasks/parse-command-arguments-and-options";
 import { handleCommand } from "./tasks/handle-command";
+import { TechTree } from ".";
 
 
 
@@ -19,7 +19,8 @@ export async function cli(args: Args) {
     await renderIntroMessage();
     await init(userState);
     // Navigate tree
-    await startVisualization();
+    const techTree = new TechTree();
+    await techTree.start();
   }
 }
 

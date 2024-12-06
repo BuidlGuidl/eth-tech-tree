@@ -42,3 +42,22 @@ export interface IUser {
   creationTimestamp: number;
   challenges: IUserChallenge[];
 }
+
+export type Actions = {
+  [label: string]: () => Promise<any>;
+}
+
+export type TreeNode = {
+  label: string;
+  name: string;
+  children: TreeNode[];
+  type: "header" | "challenge" | "quiz" | "capstone-project";
+  completed?: boolean;
+  installed?: boolean;
+  level?: number;
+  unlocked?: boolean;
+  actions?: Actions;
+  repo?: string;
+  message?: string;
+  recursive?: boolean;
+}

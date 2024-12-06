@@ -1,17 +1,8 @@
-import inquirer from "inquirer";
 import os from "os";
 import fs from "fs";
 
 export function wait(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-export async function pressEnterToContinue(customMessage?: string) {
-    await inquirer.prompt({
-        name: 'continue',
-        type: 'input',
-        message: customMessage || 'Press Enter to continue...',
-      });
 }
 
 export const checkValidPathOrCreate = async (path: string) => {

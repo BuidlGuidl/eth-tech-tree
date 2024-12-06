@@ -1,7 +1,7 @@
 import { getUser, upsertUser } from "../modules/api";
 import { IUser } from "../types";
-import inquirer from "inquirer";
-import { saveUserState } from "../utils/stateManager";
+import { input } from "@inquirer/prompts";
+import { saveUserState } from "../utils/state-manager";
 import { isValidAddressOrENS, getDevice, checkValidPathOrCreate, isValidAddress } from "../utils/helpers";
 
 // default values for unspecified args
@@ -16,14 +16,12 @@ export async function promptForMissingUserState(
   let identifier = userState.address;
 
   if (!userState.address) {
-    const answer = await inquirer.prompt({
-      type: "input",
-      name: "identifier",
+    const answer = await input({
       message: "Your wallet address (or ENS):",
       validate: isValidAddressOrENS,
     });
 
-    identifier = answer.identifier;
+    identifier = answer;
   }
 
   // Fetch the user data from the server - also handles ens resolution
@@ -42,16 +40,14 @@ export async function promptForMissingUserState(
 
   // Prompt for install location if it doesn't exist on device
   if (!existingInstallLocation) {
-    const answer = await inquirer.prompt({
-      type: "input",
-      name: "installLocation",
+    const answer = await input({
       message: "Where would you like to download the challenges?",
       default: defaultOptions.installLocation,
       validate: checkValidPathOrCreate,
     });
 
     // Create (or update) the user with their preferred install location for this device
-    user.location = answer.installLocation;
+    user.location = answer;
     user.device = userDevice;
     user = await upsertUser(user);
   }
