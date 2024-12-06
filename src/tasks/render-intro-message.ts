@@ -4,9 +4,31 @@ import { wait } from "../utils/helpers";
 export async function renderIntroMessage() {
   await checkTerminalSize();
   console.clear();
-  console.log(TITLE_TEXT);
+  const trimmedText = getTrimmedTitleText();
+  console.log(trimmedText);
   await wait(1500);
   console.clear();
+}
+
+function getTrimmedTitleText(): string {
+  const lines = TITLE_TEXT.split('\n');
+  const { rows } = process.stdout;
+  
+  // Account for padding and other UI elements
+  const availableRows = rows;
+  
+  if (availableRows >= lines.length) {
+    return TITLE_TEXT;
+  }
+
+  // Calculate how many lines to remove from top and bottom
+  const linesToRemove = lines.length - availableRows;
+  const removeFromEachEnd = Math.floor(linesToRemove / 2);
+  
+  // Trim equal amounts from top and bottom
+  const trimmedLines = lines.slice(removeFromEachEnd, lines.length - removeFromEachEnd);
+  
+  return trimmedLines.join('\n');
 }
 
 async function checkTerminalSize(): Promise<void> {
