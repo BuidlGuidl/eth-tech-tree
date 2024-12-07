@@ -1,67 +1,82 @@
 import { Transform } from "stream";
 import { select } from "@inquirer/prompts";
-import { IUser, IChallenge, TreeNode } from "../types";
+import { IUser, IChallenge } from "../types";
 import chalk from "chalk";
 
 export class ProgressView {
     private stdIn: Transform;
-    private promptCancel: AbortController | undefined;
-
+    private getPromptCancel: () => AbortController | undefined;
+    private setPromptCancel: (cancel: AbortController) => void;
     constructor(
         private userState: IUser,
         private challenges: IChallenge[],
-        stdIn: Transform
+        stdIn: Transform,
+        getPromptCancel: () => AbortController | undefined,
+        setPromptCancel: (cancel: AbortController) => void
     ) {
-        this.stdIn = stdIn;
+        this.stdIn = new Transform({
+            transform(chunk, encoding, callback) {
+                this.push(chunk);
+                callback();
+            }
+        });
+        process.stdin.pipe(this.stdIn);
+        
+        this.getPromptCancel = getPromptCancel;
+        this.setPromptCancel = setPromptCancel;
     }
 
     async show(): Promise<void> {
-        while (true) {
-            console.clear();
-            this.printStats();
-            
-            const completedChallenges = this.userState.challenges
-                .filter(c => c.status === "success")
-                .map(c => {
-                    const fullChallenge = this.challenges.find(ch => ch.name === c.challengeName);
-                    return {
-                        challenge: fullChallenge,
-                        completion: c
-                    };
-                })
-                .filter(c => c.challenge); // Filter out any challenges that don't exist anymore
-
-            const choices = [
-                ...completedChallenges.map(c => ({
-                    name: chalk.green(`✓ ${c.challenge!.label}`),
-                    value: c.challenge!.name,
-                })),
-                { name: "Return to Main Menu", value: "back" }
-            ];
-
-            this.promptCancel = new AbortController();
-            const selected = await select({
-                message: "Select a challenge to view details",
-                choices,
-                loop: false,
-                theme: {
-                    helpMode: "always" as "never" | "always" | "auto" | undefined,
-                    prefix: ""
-                }
-            }, {
-                input: this.stdIn,
-                signal: this.promptCancel?.signal,
-                
-            });
-
-            if (selected === "back") break;
-
-            // Show challenge completion details
-            const selectedChallenge = completedChallenges.find(c => c.challenge!.name === selected);
-            if (selectedChallenge) {
+        try {
+            while (true) {
                 console.clear();
-                await this.showChallengeDetails(selectedChallenge.challenge!, selectedChallenge.completion);
+                this.printStats();
+                
+                const completedChallenges = this.userState.challenges
+                    .filter(c => c.status === "success")
+                    .map(c => {
+                        const fullChallenge = this.challenges.find(ch => ch.name === c.challengeName);
+                        return {
+                            challenge: fullChallenge,
+                            completion: c
+                        };
+                    })
+                    .filter(c => c.challenge); // Filter out any challenges that don't exist anymore
+
+                const choices = [
+                    ...completedChallenges.map(c => ({
+                        name: chalk.green(`✓ ${c.challenge!.label}`),
+                        value: c.challenge!.name,
+                    })),
+                    { name: "Return to Main Menu", value: "back" }
+                ];
+
+                this.setPromptCancel(new AbortController());
+                const selected = await select({
+                    message: "Select a challenge to view details",
+                    choices,
+                    loop: false,
+                    theme: {
+                        helpMode: "always" as "never" | "always" | "auto" | undefined,
+                        prefix: ""
+                    }
+                }, {
+                    input: this.stdIn,
+                    signal: this.getPromptCancel()?.signal,
+                });
+
+                if (selected === "back") break;
+
+                // Show challenge completion details
+                const selectedChallenge = completedChallenges.find(c => c.challenge!.name === selected);
+                if (selectedChallenge) {
+                    console.clear();
+                    await this.showChallengeDetails(selectedChallenge.challenge!, selectedChallenge.completion);
+                }
             }
+        } finally {
+            process.stdin.unpipe(this.stdIn);
+            this.stdIn.destroy();
         }
     }
 
@@ -130,7 +145,8 @@ export class ProgressView {
                     prefix: ""
                 }
             }, {
-                input: this.stdIn
+                input: this.stdIn,
+                signal: this.getPromptCancel()?.signal,
             });
 
             if (action === "back") break;
@@ -218,7 +234,8 @@ export class ProgressView {
                     prefix: ""
                 }
             }, {
-                input: this.stdIn
+                input: this.stdIn,
+                signal: this.getPromptCancel()?.signal,
             });
 
             if (action === "return") break;

@@ -75,7 +75,7 @@ export class TechTree {
             }
         };
 
-        this.promptCancel = new AbortController();
+        this.setPromptCancel(new AbortController());
         try {
             this.printMenu();
             const selectedActionLabel = await select(directionsPrompt, { input: this.stdIn, signal: this.promptCancel?.signal });
@@ -345,7 +345,7 @@ Open up the challenge in your favorite code editor and follow the instructions i
     }
 
     private printMenu(): void {
-        const menuText = `${chalk.bold("<q> to quit | <Esc> to go back | <P> view progress")}`; 
+        const menuText = `${chalk.bold("<q> to quit | <Esc> to go back | <p> view progress")}`; 
         const width = process.stdout.columns || 80;
         const paddedText = menuText.padEnd(width, ' ');
         
@@ -377,6 +377,9 @@ Open up the challenge in your favorite code editor and follow the instructions i
             // Get out of the event loop so the existing prompt can cancel before starting the next prompt
             setImmediate(async () => {
                 console.clear();
+                // Recreate the stdin interceptor
+                this.stdinInterceptor = new StdInInterceptor(this);
+                this.stdIn = this.stdinInterceptor.outputStream;
                 await this.start();
             });
         } else if (key.name === 'p') {
@@ -387,12 +390,25 @@ Open up the challenge in your favorite code editor and follow the instructions i
                 const progressView = new ProgressView(
                     this.userState,
                     this.challenges,
-                    this.stdIn
+                    this.stdIn,
+                    this.getPromptCancel,
+                    this.setPromptCancel
                 );
                 await progressView.show();
+                // Recreate the stdin interceptor after returning from progress view
+                this.stdinInterceptor = new StdInInterceptor(this);
+                this.stdIn = this.stdinInterceptor.outputStream;
                 await this.start();
             });
         }
+    }
+
+    getPromptCancel(): AbortController | undefined {
+        return this.promptCancel;
+    }
+
+    setPromptCancel(cancel: AbortController): void {
+        this.promptCancel = cancel;
     }
 
     getMaxViewHeight(): number {
