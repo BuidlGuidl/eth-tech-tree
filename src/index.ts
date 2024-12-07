@@ -8,6 +8,7 @@ import { loadChallenges, loadUserState, saveUserState } from "./utils/state-mana
 import { getUser } from "./modules/api";
 import { setupChallenge, submitChallenge } from "./actions";
 import { Key } from "readline";
+import { ProgressView } from "./utils/progress-view";
 
 export class TechTree {
     private stdinInterceptor: StdInInterceptor;
@@ -100,7 +101,7 @@ export class TechTree {
 
     getChallengeMessage(node: TreeNode): string {
         const { installLocation } = this.userState;
-        return `${chalk.red(node.label)}
+        return `${chalk.blue(node.label)}
 ${node.message}
 ${node.completed ? `
 🏆 Challenge Completed` : node.installed ? `
@@ -119,7 +120,7 @@ Open up the challenge in your favorite code editor and follow the instructions i
         }, []);
     
         for (let tag of tags) {
-                const filteredChallenges = this.challenges.filter((challenge: IChallenge) => challenge.tags.includes(tag) /*&& challenge.enabled*/);
+                const filteredChallenges = this.challenges.filter((challenge: IChallenge) => challenge.tags.includes(tag) && challenge.enabled);
                 let completedCount = 0;
                 const transformedChallenges = filteredChallenges.map((challenge: IChallenge) => {
                     const { label, name, level, type, childrenNames, enabled: unlocked, description } = challenge;
@@ -344,10 +345,9 @@ Open up the challenge in your favorite code editor and follow the instructions i
     }
 
     private printMenu(): void {
-        const menuText = "<Esc> to go back"; 
+        const menuText = `${chalk.bold("<q> to quit | <Esc> to go back | <P> view progress")}`; 
         const width = process.stdout.columns || 80;
         const paddedText = menuText.padEnd(width, ' ');
-        const invertedText = '\x1B[7m' + paddedText + '\x1B[0m';
         
         // Save cursor position
         process.stdout.write('\x1B7');
@@ -358,7 +358,7 @@ Open up the challenge in your favorite code editor and follow the instructions i
         // Print at bottom
         process.stdout.moveCursor(0, this.getMaxViewHeight());
         process.stdout.clearLine(0);
-        process.stdout.write(invertedText);
+        process.stdout.write(paddedText);
         
         // Move cursor to line 1 (just below top menu)
         process.stdout.cursorTo(0, 0);
@@ -368,16 +368,30 @@ Open up the challenge in your favorite code editor and follow the instructions i
     }
 
     async handleKeyPress(key: Key) {
-        if (key.name === 'escape' || key.name === 'backspace') {
+        if ((key.ctrl && key.name === 'c') || key.name === 'q') {
+            this.stdinInterceptor.cleanExit();
+        } else if (key.name === 'escape') {
             if (this.promptCancel) {
                 this.promptCancel?.abort();
             }
             // Get out of the event loop so the existing prompt can cancel before starting the next prompt
             setImmediate(async () => {
-                this.clearView();
-                await this.navigate(this.backNode);
+                console.clear();
+                await this.start();
             });
-            
+        } else if (key.name === 'p') {
+            if (this.promptCancel) {
+                this.promptCancel?.abort();
+            }
+            setImmediate(async () => {
+                const progressView = new ProgressView(
+                    this.userState,
+                    this.challenges,
+                    this.stdIn
+                );
+                await progressView.show();
+                await this.start();
+            });
         }
     }
 

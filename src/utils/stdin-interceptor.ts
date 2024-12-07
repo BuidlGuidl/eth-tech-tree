@@ -32,9 +32,6 @@ export class StdInInterceptor {
 
         // Handle keypress events
         process.stdin.on('keypress', async (str, key) => {
-            if (key.ctrl && key.name === 'c') {
-                this.cleanExit();
-            }
             await this.treeRef.handleKeyPress(key);
         });
 
@@ -42,7 +39,7 @@ export class StdInInterceptor {
         process.stdin.pipe(this.outputStream);
     }
 
-    private cleanExit(): void {
+    cleanExit(): void {
         // Clear the screen
         console.clear();
         // Move cursor to top
