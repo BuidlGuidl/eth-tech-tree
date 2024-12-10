@@ -17,7 +17,7 @@ export class TechTree {
     private userState: IUser;
     private challenges: IChallenge[];
     private backNode: TreeNode | undefined;
-    promptCancel: AbortController | undefined;
+    private promptCancel: AbortController[] = [];
 
     constructor() {
         this.stdinInterceptor = new StdInInterceptor(this);
@@ -58,9 +58,10 @@ export class TechTree {
         const headerOrParent = node.type === "challenge" ? header : parent;
         if (headerOrParent) {
             this.backNode = headerOrParent;
-            choices.unshift({ name: " ⤴️", value: headerOrParent.label });
-            actions[headerOrParent.label] = () => this.navigate(headerOrParent);
-            defaultChoice = choices[1].value;
+            // Disabled back button for now
+            // choices.unshift({ name: chalk.bold("←"), value: headerOrParent.label });
+            // actions[headerOrParent.label] = () => this.navigate(headerOrParent);
+            // defaultChoice = choices[1].value;
         }
 
         const directionsPrompt = {
@@ -75,10 +76,9 @@ export class TechTree {
             }
         };
 
-        this.setPromptCancel(new AbortController());
         try {
             this.printMenu();
-            const selectedActionLabel = await select(directionsPrompt, { input: this.stdIn, signal: this.promptCancel?.signal });
+            const selectedActionLabel = await select(directionsPrompt, { input: this.stdIn, signal: this.getPromptCancel()?.signal });
             const selectedAction = actions[selectedActionLabel];
             if (selectedAction) {
                 await selectedAction();
@@ -115,7 +115,7 @@ Open up the challenge in your favorite code editor and follow the instructions i
     buildTree(): TreeNode {
         const userChallenges = this.userState?.challenges || [];
         const tree: TreeNode[] = [];
-        const tags = this.challenges.reduce((acc: string[], challenge: any) => {
+        const tags = this.challenges.reduce((acc: string[], challenge: IChallenge) => {
             return Array.from(new Set(acc.concat(challenge.tags)));
         }, []);
     
@@ -124,7 +124,7 @@ Open up the challenge in your favorite code editor and follow the instructions i
                 let completedCount = 0;
                 const transformedChallenges = filteredChallenges.map((challenge: IChallenge) => {
                     const { label, name, level, type, childrenNames, enabled: unlocked, description } = challenge;
-                    const parentName = this.challenges.find((c: any) => c.childrenNames?.includes(name))?.name;
+                    const parentName = this.challenges.find((c: IChallenge) => c.childrenNames?.includes(name))?.name;
                     const completed = userChallenges.find((c: IUserChallenge) => c.challengeName === name)?.status === "success";
                     if (completed) {
                         completedCount++;
@@ -164,6 +164,7 @@ Open up the challenge in your favorite code editor and follow the instructions i
             if (node.type !== "challenge") {
                 choices.push(...node.children.map(child => ({ name: this.getNodeLabel(child), value: child.label })));
                 for ( const child of node.children ) {
+
                     actions[child.label] = () => this.navigate(child);
                 }
             } else {
@@ -208,17 +209,17 @@ Open up the challenge in your favorite code editor and follow the instructions i
     
     
         if (isHeader) {
-            return `${depth} ${chalk.blue(label)}`;
+            return `${depth}${chalk.blue(label)}`;
         } else if (!unlocked) {
-            return `${depth} ${chalk.dim(chalk.dim(label))}`;
+            return `${depth}${chalk.dim(chalk.dim(label))}`;
         } else if (isChallenge) {
-            return `${depth} ${label} ${completed ? "🏆" : ""}`;
+            return `${depth}${label} ${completed ? "🏆" : ""}`;
         } else if (isQuiz) {
-            return `${depth} ${label} 📜`;
+            return `${depth}${label} 📜`;
         } else if (isCapstoneProject) {
-            return`${depth} ${label} 💻`;
+            return`${depth}${label} 💻`;
         } else {
-            return `${depth} ${label}`;
+            return `${depth}${label}`;
         }
     }
 
@@ -337,6 +338,7 @@ Open up the challenge in your favorite code editor and follow the instructions i
             }
           }, {
             input: this.stdIn,
+            signal: this.getPromptCancel()?.signal
           });
     }
     private clearView(): void {
@@ -370,45 +372,36 @@ Open up the challenge in your favorite code editor and follow the instructions i
     async handleKeyPress(key: Key) {
         if ((key.ctrl && key.name === 'c') || key.name === 'q') {
             this.stdinInterceptor.cleanExit();
-        } else if (key.name === 'escape') {
-            if (this.promptCancel) {
-                this.promptCancel?.abort();
+        } else if (key.name === 'escape' || key.name === 'backspace') {
+            if (this.promptCancel.length) {
+                this.promptCancel.forEach(cancel => cancel.abort());
+                this.promptCancel = [];
             }
             // Get out of the event loop so the existing prompt can cancel before starting the next prompt
             setImmediate(async () => {
                 console.clear();
-                // Recreate the stdin interceptor
-                this.stdinInterceptor = new StdInInterceptor(this);
-                this.stdIn = this.stdinInterceptor.outputStream;
-                await this.start();
+                await this.navigate(this.backNode);
             });
         } else if (key.name === 'p') {
-            if (this.promptCancel) {
-                this.promptCancel?.abort();
+            if (this.promptCancel.length) {
+                this.promptCancel.forEach(cancel => cancel.abort());
+                this.promptCancel = [];
             }
             setImmediate(async () => {
                 const progressView = new ProgressView(
                     this.userState,
                     this.challenges,
                     this.stdIn,
-                    this.getPromptCancel,
-                    this.setPromptCancel
+                    this.getPromptCancel
                 );
                 await progressView.show();
-                // Recreate the stdin interceptor after returning from progress view
-                this.stdinInterceptor = new StdInInterceptor(this);
-                this.stdIn = this.stdinInterceptor.outputStream;
-                await this.start();
             });
         }
     }
 
     getPromptCancel(): AbortController | undefined {
-        return this.promptCancel;
-    }
-
-    setPromptCancel(cancel: AbortController): void {
-        this.promptCancel = cancel;
+        this.promptCancel.push(new AbortController());
+        return this.promptCancel[-1];
     }
 
     getMaxViewHeight(): number {

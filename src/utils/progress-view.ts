@@ -6,13 +6,12 @@ import chalk from "chalk";
 export class ProgressView {
     private stdIn: Transform;
     private getPromptCancel: () => AbortController | undefined;
-    private setPromptCancel: (cancel: AbortController) => void;
+    
     constructor(
         private userState: IUser,
         private challenges: IChallenge[],
         stdIn: Transform,
         getPromptCancel: () => AbortController | undefined,
-        setPromptCancel: (cancel: AbortController) => void
     ) {
         this.stdIn = new Transform({
             transform(chunk, encoding, callback) {
@@ -23,7 +22,6 @@ export class ProgressView {
         process.stdin.pipe(this.stdIn);
         
         this.getPromptCancel = getPromptCancel;
-        this.setPromptCancel = setPromptCancel;
     }
 
     async show(): Promise<void> {
@@ -51,7 +49,6 @@ export class ProgressView {
                     { name: "Return to Main Menu", value: "back" }
                 ];
 
-                this.setPromptCancel(new AbortController());
                 const selected = await select({
                     message: "Select a challenge to view details",
                     choices,
@@ -224,7 +221,7 @@ export class ProgressView {
             if (currentPage < totalPages - 1) {
                 choices.unshift({ name: "Next Page", value: "next" });
             }
-
+            
             const action = await select({
                 message: "Navigation",
                 choices,
