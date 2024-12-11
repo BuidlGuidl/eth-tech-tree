@@ -19,15 +19,6 @@ export class ProgressView {
         const points = this.calculatePoints(completedChallenges);
         const completionRate = (completedChallenges.length / this.challenges.filter(c => c.enabled).length * 100).toFixed(1);
 
-        // Create stats node
-        const statsNode: TreeNode = {
-            type: "header",
-            label: "Progress Stats",
-            name: "stats",
-            children: [], // Stats node doesn't need children
-            message: this.buildStatsMessage(points, completionRate)
-        };
-
         // Create completed challenges node with all completed challenges as children
         const challengeNodes: TreeNode[] = completedChallenges.map(({ challenge, completion }) => {
             const children: TreeNode[] = [];
@@ -46,24 +37,16 @@ export class ProgressView {
             };
         });
 
-        const completedNode: TreeNode = {
+        // Create stats node
+        const statsNode: TreeNode = {
             type: "header",
-            label: "Completed Challenges",
-            name: "completed",
-            children: challengeNodes,
-            message: `You have completed ${completedChallenges.length} challenges`
+            label: "Progress Stats",
+            name: "stats",
+            children: [...challengeNodes],
+            message: this.buildStatsMessage(points, completionRate)
         };
 
-        // Main progress menu
-        const progressMenu: TreeNode = {
-            type: "header",
-            label: "Progress Menu",
-            name: "progress-menu",
-            children: [statsNode, completedNode],
-            message: "View your progress"
-        };
-
-        return progressMenu;
+        return statsNode;
     }
 
     private calculatePoints(completedChallenges: Array<{ challenge: IChallenge | undefined, completion: any }>): number {
@@ -77,15 +60,15 @@ export class ProgressView {
     }
 
     private buildStatsMessage(points: number, completionRate: string): string {
-        return `${chalk.bold("Your Stats")}
+        const totalChallenges = this.challenges.filter(c => c.enabled).length;
+        const completedChallenges = this.userState.challenges.filter(c => c.status === "success").length;
+        return `${chalk.bold("Your Progress")}
 
 Address: ${chalk.blue(this.userState.ens || this.userState.address)}
 ${chalk.yellow(`Points Earned: ${points.toLocaleString()}`)}
 
-Challenge Progress
-Total Challenges: ${chalk.blue(this.challenges.filter(c => c.enabled).length)}
-Completed: ${chalk.blue(`${this.userState.challenges.filter(c => c.status === "success").length} (${completionRate}%)`)}
-`;
+ChallengesCompleted: ${chalk.blue(`${completedChallenges}/${totalChallenges} (${completionRate}%)`)}
+${completedChallenges ? "Details:" : ""}`;
     }
 
     private buildChallengeMessage(challenge: IChallenge, completion: any): string {
@@ -111,7 +94,6 @@ Completed: ${chalk.blue(`${this.userState.challenges.filter(c => c.status === "s
             label: `${functionName}: ${chalk.yellow(`${gasUsed.toLocaleString()} gas`)}`,
             name: `gas-entry-${functionName}`,
             children: [],
-            disabled: true,
             message: `Function: ${functionName}\nGas Used: ${gasUsed.toLocaleString()} (${((gasUsed / totalGas) * 100).toFixed(1)}% of total)`
         }));
 
