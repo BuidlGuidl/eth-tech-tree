@@ -1,5 +1,11 @@
 # eth-tech-tree
 
+## 0.1.12
+
+### Patch Changes
+
+- 7ae1792: Major UI overhaul. Everything should still work similarly to last release.
+
 ## 0.1.11
 
 ### Patch Changes
