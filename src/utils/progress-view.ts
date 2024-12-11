@@ -1,5 +1,6 @@
 import { IUser, IChallenge, TreeNode } from "../types";
 import chalk from "chalk";
+import { calculatePoints } from "./helpers";
 
 export class ProgressView {
     constructor(
@@ -16,7 +17,7 @@ export class ProgressView {
             }))
             .filter(c => c.challenge);
 
-        const points = this.calculatePoints(completedChallenges);
+        const points = calculatePoints(completedChallenges);
         const completionRate = (completedChallenges.length / this.challenges.filter(c => c.enabled).length * 100).toFixed(1);
 
         // Create completed challenges node with all completed challenges as children
@@ -40,7 +41,7 @@ export class ProgressView {
         // Create stats node
         const statsNode: TreeNode = {
             type: "header",
-            label: "Progress Stats",
+            label: "Progress",
             name: "stats",
             children: [...challengeNodes],
             message: this.buildStatsMessage(points, completionRate)
@@ -49,22 +50,12 @@ export class ProgressView {
         return statsNode;
     }
 
-    private calculatePoints(completedChallenges: Array<{ challenge: IChallenge | undefined, completion: any }>): number {
-        const pointsPerLevel = [100, 150, 225, 300, 400, 500];
-        return completedChallenges
-            .filter(c => c.challenge)
-            .reduce((total, { challenge }) => {
-                const points = pointsPerLevel[challenge!.level - 1] || 100;
-                return total + points;
-            }, 0);
-    }
-
     private buildStatsMessage(points: number, completionRate: string): string {
         const totalChallenges = this.challenges.filter(c => c.enabled).length;
         const completedChallenges = this.userState.challenges.filter(c => c.status === "success").length;
         return `${chalk.bold("Your Progress")}
 
-Address: ${chalk.blue(this.userState.ens || this.userState.address)}
+Address: ${chalk.green(this.userState.ens || this.userState.address)}
 ${chalk.yellow(`Points Earned: ${points.toLocaleString()}`)}
 
 Challenges Completed: ${chalk.blue(`${completedChallenges}/${totalChallenges} (${completionRate}%)`)}
@@ -99,7 +90,7 @@ ${completedChallenges ? "Details:" : ""}`;
 
         return {
             type: "header",
-            label: "View Gas Report",
+            label: "Gas Report",
             name: "gas-report",
             children: nodes,
             message: `Total Gas Used: ${chalk.bold(totalGas.toLocaleString())}\nDetailed breakdown:`

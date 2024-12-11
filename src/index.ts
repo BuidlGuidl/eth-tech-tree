@@ -7,6 +7,7 @@ import { getUser } from "./modules/api";
 import { setupChallenge, submitChallenge } from "./actions";
 import select from './utils/global-context-select-list';
 import { ProgressView } from "./utils/progress-view";
+import { calculatePoints } from "./utils/helpers";
 
 type GlobalChoice = {
     value: string;
@@ -19,6 +20,8 @@ export class TechTree {
     private challenges: IChallenge[];
     private history: { node: TreeNode, selection: string }[] = [];
     private globalChoices: GlobalChoice[];
+    private nodeLabel: string = "Main Menu";
+
     constructor() {
         this.userState = loadUserState();
         this.challenges = loadChallenges();
@@ -69,6 +72,7 @@ export class TechTree {
         };
 
         try {
+            this.nodeLabel = node.label;
             this.clearView();
             this.printMenu();
             const { answer } = await select(directionsPrompt);
@@ -349,9 +353,23 @@ Open up the challenge in your favorite code editor and follow the instructions i
     }
 
     private printMenu(): void {
-        const menuText = `${chalk.bold("<q> to quit | <Esc> to go back | <p> view progress")}`;
-        const width = process.stdout.columns || 80;
-        const paddedText = menuText.padEnd(width, ' ');
+        const currentViewName = this.nodeLabel || "Main Menu";
+        const user = this.userState.ens || this.userState.address;
+        const completedChallenges = this.userState.challenges
+            .filter(c => c.status === "success")
+            .map(c => ({
+                challenge: this.challenges.find(ch => ch.name === c.challengeName),
+                completion: c
+            }))
+            .filter(c => c.challenge);
+        const points = calculatePoints(completedChallenges);
+        
+        // First get the length without chalk styling applied
+        const topMenuTextPlain = chalk.bold(`${currentViewName} - ${chalk.green(user)} | ${chalk.yellow(`${points} points`)}`);
+        const bottomMenuTextPlain = chalk.bold(`${chalk.bgBlue(`<q>`)} to quit | ${chalk.bgBlue(`<Esc>`)} to go back | ${chalk.bgBlue(`<p>`)} view progress`);
+        const width = process.stdout.columns;
+        const paddedTopText = topMenuTextPlain.padEnd(width, ' ');
+        const paddedBottomText = bottomMenuTextPlain.padEnd(width, ' ');
 
         // Save cursor position
         process.stdout.write('\x1B7');
@@ -359,13 +377,18 @@ Open up the challenge in your favorite code editor and follow the instructions i
         // Hide cursor while we work
         process.stdout.write('\x1B[?25l');
 
-        // Print at bottom
-        process.stdout.moveCursor(0, this.getMaxViewHeight());
-        process.stdout.clearLine(0);
-        process.stdout.write(paddedText);
-
-        // Move cursor to line 1
+        // Print at top
         process.stdout.cursorTo(0, 0);
+        process.stdout.clearLine(0);
+        process.stdout.write(paddedTopText);
+
+        // Print at bottom
+        process.stdout.cursorTo(0, this.getMaxViewHeight());
+        process.stdout.clearLine(0);
+        process.stdout.write(paddedBottomText);
+
+        // Move cursor to line 1 (just below the top menu)
+        process.stdout.cursorTo(0, 1);
 
         // Show cursor again
         process.stdout.write('\x1B[?25h');

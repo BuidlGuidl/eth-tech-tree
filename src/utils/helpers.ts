@@ -1,5 +1,6 @@
 import os from "os";
 import fs from "fs";
+import { IChallenge } from "../types";
 
 export function wait(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms));
@@ -38,4 +39,14 @@ export const getDevice = (): string => {
   const platform = os.platform();
   const arch = os.arch();
   return `${hostname}(${platform}:${arch})`;
+}
+
+export const calculatePoints = (completedChallenges: Array<{ challenge: IChallenge | undefined, completion: any }>): number => {
+  const pointsPerLevel = [100, 150, 225, 300, 400, 500];
+  return completedChallenges
+      .filter(c => c.challenge)
+      .reduce((total, { challenge }) => {
+          const points = pointsPerLevel[challenge!.level - 1] || 100;
+          return total + points;
+      }, 0);
 }
