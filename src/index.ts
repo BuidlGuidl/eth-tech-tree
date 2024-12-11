@@ -160,13 +160,11 @@ Open up the challenge in your favorite code editor and follow the instructions i
             });
             const nestedChallenges = this.recursiveNesting(transformedChallenges);
 
-            const sortedByUnlocked = nestedChallenges.sort((a: TreeNode, b: TreeNode) => { return a.unlocked ? -1 : 1 });
-
             tree.push({
                 type: "header",
                 label: `${tag} ${chalk.green(`(${completedCount}/${filteredChallenges.length})`)}`,
                 name: `${tag.toLowerCase()}`,
-                children: sortedByUnlocked,
+                children: nestedChallenges,
                 recursive: true
             });
         }
@@ -225,13 +223,13 @@ Open up the challenge in your favorite code editor and follow the instructions i
             node.children.forEach((child, i, siblings) => getChoicesAndActionsRecursive(child, i === siblings.length - 1, depth));
         };
 
-        getChoicesAndActionsRecursive(node);
+        node.children.forEach((child, i, siblings) => getChoicesAndActionsRecursive(child, i === siblings.length - 1));
 
         return { choices, actions };
     }
 
     getNodeLabel(node: TreeNode, depth: string = ""): string {
-        const { label, level, type, completed, unlocked } = node;
+        const { label, type, completed, unlocked } = node;
         const isHeader = type === "header";
         const isChallenge = type === "challenge";
         const isQuiz = type === "quiz";
