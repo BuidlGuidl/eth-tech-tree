@@ -67,7 +67,7 @@ export class ProgressView {
 Address: ${chalk.blue(this.userState.ens || this.userState.address)}
 ${chalk.yellow(`Points Earned: ${points.toLocaleString()}`)}
 
-ChallengesCompleted: ${chalk.blue(`${completedChallenges}/${totalChallenges} (${completionRate}%)`)}
+Challenges Completed: ${chalk.blue(`${completedChallenges}/${totalChallenges} (${completionRate}%)`)}
 ${completedChallenges ? "Details:" : ""}`;
     }
 
