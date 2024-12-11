@@ -27,6 +27,7 @@ export class TechTree {
         this.challenges = loadChallenges();
         this.globalTree = this.buildTree();
         this.globalChoices = [
+            { value: 'quit', key: 'q' },
             { value: 'help', key: 'h' },
             { value: 'progress', key: 'p' },
             { value: 'back', key: 'escape' },
