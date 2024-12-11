@@ -9,4 +9,5 @@ export default {
     sourcemap: true,
   },
   plugins: [autoExternal(), typescript({ exclude: ["challenges/**"] })],
+  external: ["@inquirer/core", "figures"],
 };

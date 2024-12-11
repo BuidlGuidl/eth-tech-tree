@@ -1,37 +1,52 @@
-import { Transform } from "stream";
 import { existsSync, rmSync } from "fs";
-import { select, confirm } from "@inquirer/prompts";
-import { StdInInterceptor } from "./utils/stdin-interceptor";
+import { confirm, input } from "@inquirer/prompts";
 import { IUserChallenge, IChallenge, TreeNode, IUser, Actions } from "./types";
 import chalk from "chalk";
 import { loadChallenges, loadUserState, saveUserState } from "./utils/state-manager";
 import { getUser } from "./modules/api";
 import { setupChallenge, submitChallenge } from "./actions";
-import { Key } from "readline";
+import select from './utils/globalContextSelectList';
 import { ProgressView } from "./utils/progress-view";
 
+type GlobalChoice = {
+    value: string;
+    key: string;
+}
+
 export class TechTree {
-    private stdinInterceptor: StdInInterceptor;
-    private stdIn: Transform;
     private globalTree: TreeNode;
     private userState: IUser;
     private challenges: IChallenge[];
-    private backNode: TreeNode | undefined;
-    private promptCancel: AbortController[] = [];
-
+    private history: { node: TreeNode, selection: string }[] = [];
+    private globalChoices: GlobalChoice[];
     constructor() {
-        this.stdinInterceptor = new StdInInterceptor(this);
-        this.stdIn = this.stdinInterceptor.outputStream;
         this.userState = loadUserState();
         this.challenges = loadChallenges();
         this.globalTree = this.buildTree();
+        this.globalChoices = [
+            { value: 'help', key: 'h' },
+            { value: 'progress', key: 'p' },
+            { value: 'back', key: 'escape' },
+            { value: 'back', key: 'backspace' },
+        ];
+    
+        this.listenForQuit();
+    }
+
+    listenForQuit(): void {
+        process.stdin.setRawMode(true);
+        process.stdin.on('keypress', (_, key) => {
+            if ((key.ctrl && key.name === 'c') || key.name === 'q') {
+                this.quit();
+            }
+        });
     }
 
     async start(): Promise<void> {
         await this.navigate();
     }
 
-    async navigate(node?: TreeNode): Promise<void> {
+    async navigate(node?: TreeNode, selection?: string): Promise<void> {
         if (!node) {
             this.globalTree = this.buildTree();
             node = Object.assign({}, this.globalTree);
@@ -48,27 +63,24 @@ export class TechTree {
             return this.navigate(header);
         }
 
+        // If node has no children, display message and wait for user input
+        if (node.children.length === 0) {
+            this.printMenu();
+            console.log(this.getMessage(node));
+            await this.pressEnterToContinue();
+            await this.goBack();
+            return;
+        }
+
         // Handle navigation nodes
         const { choices, actions } = this.getChoicesAndActions(node);
-        const header = this.findHeader(this.globalTree, node) as TreeNode;
-        const parent = this.findParent(this.globalTree, node) as TreeNode;
-        let defaultChoice = undefined;
-
-        // If the node is a challenge, use the header as the parent for the back action, otherwise use the parent
-        const headerOrParent = node.type === "challenge" ? header : parent;
-        if (headerOrParent) {
-            this.backNode = headerOrParent;
-            // Disabled back button for now
-            // choices.unshift({ name: chalk.bold("←"), value: headerOrParent.label });
-            // actions[headerOrParent.label] = () => this.navigate(headerOrParent);
-            // defaultChoice = choices[1].value;
-        }
 
         const directionsPrompt = {
             message: this.getMessage(node),
+            globalChoices: this.globalChoices,
             choices,
             loop: false,
-            default: defaultChoice,
+            default: selection,
             pageSize: this.getMaxViewHeight() - 3,
             theme: {
                 helpMode: "always" as "never" | "always" | "auto" | undefined,
@@ -78,9 +90,14 @@ export class TechTree {
 
         try {
             this.printMenu();
-            const selectedActionLabel = await select(directionsPrompt, { input: this.stdIn, signal: this.getPromptCancel()?.signal });
-            const selectedAction = actions[selectedActionLabel];
-            if (selectedAction) {
+            const { answer } = await select(directionsPrompt);
+            if (!this.globalChoices.find(choice => choice.value === answer)) {
+                const selectedAction = actions[answer];
+                // Only save new history if the action is not a global choice
+                this.history.push({ node, selection: answer });
+                await selectedAction();
+            } else {
+                const selectedAction = this.getGlobalChoiceAction(answer);
                 await selectedAction();
             }
         } catch (error) {
@@ -89,7 +106,35 @@ export class TechTree {
         }
     }
 
+    getGlobalChoiceAction(selectedActionLabel: string): Function {
+        if (selectedActionLabel === 'quit') {
+            return () => this.quit();
+        } else if (selectedActionLabel === 'back') {
+            return () => this.goBack();
+        } else if (selectedActionLabel === 'help') {
+            return () => this.printHelp();
+        } else if (selectedActionLabel === 'progress') {
+            return () => this.printProgress();
+        }
+        throw new Error(`Invalid global choice: ${selectedActionLabel}`);
+    }
+
+    async goBack(): Promise<void> {
+        if (this.history.length > 0) {
+            const { node, selection } = this.history.pop() as { node: TreeNode, selection: string };
+           await this.navigate(node, selection);
+        } else {
+            await this.navigate();
+        }
+    }
+
     getMessage(node: TreeNode): string {
+        // If the node has a message, display it
+        if (node.message) {
+            return node.message;
+        }
+        
+        // Default messages based on node type
         if (node.type === "challenge") {
             return this.getChallengeMessage(node);
         } else if (node.children.find(child => child.type === "challenge")) {
@@ -101,7 +146,7 @@ export class TechTree {
 
     getChallengeMessage(node: TreeNode): string {
         const { installLocation } = this.userState;
-        return `${chalk.blue(node.label)}
+        return `${chalk.bold(node.label)}
 ${node.message}
 ${node.completed ? `
 🏆 Challenge Completed` : node.installed ? `
@@ -118,24 +163,24 @@ Open up the challenge in your favorite code editor and follow the instructions i
         const tags = this.challenges.reduce((acc: string[], challenge: IChallenge) => {
             return Array.from(new Set(acc.concat(challenge.tags)));
         }, []);
-    
+
         for (let tag of tags) {
-                const filteredChallenges = this.challenges.filter((challenge: IChallenge) => challenge.tags.includes(tag) && challenge.enabled);
-                let completedCount = 0;
-                const transformedChallenges = filteredChallenges.map((challenge: IChallenge) => {
-                    const { label, name, level, type, childrenNames, enabled: unlocked, description } = challenge;
-                    const parentName = this.challenges.find((c: IChallenge) => c.childrenNames?.includes(name))?.name;
-                    const completed = userChallenges.find((c: IUserChallenge) => c.challengeName === name)?.status === "success";
-                    if (completed) {
-                        completedCount++;
-                    }
-    
-                    return { label, name, level, type, actions: this.getChallengeActions(challenge as unknown as TreeNode), completed, installed: this.challengeIsInstalled(challenge as unknown as TreeNode), childrenNames, parentName, unlocked, message: description };
-                });
-                const nestedChallenges = this.recursiveNesting(transformedChallenges);
-    
-                const sortedByUnlocked = nestedChallenges.sort((a: TreeNode, b: TreeNode) => {return a.unlocked ? -1 : 1});
-                
+            const filteredChallenges = this.challenges.filter((challenge: IChallenge) => challenge.tags.includes(tag) && challenge.enabled);
+            let completedCount = 0;
+            const transformedChallenges = filteredChallenges.map((challenge: IChallenge) => {
+                const { label, name, level, type, childrenNames, enabled: unlocked, description } = challenge;
+                const parentName = this.challenges.find((c: IChallenge) => c.childrenNames?.includes(name))?.name;
+                const completed = userChallenges.find((c: IUserChallenge) => c.challengeName === name)?.status === "success";
+                if (completed) {
+                    completedCount++;
+                }
+
+                return { label, name, level, type, actions: this.getChallengeActions(challenge as unknown as TreeNode), completed, installed: this.challengeIsInstalled(challenge as unknown as TreeNode), childrenNames, parentName, unlocked, message: description };
+            });
+            const nestedChallenges = this.recursiveNesting(transformedChallenges);
+
+            const sortedByUnlocked = nestedChallenges.sort((a: TreeNode, b: TreeNode) => { return a.unlocked ? -1 : 1 });
+
             tree.push({
                 type: "header",
                 label: `${tag} ${chalk.green(`(${completedCount}/${filteredChallenges.length})`)}`,
@@ -152,7 +197,7 @@ Open up the challenge in your favorite code editor and follow the instructions i
             type: "header",
             children: enabledCategories,
         };
-        
+
         return mainMenu;
     }
 
@@ -163,7 +208,7 @@ Open up the challenge in your favorite code editor and follow the instructions i
         if (!node.recursive) {
             if (node.type !== "challenge") {
                 choices.push(...node.children.map(child => ({ name: this.getNodeLabel(child), value: child.label })));
-                for ( const child of node.children ) {
+                for (const child of node.children) {
 
                     actions[child.label] = () => this.navigate(child);
                 }
@@ -206,8 +251,8 @@ Open up the challenge in your favorite code editor and follow the instructions i
         const isChallenge = type === "challenge";
         const isQuiz = type === "quiz";
         const isCapstoneProject = type === "capstone-project";
-    
-    
+
+
         if (isHeader) {
             return `${depth}${chalk.blue(label)}`;
         } else if (!unlocked) {
@@ -217,7 +262,7 @@ Open up the challenge in your favorite code editor and follow the instructions i
         } else if (isQuiz) {
             return `${depth}${label} 📜`;
         } else if (isCapstoneProject) {
-            return`${depth}${label} 💻`;
+            return `${depth}${label} 💻`;
         } else {
             return `${depth}${label}`;
         }
@@ -258,7 +303,7 @@ Open up the challenge in your favorite code editor and follow the instructions i
                 return parent;
             }
             parent = this.findParent(allNodes, parent);
-        }    
+        }
     }
 
     recursiveNesting(challenges: any[], parentName: string | undefined = undefined): TreeNode[] {
@@ -279,7 +324,7 @@ Open up the challenge in your favorite code editor and follow the instructions i
         return existsSync(targetDir);
     }
 
-    getChallengeActions(challenge: TreeNode):  Actions {
+    getChallengeActions(challenge: TreeNode): Actions {
         const actions: Actions = {};
         const { address, installLocation } = this.userState;
         const { type, name } = challenge;
@@ -326,82 +371,45 @@ Open up the challenge in your favorite code editor and follow the instructions i
                 const challengeNode = this.findNode(this.globalTree, name) as TreeNode;
                 await this.navigate(challengeNode);
             };
-        }                    
+        }
         return actions;
     };
 
     async pressEnterToContinue(customMessage?: string) {
-        await confirm({
-            message: customMessage || 'Press Enter to continue...',
+        await input({
+            message: typeof customMessage === "string" ? customMessage : 'Press Enter to continue...',
             theme: {
-                prefix: ""
+                prefix: "",
             }
-          }, {
-            input: this.stdIn,
-            signal: this.getPromptCancel()?.signal
-          });
+        });
     }
+
     private clearView(): void {
         process.stdout.moveCursor(0, this.getMaxViewHeight());
         console.clear();
     }
 
     private printMenu(): void {
-        const menuText = `${chalk.bold("<q> to quit | <Esc> to go back | <p> view progress")}`; 
+        const menuText = `${chalk.bold("<q> to quit | <Esc> to go back | <p> view progress")}`;
         const width = process.stdout.columns || 80;
         const paddedText = menuText.padEnd(width, ' ');
-        
+
         // Save cursor position
         process.stdout.write('\x1B7');
-        
+
         // Hide cursor while we work
         process.stdout.write('\x1B[?25l');
-        
+
         // Print at bottom
         process.stdout.moveCursor(0, this.getMaxViewHeight());
         process.stdout.clearLine(0);
         process.stdout.write(paddedText);
-        
+
         // Move cursor to line 1 (just below top menu)
         process.stdout.cursorTo(0, 0);
-        
+
         // Show cursor again
         process.stdout.write('\x1B[?25h');
-    }
-
-    async handleKeyPress(key: Key) {
-        if ((key.ctrl && key.name === 'c') || key.name === 'q') {
-            this.stdinInterceptor.cleanExit();
-        } else if (key.name === 'escape' || key.name === 'backspace') {
-            if (this.promptCancel.length) {
-                this.promptCancel.forEach(cancel => cancel.abort());
-                this.promptCancel = [];
-            }
-            // Get out of the event loop so the existing prompt can cancel before starting the next prompt
-            setImmediate(async () => {
-                console.clear();
-                await this.navigate(this.backNode);
-            });
-        } else if (key.name === 'p') {
-            if (this.promptCancel.length) {
-                this.promptCancel.forEach(cancel => cancel.abort());
-                this.promptCancel = [];
-            }
-            setImmediate(async () => {
-                const progressView = new ProgressView(
-                    this.userState,
-                    this.challenges,
-                    this.stdIn,
-                    this.getPromptCancel
-                );
-                await progressView.show();
-            });
-        }
-    }
-
-    getPromptCancel(): AbortController | undefined {
-        this.promptCancel.push(new AbortController());
-        return this.promptCancel[-1];
     }
 
     getMaxViewHeight(): number {
@@ -410,5 +418,21 @@ Open up the challenge in your favorite code editor and follow the instructions i
             return process.stdout.rows;
         }
         return maxRows;
+    }
+
+    quit(): void {
+        this.clearView();
+        process.exit(0);
+    }
+
+    printHelp(): void {
+        this.clearView();
+        console.log("Help");
+    }
+
+    async printProgress(): Promise<void> {
+        const progressView = new ProgressView(this.userState, this.challenges);
+        const progressTree = progressView.buildProgressTree();
+        await this.navigate(progressTree);
     }
 }

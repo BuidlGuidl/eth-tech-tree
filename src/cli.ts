@@ -20,6 +20,7 @@ export async function cli(args: Args) {
     await init(userState);
     // Navigate tree
     const techTree = new TechTree();
+
     await techTree.start();
   }
 }

@@ -1,94 +1,13 @@
-import { Transform } from "stream";
-import { select } from "@inquirer/prompts";
-import { IUser, IChallenge } from "../types";
+import { IUser, IChallenge, TreeNode, Actions } from "../types";
 import chalk from "chalk";
 
 export class ProgressView {
-    private stdIn: Transform;
-    private getPromptCancel: () => AbortController | undefined;
-    
     constructor(
         private userState: IUser,
         private challenges: IChallenge[],
-        stdIn: Transform,
-        getPromptCancel: () => AbortController | undefined,
-    ) {
-        this.stdIn = new Transform({
-            transform(chunk, encoding, callback) {
-                this.push(chunk);
-                callback();
-            }
-        });
-        process.stdin.pipe(this.stdIn);
-        
-        this.getPromptCancel = getPromptCancel;
-    }
+    ) {}
 
-    async show(): Promise<void> {
-        try {
-            while (true) {
-                console.clear();
-                this.printStats();
-                
-                const completedChallenges = this.userState.challenges
-                    .filter(c => c.status === "success")
-                    .map(c => {
-                        const fullChallenge = this.challenges.find(ch => ch.name === c.challengeName);
-                        return {
-                            challenge: fullChallenge,
-                            completion: c
-                        };
-                    })
-                    .filter(c => c.challenge); // Filter out any challenges that don't exist anymore
-
-                const choices = [
-                    ...completedChallenges.map(c => ({
-                        name: chalk.green(`✓ ${c.challenge!.label}`),
-                        value: c.challenge!.name,
-                    })),
-                    { name: "Return to Main Menu", value: "back" }
-                ];
-
-                const selected = await select({
-                    message: "Select a challenge to view details",
-                    choices,
-                    loop: false,
-                    theme: {
-                        helpMode: "always" as "never" | "always" | "auto" | undefined,
-                        prefix: ""
-                    }
-                }, {
-                    input: this.stdIn,
-                    signal: this.getPromptCancel()?.signal,
-                });
-
-                if (selected === "back") break;
-
-                // Show challenge completion details
-                const selectedChallenge = completedChallenges.find(c => c.challenge!.name === selected);
-                if (selectedChallenge) {
-                    console.clear();
-                    await this.showChallengeDetails(selectedChallenge.challenge!, selectedChallenge.completion);
-                }
-            }
-        } finally {
-            process.stdin.unpipe(this.stdIn);
-            this.stdIn.destroy();
-        }
-    }
-
-    private calculatePoints(completedChallenges: Array<{ challenge: IChallenge | undefined, completion: any }>): number {
-        const pointsPerLevel = [100, 150, 225, 300, 400, 500]
-        return completedChallenges
-            .filter(c => c.challenge) // Only count challenges that still exist
-            .reduce((total, { challenge }) => {
-                const points = pointsPerLevel[challenge!.level - 1] || 100;
-                return total + points;
-            }, 0);
-    }
-
-    private printStats(): void {
-        const totalChallenges = this.challenges.filter(c => c.enabled).length;
+    buildProgressTree(): TreeNode {
         const completedChallenges = this.userState.challenges
             .filter(c => c.status === "success")
             .map(c => ({
@@ -96,148 +15,110 @@ export class ProgressView {
                 completion: c
             }))
             .filter(c => c.challenge);
-        
-        const completionRate = (completedChallenges.length / totalChallenges * 100).toFixed(1);
+
         const points = this.calculatePoints(completedChallenges);
+        const completionRate = (completedChallenges.length / this.challenges.filter(c => c.enabled).length * 100).toFixed(1);
 
-        // Print user info
-        console.log(chalk.bold("\nUser Profile"));
-        console.log(`Address: ${chalk.blue(this.userState.ens || this.userState.address)}`);
-        console.log(chalk.yellow(`Points Earned: ${points.toLocaleString()}`));
+        // Create stats node
+        const statsNode: TreeNode = {
+            type: "header",
+            label: "Progress Stats",
+            name: "stats",
+            children: [], // Stats node doesn't need children
+            message: this.buildStatsMessage(points, completionRate)
+        };
 
-        // Print challenge stats
-        console.log(chalk.bold("\nChallenge Progress"));
-        console.log(`Total Challenges: ${chalk.blue(totalChallenges)}`);
-        console.log(`Completed: ${chalk.blue(`${completedChallenges.length} (${completionRate}%)\n`)}`);
-    }
-
-    private async showChallengeDetails(challenge: IChallenge, completion: any): Promise<void> {
-        while (true) {
-            console.clear();
-            console.log(chalk.bold(`\n${challenge.label} Details\n`));
-            console.log(`Description: ${challenge.description}`);
-            console.log(`\nCompletion Date: ${chalk.blue(new Date(completion.timestamp).toLocaleString())}`);
-            if (completion.contractAddress) {
-                console.log(`Contract Address: ${chalk.blue(completion.contractAddress)}`);
-                console.log(`Network: ${chalk.blue(completion.network)}`);
-            }
-
-            const choices = [
-                { name: "Return to Challenge List", value: "back" }
-            ];
-
+        // Create completed challenges node with all completed challenges as children
+        const challengeNodes: TreeNode[] = completedChallenges.map(({ challenge, completion }) => {
+            const children: TreeNode[] = [];
+            
+            // Add gas report node as a child if available
             if (completion.gasReport && completion.gasReport.length > 0) {
-                choices.unshift({ 
-                    name: "View Gas Report", 
-                    value: "gas",
-                });
+                children.push(this.buildGasReportNode(completion.gasReport));
             }
 
-            const action = await select({
-                message: "Select an option",
-                choices,
-                loop: false,
-                theme: {
-                    helpMode: "always" as "never" | "always" | "auto" | undefined,
-                    prefix: ""
-                }
-            }, {
-                input: this.stdIn,
-                signal: this.getPromptCancel()?.signal,
-            });
+            return {
+                type: "header",
+                label: challenge!.label,
+                name: challenge!.name,
+                children,
+                message: this.buildChallengeMessage(challenge!, completion)
+            };
+        });
 
-            if (action === "back") break;
-            if (action === "gas") {
-                await this.showGasTable(completion.gasReport);
-            }
-        }
+        const completedNode: TreeNode = {
+            type: "header",
+            label: "Completed Challenges",
+            name: "completed",
+            children: challengeNodes,
+            message: `You have completed ${completedChallenges.length} challenges`
+        };
+
+        // Main progress menu
+        const progressMenu: TreeNode = {
+            type: "header",
+            label: "Progress Menu",
+            name: "progress-menu",
+            children: [statsNode, completedNode],
+            message: "View your progress"
+        };
+
+        return progressMenu;
     }
 
-    private async showGasTable(gasReport: Array<{ functionName: string; gasUsed: number }>): Promise<void> {
-        const gasInfo = gasReport
-            .sort((a, b) => b.gasUsed - a.gasUsed); // Sort by gas usage, highest first
+    private calculatePoints(completedChallenges: Array<{ challenge: IChallenge | undefined, completion: any }>): number {
+        const pointsPerLevel = [100, 150, 225, 300, 400, 500];
+        return completedChallenges
+            .filter(c => c.challenge)
+            .reduce((total, { challenge }) => {
+                const points = pointsPerLevel[challenge!.level - 1] || 100;
+                return total + points;
+            }, 0);
+    }
 
-        let currentPage = 0;
-        const headerRows = 6;
-        const footerRows = 2;
-        const tableHeaderRows = 3;
+    private buildStatsMessage(points: number, completionRate: string): string {
+        return `Your Stats
+Address: ${chalk.blue(this.userState.ens || this.userState.address)}
+${chalk.yellow(`Points Earned: ${points.toLocaleString()}`)}
+
+Challenge Progress
+Total Challenges: ${chalk.blue(this.challenges.filter(c => c.enabled).length)}
+Completed: ${chalk.blue(`${this.userState.challenges.filter(c => c.status === "success").length} (${completionRate}%)`)}`;
+    }
+
+    private buildChallengeMessage(challenge: IChallenge, completion: any): string {
+        let message = `${chalk.bold(challenge.label)}\n\n`;
+        message += `Description: ${challenge.description}\n\n`;
+        message += `Completion Date: ${chalk.blue(new Date(completion.timestamp).toLocaleString())}\n`;
         
-        while (true) {
-            console.log(chalk.bold('\nGas Consumption Report:\n'));
-
-            // Calculate column widths
-            const methodWidth = Math.max(...gasInfo.map(g => g.functionName.length), 'Function Name'.length);
-            const gasWidth = Math.max(...gasInfo.map(g => g.gasUsed.toString().length), 'Gas Used'.length);
-
-            // Print header
-            console.log(
-                '┌' + '─'.repeat(methodWidth + 2) + 
-                '┬' + '─'.repeat(gasWidth + 2) + '┐'
-            );
-            console.log(
-                '│ ' + 'Function Name'.padEnd(methodWidth) + 
-                ' │ ' + 'Gas Used'.padEnd(gasWidth) + ' │'
-            );
-            console.log(
-                '├' + '─'.repeat(methodWidth + 2) + 
-                '┼' + '─'.repeat(gasWidth + 2) + '┤'
-            );
-
-            // Calculate available rows and page info
-            const availableRows = process.stdout.rows - headerRows - footerRows - tableHeaderRows;
-            const totalPages = Math.ceil(gasInfo.length / availableRows);
-            const startIdx = currentPage * availableRows;
-            const endIdx = Math.min(startIdx + availableRows, gasInfo.length);
-            
-            // Print table body
-            for (let i = startIdx; i < endIdx; i++) {
-                const { functionName, gasUsed } = gasInfo[i];
-                console.log(
-                    '│ ' + functionName.padEnd(methodWidth) + 
-                    ' │ ' + gasUsed.toString().padStart(gasWidth) + ' │'
-                );
-            }
-
-            // Print footer
-            console.log(
-                '└' + '─'.repeat(methodWidth + 2) + 
-                '┴' + '─'.repeat(gasWidth + 2) + '┘'
-            );
-
-            // Show total gas used
-            const totalGas = gasInfo.reduce((sum, g) => sum + g.gasUsed, 0);
-            console.log(chalk.bold(`\nTotal Gas Used: ${totalGas.toLocaleString()}`));
-
-            // Show navigation info if multiple pages
-            if (totalPages > 1) {
-                console.log(chalk.dim(`\nPage ${currentPage + 1}/${totalPages} (Use ↑/↓ to scroll, Enter to return)`));
-            }
-
-            // Handle navigation
-            const choices = [{ name: "Return to Challenge Details", value: "return" }];
-            if (currentPage > 0) {
-                choices.unshift({ name: "Previous Page", value: "prev" });
-            }
-            if (currentPage < totalPages - 1) {
-                choices.unshift({ name: "Next Page", value: "next" });
-            }
-            
-            const action = await select({
-                message: "Navigation",
-                choices,
-                loop: false,
-                theme: {
-                    helpMode: "always" as "never" | "always" | "auto" | undefined,
-                    prefix: ""
-                }
-            }, {
-                input: this.stdIn,
-                signal: this.getPromptCancel()?.signal,
-            });
-
-            if (action === "return") break;
-            if (action === "prev") currentPage--;
-            if (action === "next") currentPage++;
+        if (completion.contractAddress) {
+            message += `Contract Address: ${chalk.blue(completion.contractAddress)}\n`;
+            message += `Network: ${chalk.blue(completion.network)}\n`;
         }
+
+        return message;
+    }
+
+    private buildGasReportNode(gasReport: Array<{ functionName: string; gasUsed: number }>): TreeNode {
+        const gasInfo = gasReport.sort((a, b) => b.gasUsed - a.gasUsed);
+        const totalGas = gasInfo.reduce((sum, g) => sum + g.gasUsed, 0);
+
+        // Create individual gas entry nodes
+        const nodes: TreeNode[] = gasInfo.map(({ functionName, gasUsed }) => ({
+            type: "header",
+            label: `${functionName}: ${chalk.yellow(`${gasUsed.toLocaleString()} gas`)}`,
+            name: `gas-entry-${functionName}`,
+            children: [],
+            disabled: true,
+            message: `Function: ${functionName}\nGas Used: ${gasUsed.toLocaleString()} (${((gasUsed / totalGas) * 100).toFixed(1)}% of total)`
+        }));
+
+        return {
+            type: "header",
+            label: "View Gas Report",
+            name: "gas-report",
+            children: nodes,
+            message: `Total Gas Used: ${chalk.bold(totalGas.toLocaleString())}\nDetailed breakdown:`
+        };
     }
 } 
