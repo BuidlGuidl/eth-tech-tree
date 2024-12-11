@@ -5,7 +5,7 @@ import path from "path";
 import fs from "fs";
 import { createFirstGitCommit } from "../tasks/create-first-git-commit";
 import { fetchChallenges } from "../modules/api";
-import { loadChallenges } from "../utils/stateManager";
+import { loadChallenges } from "../utils/state-manager";
 import { IChallenge } from "../types";
 import { BASE_REPO, BASE_BRANCH, BASE_COMMIT } from "../config";
 import { DefaultRenderer, Listr, ListrTaskWrapper, SimpleRenderer } from "listr2";

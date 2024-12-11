@@ -1,23 +1,18 @@
-import inquirer from "inquirer";
-import { loadUserState } from "../utils/stateManager";
+import { loadUserState } from "../utils/state-manager";
 import { submitChallengeToServer } from "../modules/api";
 import chalk from "chalk";
+import { input } from "@inquirer/prompts";
 
 export async function submitChallenge(name: string, contractAddress?: string) {
     const { address: userAddress } = loadUserState();
     if (!contractAddress) {
         // Prompt the user for the contract address
-        const questions = [
-            {
-                type: "input",
-                name: "address",
-                message: "Completed challenge contract address on Sepolia:",
-                validate: (value: string) => /^0x[a-fA-F0-9]{40}$/.test(value),
-            },
-        ];
-        const answers = await inquirer.prompt(questions);
-        const { address } = answers;
-        contractAddress = address;
+        const question = {
+            message: "Completed challenge contract address on Sepolia:",
+            validate: (value: string) => /^0x[a-fA-F0-9]{40}$/.test(value),
+        };
+        const answer = await input(question);
+        contractAddress = answer;
     }
     
     console.log("Submitting challenge...");
