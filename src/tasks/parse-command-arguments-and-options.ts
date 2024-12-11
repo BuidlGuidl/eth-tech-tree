@@ -1,7 +1,7 @@
 import arg from "arg";
 import { IUser } from "../types";
 import fs from "fs";
-import inquirer from "inquirer";
+import { select, input } from "@inquirer/prompts";
 import { isValidAddress } from "../utils/helpers";
 import { promptForMissingUserState } from "./prompt-for-missing-user-state";
 
@@ -126,7 +126,11 @@ export async function promptForMissingCommandArgs(commands: CommandOptions, user
       });
     }
   }
-  const answers = await inquirer.prompt(questions, cliAnswers);
+  const answers = [];
+  for (const question of questions) {
+    const answer = await input(question);
+    answers.push(answer);
+  }
 
   return {
     ...commands,
