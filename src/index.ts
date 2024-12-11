@@ -353,6 +353,9 @@ Open up the challenge in your favorite code editor and follow the instructions i
     }
 
     private printMenu(): void {
+        const border = chalk.blue("─");
+        const borderLeft = chalk.blue("●─");
+        const borderRight = chalk.blue("─●");
         const currentViewName = this.nodeLabel || "Main Menu";
         const user = this.userState.ens || this.userState.address;
         const completedChallenges = this.userState.challenges
@@ -364,34 +367,37 @@ Open up the challenge in your favorite code editor and follow the instructions i
             .filter(c => c.challenge);
         const points = calculatePoints(completedChallenges);
         
-        // First get the length without chalk styling applied
-        const topMenuTextPlain = chalk.bold(`${currentViewName} - ${chalk.green(user)} | ${chalk.yellow(`${points} points`)}`);
-        const bottomMenuTextPlain = chalk.bold(`${chalk.bgBlue(`<q>`)} to quit | ${chalk.bgBlue(`<Esc>`)} to go back | ${chalk.bgBlue(`<p>`)} view progress`);
-        const width = process.stdout.columns;
-        const paddedTopText = topMenuTextPlain.padEnd(width, ' ');
-        const paddedBottomText = bottomMenuTextPlain.padEnd(width, ' ');
 
+        const width = process.stdout.columns;
+        const userInfo = `${chalk.green(user)} ${chalk.yellow(`(${points} points)`)}`;
+        const topMenuText = chalk.bold(`${borderLeft}${currentViewName}${new Array(width - (this.stripAnsi(currentViewName).length + this.stripAnsi(userInfo).length + 4)).fill(border).join('')}${userInfo}${borderRight}`);
+        const bottomMenuText = chalk.bold(`${borderLeft}${chalk.bgBlue(`<q>`)} to quit | ${chalk.bgBlue(`<Esc>`)} to go back | ${chalk.bgBlue(`<p>`)} view progress${new Array(width - 54).fill(border).join('')}${borderRight}`);
+        
         // Save cursor position
         process.stdout.write('\x1B7');
 
         // Hide cursor while we work
         process.stdout.write('\x1B[?25l');
-
+        
         // Print at top
         process.stdout.cursorTo(0, 0);
         process.stdout.clearLine(0);
-        process.stdout.write(paddedTopText);
+        process.stdout.write(topMenuText);
 
         // Print at bottom
         process.stdout.cursorTo(0, this.getMaxViewHeight());
         process.stdout.clearLine(0);
-        process.stdout.write(paddedBottomText);
+        process.stdout.write(bottomMenuText);
 
         // Move cursor to line 1 (just below the top menu)
         process.stdout.cursorTo(0, 1);
 
         // Show cursor again
         process.stdout.write('\x1B[?25h');
+    }
+
+    stripAnsi(text: string): string {
+        return text.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '');
     }
 
     getMaxViewHeight(): number {

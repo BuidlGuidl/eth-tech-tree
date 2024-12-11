@@ -32,7 +32,7 @@ function getTrimmedTitleText(): string {
 }
 
 async function checkTerminalSize(): Promise<void> {
-  const minRows = 10;
+  const minRows = 16;
   const minCols = 80;
   const { rows, columns } = process.stdout;
   
