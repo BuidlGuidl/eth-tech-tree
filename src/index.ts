@@ -1,11 +1,11 @@
 import { existsSync, rmSync } from "fs";
-import { confirm, input } from "@inquirer/prompts";
+import { confirm } from "@inquirer/prompts";
 import { IUserChallenge, IChallenge, TreeNode, IUser, Actions } from "./types";
 import chalk from "chalk";
 import { loadChallenges, loadUserState, saveUserState } from "./utils/state-manager";
 import { getUser } from "./modules/api";
 import { setupChallenge, submitChallenge } from "./actions";
-import select from './utils/globalContextSelectList';
+import select from './utils/global-context-select-list';
 import { ProgressView } from "./utils/progress-view";
 
 type GlobalChoice = {
@@ -52,26 +52,6 @@ export class TechTree {
             node = Object.assign({}, this.globalTree);
         }
 
-        this.clearView();
-
-        // Handle locked challenges
-        if (node.type !== "header" && !node.unlocked) {
-            this.printMenu();
-            console.log("This challenge doesn't exist yet. 🤔 Consider contributing to the project here: https://github.com/BuidlGuidl/eth-tech-tree-challenges");
-            await this.pressEnterToContinue();
-            const header = this.findHeader(this.globalTree, node) as TreeNode;
-            return this.navigate(header);
-        }
-
-        // If node has no children, display message and wait for user input
-        if (node.children.length === 0) {
-            this.printMenu();
-            console.log(this.getMessage(node));
-            await this.pressEnterToContinue();
-            await this.goBack();
-            return;
-        }
-
         // Handle navigation nodes
         const { choices, actions } = this.getChoicesAndActions(node);
 
@@ -89,6 +69,7 @@ export class TechTree {
         };
 
         try {
+            this.clearView();
             this.printMenu();
             const { answer } = await select(directionsPrompt);
             if (!this.globalChoices.find(choice => choice.value === answer)) {
@@ -128,15 +109,12 @@ export class TechTree {
         }
     }
 
-    getMessage(node: TreeNode): string {
-        // If the node has a message, display it
-        if (node.message) {
-            return node.message;
-        }
-        
+    getMessage(node: TreeNode): string {        
         // Default messages based on node type
         if (node.type === "challenge") {
             return this.getChallengeMessage(node);
+        } else if (node.message) {
+            return node.message;
         } else if (node.children.find(child => child.type === "challenge")) {
             return "Select a challenge";
         } else {
@@ -153,7 +131,6 @@ ${node.completed ? `
 Open up the challenge in your favorite code editor and follow the instructions in the README:
 
 📂 Challenge Location: ${installLocation}/${node.name}` : ""}
-
 `;
     }
 
@@ -211,6 +188,10 @@ Open up the challenge in your favorite code editor and follow the instructions i
                 for (const child of node.children) {
 
                     actions[child.label] = () => this.navigate(child);
+                }
+                if (node.children.length === 0) {
+                    choices.push({ name: "Back", value: "back" });
+                    actions["Back"] = () => this.goBack();
                 }
             } else {
                 actions = node.actions as Actions;
@@ -281,31 +262,6 @@ Open up the challenge in your favorite code editor and follow the instructions i
         }
     }
 
-    findParent(allNodes: TreeNode, targetNode: TreeNode): TreeNode | undefined {
-        if (allNodes.children.includes(targetNode)) {
-            return allNodes;
-        } else {
-            for (const childNode of allNodes.children) {
-                const parent = this.findParent(childNode, targetNode);
-                if (parent) return parent;
-            }
-            return undefined;
-        }
-    }
-
-    findHeader(allNodes: TreeNode, targetNode: TreeNode): TreeNode | undefined {
-        let parent = this.findParent(allNodes, targetNode);
-        while (true) {
-            if (!parent) {
-                return allNodes;
-            }
-            if (parent?.type === "header") {
-                return parent;
-            }
-            parent = this.findParent(allNodes, parent);
-        }
-    }
-
     recursiveNesting(challenges: any[], parentName: string | undefined = undefined): TreeNode[] {
         const tree: TreeNode[] = [];
         for (let challenge of challenges) {
@@ -336,6 +292,7 @@ Open up the challenge in your favorite code editor and follow the instructions i
                 this.globalTree = this.buildTree();
                 // Wait for enter key
                 await this.pressEnterToContinue();
+                this.history.pop(); // Remove the old node from history since it has different actions
                 // Return to challenge menu
                 const challengeNode = this.findNode(this.globalTree, name) as TreeNode;
                 await this.navigate(challengeNode);
@@ -350,6 +307,7 @@ Open up the challenge in your favorite code editor and follow the instructions i
                 await setupChallenge(name, installLocation);
                 this.globalTree = this.buildTree();
                 await this.pressEnterToContinue();
+                this.history.pop(); // Remove the old node from history since it has different actions
                 // Return to challenge menu
                 const challengeNode = this.findNode(this.globalTree, name) as TreeNode;
                 await this.navigate(challengeNode);
@@ -367,6 +325,7 @@ Open up the challenge in your favorite code editor and follow the instructions i
                 this.globalTree = this.buildTree();
                 // Wait for enter key
                 await this.pressEnterToContinue();
+                this.history.pop(); // Remove the old node from history since it has different actions
                 // Return to challenge menu
                 const challengeNode = this.findNode(this.globalTree, name) as TreeNode;
                 await this.navigate(challengeNode);
@@ -376,7 +335,7 @@ Open up the challenge in your favorite code editor and follow the instructions i
     };
 
     async pressEnterToContinue(customMessage?: string) {
-        await input({
+        await confirm({
             message: typeof customMessage === "string" ? customMessage : 'Press Enter to continue...',
             theme: {
                 prefix: "",
@@ -405,7 +364,7 @@ Open up the challenge in your favorite code editor and follow the instructions i
         process.stdout.clearLine(0);
         process.stdout.write(paddedText);
 
-        // Move cursor to line 1 (just below top menu)
+        // Move cursor to line 1
         process.stdout.cursorTo(0, 0);
 
         // Show cursor again

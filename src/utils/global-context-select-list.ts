@@ -15,8 +15,6 @@ import {
 } from '@inquirer/core';
 import type { PartialDeep } from '@inquirer/type';
 import chalk from 'chalk';
-import figures from 'figures';
-import ansiEscapes from 'ansi-escapes';
 
 type SelectTheme = {
     icon: { cursor: string };
@@ -24,7 +22,7 @@ type SelectTheme = {
 };
 
 const selectTheme: SelectTheme = {
-    icon: { cursor: figures.pointer },
+    icon: { cursor: '❯' },
     style: { disabled: (text: string) => chalk.dim(`- ${text}`) },
 };
 
@@ -99,7 +97,6 @@ export default createPrompt(
         const selectedChoice = items[active] as Choice<Value>;
 
         useKeypress((key, rl) => {
-
             // Check for global choices first
             const globalChoice = config.globalChoices.find(choice => {
                 if (!!choice.key.length) {
@@ -111,6 +108,7 @@ export default createPrompt(
                 }
                 return choice.key === key.name;
             });
+
             if (globalChoice !== undefined) {
                 setStatus('done');
                 done({
@@ -185,8 +183,6 @@ export default createPrompt(
             ? `\n${selectedChoice.description}`
             : ``;
 
-        return `${[prefix, message].filter(Boolean).join(' ')}\n${page}${choiceDescription}${ansiEscapes.cursorHide}`;
+        return `${[prefix, message].filter(Boolean).join(' ')}\n${page}${choiceDescription}${'\x1B[?25l'}`;
     },
 );
-
-export { Separator }; 

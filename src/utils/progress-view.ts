@@ -1,4 +1,4 @@
-import { IUser, IChallenge, TreeNode, Actions } from "../types";
+import { IUser, IChallenge, TreeNode } from "../types";
 import chalk from "chalk";
 
 export class ProgressView {
@@ -77,13 +77,15 @@ export class ProgressView {
     }
 
     private buildStatsMessage(points: number, completionRate: string): string {
-        return `Your Stats
+        return `${chalk.bold("Your Stats")}
+
 Address: ${chalk.blue(this.userState.ens || this.userState.address)}
 ${chalk.yellow(`Points Earned: ${points.toLocaleString()}`)}
 
 Challenge Progress
 Total Challenges: ${chalk.blue(this.challenges.filter(c => c.enabled).length)}
-Completed: ${chalk.blue(`${this.userState.challenges.filter(c => c.status === "success").length} (${completionRate}%)`)}`;
+Completed: ${chalk.blue(`${this.userState.challenges.filter(c => c.status === "success").length} (${completionRate}%)`)}
+`;
     }
 
     private buildChallengeMessage(challenge: IChallenge, completion: any): string {
