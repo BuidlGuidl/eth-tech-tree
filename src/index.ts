@@ -39,7 +39,7 @@ export class TechTree {
     listenForQuit(): void {
         process.stdin.setRawMode(true);
         process.stdin.on('keypress', (_, key) => {
-            if ((key.ctrl && key.name === 'c') || key.name === 'q') {
+            if ((key.ctrl && key.name === 'c')) {
                 this.quit();
             }
         });
