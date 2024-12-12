@@ -1,5 +1,11 @@
 # eth-tech-tree
 
+## 0.1.13
+
+### Patch Changes
+
+- 419a741: Ask user for confirmation before resetting their challenge
+
 ## 0.1.12
 
 ### Patch Changes
