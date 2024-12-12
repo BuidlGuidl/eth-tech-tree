@@ -20,6 +20,11 @@ Submit a challenge:
        npx eth-tech-tree submit CHALLENGE_NAME CONTRACT_ADDRESS
 ```
 
+Reset your user state (it will re-prompt you for your address and install location):
+```bash
+       npx eth-tech-tree reset
+```
+
 ## Development
 Clone and `cd` into the repo then run this CLI application with the following commands
 - `yarn install`
