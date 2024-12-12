@@ -129,8 +129,7 @@ export class TechTree {
 
     getChallengeMessage(node: TreeNode): string {
         const { installLocation } = this.userState;
-        return `${chalk.bold(node.label)}
-${node.message}
+        return `${node.message}
 ${node.completed ? `
 🏆 Challenge Completed` : node.installed ? `
 Open up the challenge in your favorite code editor and follow the instructions in the README:
@@ -303,17 +302,22 @@ Open up the challenge in your favorite code editor and follow the instructions i
         } else {
             actions["Reset Challenge"] = async () => {
                 this.clearView();
-                const targetDir = `${installLocation}/${name}`;
-                console.log(`Removing ${targetDir}...`);
-                rmSync(targetDir, { recursive: true, force: true });
-                console.log(`Installing fresh copy of challenge...`);
-                await setupChallenge(name, installLocation);
-                this.globalTree = this.buildTree();
-                await this.pressEnterToContinue();
-                this.history.pop(); // Remove the old node from history since it has different actions
-                // Return to challenge menu
-                const challengeNode = this.findNode(this.globalTree, name) as TreeNode;
-                await this.navigate(challengeNode);
+                const confirmReset = await this.pressEnterToContinue("Are you sure you want to reset this challenge? This will remove the challenge from your local machine and re-install it.", false);
+                if (!confirmReset) {
+                    await this.goBack();
+                } else {
+                    const targetDir = `${installLocation}/${name}`;
+                    console.log(`Removing ${targetDir}...`);
+                    rmSync(targetDir, { recursive: true, force: true });
+                    console.log(`Installing fresh copy of challenge...`);
+                    await setupChallenge(name, installLocation);
+                    this.globalTree = this.buildTree();
+                    await this.pressEnterToContinue();
+                    this.history.pop(); // Remove the old node from history since it has different actions
+                    // Return to challenge menu
+                    const challengeNode = this.findNode(this.globalTree, name) as TreeNode;
+                    await this.navigate(challengeNode);
+                }
             };
             actions["Submit Completed Challenge"] = async () => {
                 this.clearView();
@@ -337,13 +341,15 @@ Open up the challenge in your favorite code editor and follow the instructions i
         return actions;
     };
 
-    async pressEnterToContinue(customMessage?: string) {
-        await confirm({
+    async pressEnterToContinue(customMessage?: string, defaultAnswer: boolean = true) {
+        const answer = await confirm({
             message: typeof customMessage === "string" ? customMessage : 'Press Enter to continue...',
+            default: defaultAnswer,
             theme: {
                 prefix: "",
             }
         });
+        return answer;
     }
 
     private clearView(): void {
