@@ -41,6 +41,10 @@ export const getDevice = (): string => {
   return `${hostname}(${platform}:${arch})`;
 }
 
+export const stripAnsi = (text: string): string => {
+  return text.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '');
+}
+
 export const calculatePoints = (completedChallenges: Array<{ challenge: IChallenge | undefined, completion: any }>): number => {
   const pointsPerLevel = [100, 150, 225, 300, 400, 500];
   return completedChallenges

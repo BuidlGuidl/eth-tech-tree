@@ -49,6 +49,7 @@ export type Actions = {
 
 export type TreeNode = {
   label: string;
+  shortname?: string;
   name: string;
   children: TreeNode[];
   type: "header" | "challenge" | "quiz" | "capstone-project";
