@@ -1,5 +1,11 @@
 # eth-tech-tree
 
+## 0.2.0
+
+### Minor Changes
+
+- 4353d48: Added leaderboard view
+
 ## 0.1.13
 
 ### Patch Changes
