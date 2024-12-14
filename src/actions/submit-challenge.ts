@@ -21,11 +21,14 @@ export async function submitChallenge(name: string, contractAddress?: string) {
     // Send the contract address to the server
     const response = await submitChallengeToServer(userAddress as string, "sepolia", name, contractAddress as string);
     if (response.result) {
-        const { passed, failingTests } = response.result;
+        const { passed, failingTests, error } = response.result;
         if (passed) {
             console.log("Challenge passed tests! Congratulations!");
-            // TODO: Update user state and reflect in tree
         } else {
+            if (error) {
+                console.log("The testing server encountered an error when running this test:");
+                console.log(chalk.red(error));
+            }
             console.log("Failing tests:", Object.keys(failingTests).length);
             for (const testName in failingTests) {
                 console.log(chalk.blue(testName), chalk.red(failingTests[testName].reason));

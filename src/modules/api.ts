@@ -72,3 +72,17 @@ export const submitChallengeToServer = async (userAddress: string, network: stri
     return {};
   }
 };
+
+/**
+ * Fetch Leaderboard
+ */
+export const fetchLeaderboard = async () => {
+  try {
+    const response = await fetch(`${API_URL}/leaderboard`);
+    const data = await response.json();
+    return data.leaderboard;
+  } catch (error) {
+    console.error('Error:', error);
+    return [];
+  }
+};

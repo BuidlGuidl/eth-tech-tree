@@ -7,7 +7,9 @@ import { getUser } from "./modules/api";
 import { setupChallenge, submitChallenge } from "./actions";
 import select from './utils/global-context-select-list';
 import { ProgressView } from "./utils/progress-view";
-import { calculatePoints } from "./utils/helpers";
+import { calculatePoints, stripAnsi } from "./utils/helpers";
+import { LeaderboardView } from "./utils/leaderboard-view";
+import { fetchLeaderboard } from "./modules/api";
 
 type GlobalChoice = {
     value: string;
@@ -30,6 +32,7 @@ export class TechTree {
             { value: 'quit', key: 'q' },
             { value: 'help', key: 'h' },
             { value: 'progress', key: 'p' },
+            { value: 'leaderboard', key: 'l' },
             { value: 'back', key: 'escape' },
             { value: 'back', key: 'backspace' },
         ];
@@ -73,7 +76,7 @@ export class TechTree {
         };
 
         try {
-            this.nodeLabel = node.label;
+            this.nodeLabel = node.shortname || node.label;
             this.clearView();
             this.printMenu();
             const { answer } = await select(directionsPrompt);
@@ -87,8 +90,11 @@ export class TechTree {
                 await selectedAction();
             }
         } catch (error) {
-            // Do nothing
-            // console.log(error);
+            if (error instanceof Error && error.name === 'ExitPromptError') {
+                // Because canceling the promise can cause the inquirer prompt to throw we need to silence this error
+              } else {
+                throw error;
+              }
         }
     }
 
@@ -101,6 +107,8 @@ export class TechTree {
             return () => this.printHelp();
         } else if (selectedActionLabel === 'progress') {
             return () => this.printProgress();
+        } else if (selectedActionLabel === 'leaderboard') {
+            return () => this.printLeaderboard();
         }
         throw new Error(`Invalid global choice: ${selectedActionLabel}`);
     }
@@ -375,8 +383,8 @@ Open up the challenge in your favorite code editor and follow the instructions i
 
         const width = process.stdout.columns;
         const userInfo = `${chalk.green(user)} ${chalk.yellow(`(${points} points)`)}`;
-        const topMenuText = chalk.bold(`${borderLeft}${currentViewName}${new Array(width - (this.stripAnsi(currentViewName).length + this.stripAnsi(userInfo).length + 4)).fill(border).join('')}${userInfo}${borderRight}`);
-        const bottomMenuText = chalk.bold(`${borderLeft}${chalk.bgBlue(`<q>`)} to quit | ${chalk.bgBlue(`<Esc>`)} to go back | ${chalk.bgBlue(`<p>`)} view progress${new Array(width - 54).fill(border).join('')}${borderRight}`);
+        const topMenuText = chalk.bold(`${borderLeft}${currentViewName}${new Array(width - (stripAnsi(currentViewName).length + stripAnsi(userInfo).length + 4)).fill(border).join('')}${userInfo}${borderRight}`);
+        const bottomMenuText = chalk.bold(`${borderLeft}${chalk.bgBlue(`<q>`)} to quit | ${chalk.bgBlue(`<Esc>`)} to go back | ${chalk.bgBlue(`<p>`)} view progress | ${chalk.bgBlue(`<l>`)} leaderboard${new Array(width - 72).fill(border).join('')}${borderRight}`);
         
         // Save cursor position
         process.stdout.write('\x1B7');
@@ -401,10 +409,6 @@ Open up the challenge in your favorite code editor and follow the instructions i
         process.stdout.write('\x1B[?25h');
     }
 
-    stripAnsi(text: string): string {
-        return text.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '');
-    }
-
     getMaxViewHeight(): number {
         const maxRows = 20;
         if (process.stdout.rows < maxRows) {
@@ -427,5 +431,12 @@ Open up the challenge in your favorite code editor and follow the instructions i
         const progressView = new ProgressView(this.userState, this.challenges);
         const progressTree = progressView.buildProgressTree();
         await this.navigate(progressTree);
+    }
+
+    async printLeaderboard(): Promise<void> {
+        const leaderboardData = await fetchLeaderboard();
+        const leaderboardView = new LeaderboardView(leaderboardData, this.userState.address);
+        const leaderboardTree = leaderboardView.buildLeaderboardTree();
+        await this.navigate(leaderboardTree);
     }
 }

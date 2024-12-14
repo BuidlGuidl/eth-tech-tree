@@ -53,9 +53,7 @@ export class ProgressView {
     private buildStatsMessage(points: number, completionRate: string): string {
         const totalChallenges = this.challenges.filter(c => c.enabled).length;
         const completedChallenges = this.userState.challenges.filter(c => c.status === "success").length;
-        return `${chalk.bold("Your Progress")}
-
-Address: ${chalk.green(this.userState.ens || this.userState.address)}
+        return `Address: ${chalk.green(this.userState.ens || this.userState.address)}
 ${chalk.yellow(`Points Earned: ${points.toLocaleString()}`)}
 
 Challenges Completed: ${chalk.blue(`${completedChallenges}/${totalChallenges} (${completionRate}%)`)}
@@ -63,8 +61,7 @@ ${completedChallenges ? "Details:" : ""}`;
     }
 
     private buildChallengeMessage(challenge: IChallenge, completion: any): string {
-        let message = `${chalk.bold(challenge.label)}\n\n`;
-        message += `Description: ${challenge.description}\n\n`;
+        let message = `Description: ${challenge.description}\n\n`;
         message += `Completion Date: ${chalk.blue(new Date(completion.timestamp).toLocaleString())}\n`;
         
         if (completion.contractAddress) {
