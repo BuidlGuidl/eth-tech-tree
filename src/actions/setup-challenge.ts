@@ -10,7 +10,7 @@ export const setupChallenge = async (name: string, installLocation: string) => {
     let challengeRepo = "BuidlGuidl/eth-tech-tree-challenges";
     challengeRepo = process.env.CHALLENGE_REPO || challengeRepo;
 
-    const extensionName = `${challengeRepo}:${name}-extension`;// Remove extension part eventually
+    const extensionName = `${challengeRepo}:${name}`;
     const challengeDir = `${installLocation}/${name}`;
     await execa("create-eth", ["-e", extensionName, challengeDir], { stdio: "inherit" });
     console.clear();
