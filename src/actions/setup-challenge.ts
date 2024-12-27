@@ -1,4 +1,5 @@
 import chalk from "chalk";
+import fs from "fs";
 import { execa } from "execa";
 import semver, { Range } from 'semver';
 
@@ -10,12 +11,19 @@ export const setupChallenge = async (name: string, installLocation: string) => {
     let challengeRepo = "BuidlGuidl/eth-tech-tree-challenges";
     challengeRepo = process.env.CHALLENGE_REPO || challengeRepo;
 
-    const extensionName = `${challengeRepo}:${name}`;
+    // Create install location if it doesn't exist
+    fs.mkdirSync(installLocation, { recursive: true });
+
+    const extensionName = `${challengeRepo}:${name}-extension`;
     const challengeDir = `${installLocation}/${name}`;
-    await execa("create-eth", ["-e", extensionName, challengeDir], { stdio: "inherit" });
-    console.clear();
-    console.log(chalk.green("Challenge setup completed successfully.\n"));
-    console.log(chalk.cyan(`Now open this repository in your favorite code editor and look at the readme for instructions:\n${challengeDir}`));
+    try {
+        await execa("create-eth", ["-e", extensionName, challengeDir], { stdio: "inherit" });
+        console.clear();
+        console.log(chalk.green("Challenge setup completed successfully.\n"));
+        console.log(chalk.cyan(`Now open this repository in your favorite code editor and look at the readme for instructions:\n${challengeDir}`));
+    } catch (e) {
+        console.error(`Failed to create challenge: ${name}, \n${e}`);
+    }    
 }
 
 const checkDependencyInstalled = async (name: RequiredDependency) => {
