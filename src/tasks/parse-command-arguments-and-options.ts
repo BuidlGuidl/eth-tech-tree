@@ -1,8 +1,8 @@
 import arg from "arg";
 import { IUser } from "../types";
 import fs from "fs";
-import { select, input } from "@inquirer/prompts";
-import { isValidAddress } from "../utils/helpers";
+import { search, input } from "@inquirer/prompts";
+import { isValidAddress, searchChallenges } from "../utils/helpers";
 import { promptForMissingUserState } from "./prompt-for-missing-user-state";
 
 type Commands = {
@@ -26,6 +26,28 @@ type SubmitCommand = {
 }
 
 export type CommandOptions = BaseOptions & { command: string | null } & SetupCommand & SubmitCommand;
+
+export type Choice<Value> = {
+  value: Value;
+  name?: string;
+  description?: string;
+  short?: string;
+  disabled?: boolean | string;
+};
+
+type SearchOptions = {
+  type: "search";
+  name: string;
+  message: string;
+  source: (term: string | undefined) => Promise<Choice<string>[]>;
+}
+
+type InputOptions = {
+  type: "input";
+  name: string;
+  message: string;
+  validate: (value: string) => string | true;
+}
 
 const commandArguments = {
   setup: {
@@ -76,9 +98,6 @@ export async function parseCommandArgumentsAndOptions(
 }
 
 export async function promptForMissingCommandArgs(commands: CommandOptions, userState: IUser): Promise<CommandOptions> {
-  const cliAnswers = Object.fromEntries(
-    Object.entries(commands).filter(([key, value]) => value !== null)
-  );
   const questions = [];
 
   const { command, challenge, contractAddress } = commands;
@@ -90,9 +109,10 @@ export async function promptForMissingCommandArgs(commands: CommandOptions, user
   if (command === "setup") {
     if (!challenge) {
       questions.push({
-        type: "input",
+        type: "search",
         name: "challenge",
         message: "Which challenge would you like to setup?",
+        source: searchChallenges
       });
     }
     if (!installLocation) {
@@ -112,24 +132,30 @@ export async function promptForMissingCommandArgs(commands: CommandOptions, user
 
     if (!challenge) {
       questions.push({
-        type: "input",
+        type: "search",
         name: "challenge",
         message: "Which challenge would you like to submit?",
+        source: searchChallenges
       });
     }
     if (!contractAddress) {
       questions.push({
         type: "input",
         name: "contractAddress",
-        message: "What is the deployed contract address?",
-        validate: isValidAddress,
+        message: "What is the contract address of your completed challenge?",
+        validate: (value: string) => isValidAddress(value) ? true : "Please enter a valid contract address",
       });
     }
   }
-  const answers = [];
+  const answers: Record<string, string> = {};
   for (const question of questions) {
-    const answer = await input(question);
-    answers.push(answer);
+    if (question.type === "search") {
+      const answer = await search(question as unknown as SearchOptions);
+      answers[question.name] = answer;
+    } else if (question.type === "input") {
+      const answer = await input(question as InputOptions);
+      answers[question.name] = answer;
+    }
   }
 
   return {
