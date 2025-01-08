@@ -10,7 +10,8 @@ const defaultOptions: Partial<IUser> = {
 };
 
 export async function promptForMissingUserState(
-  userState: IUser
+  userState: IUser,
+  skipInstallLocation: boolean = false
 ): Promise<IUser> {
   const userDevice = getDevice();
   let identifier = userState.address;
@@ -39,7 +40,7 @@ export async function promptForMissingUserState(
   }
 
   // Prompt for install location if it doesn't exist on device
-  if (!existingInstallLocation) {
+  if (!existingInstallLocation && !skipInstallLocation) {
     const answer = await input({
       message: "Where would you like to download the challenges?",
       default: defaultOptions.installLocation,
@@ -53,8 +54,8 @@ export async function promptForMissingUserState(
   }
   
   const { address, ens, installLocations, challenges, creationTimestamp } = user;
-  const thisDeviceLocation = installLocations.find((loc: {location: string, device: string}) => loc.device === userDevice);
-  const newState = { address, ens, installLocation: thisDeviceLocation.location, challenges, creationTimestamp };
+  const thisDeviceLocation = installLocations?.find((loc: {location: string, device: string}) => loc.device === userDevice);
+  const newState = { address, ens, installLocation: thisDeviceLocation?.location, challenges, creationTimestamp };
   if (JSON.stringify(userState) !== JSON.stringify(newState)) {
     // Save the new state locally
     await saveUserState(newState);
