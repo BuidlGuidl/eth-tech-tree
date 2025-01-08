@@ -128,7 +128,7 @@ export async function promptForMissingCommandArgs(commands: CommandOptions, user
 
   if (command === "submit") {
     // Need user state so direct to promptForMissingUserState
-    await promptForMissingUserState(userState);
+    await promptForMissingUserState(userState, true);
 
     if (!challenge) {
       questions.push({
