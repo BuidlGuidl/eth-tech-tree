@@ -91,7 +91,7 @@ export class TechTree {
             }
         } catch (error) {
             if (error instanceof Error && error.name === 'ExitPromptError') {
-                // Because canceling the promise can cause the inquirer prompt to throw we need to silence this error
+                // Because canceling the promise (e.g. ctrl+c) can cause the inquirer prompt to throw we need to silence this error
               } else {
                 throw error;
               }

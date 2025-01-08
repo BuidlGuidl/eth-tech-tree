@@ -2,14 +2,15 @@ import { loadUserState } from "../utils/state-manager";
 import { submitChallengeToServer } from "../modules/api";
 import chalk from "chalk";
 import { input } from "@inquirer/prompts";
+import { isValidAddress } from "../utils/helpers";
 
 export async function submitChallenge(name: string, contractAddress?: string) {
     const { address: userAddress } = loadUserState();
     if (!contractAddress) {
         // Prompt the user for the contract address
         const question = {
-            message: "Completed challenge contract address on Sepolia:",
-            validate: (value: string) => /^0x[a-fA-F0-9]{40}$/.test(value),
+            message: "What is the contract address of your completed challenge?:",
+            validate: (value: string) => isValidAddress(value) ? true : "Please enter a valid contract address",
         };
         const answer = await input(question);
         contractAddress = answer;

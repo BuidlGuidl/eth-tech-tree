@@ -10,18 +10,26 @@ import { TechTree } from ".";
 
 
 export async function cli(args: Args) {
-  const commands = await parseCommandArgumentsAndOptions(args);
-  const userState = loadUserState();
-  if (commands.command || commands.help) {
-    const parsedCommands = await promptForMissingCommandArgs(commands, userState);
-    await handleCommand(parsedCommands);
-  } else {
-    await renderIntroMessage();
-    await init(userState);
-    // Navigate tree
-    const techTree = new TechTree();
+  try {
+    const commands = await parseCommandArgumentsAndOptions(args);
+    const userState = loadUserState();
+    if (commands.command || commands.help) {
+      const parsedCommands = await promptForMissingCommandArgs(commands, userState);
+      await handleCommand(parsedCommands);
+    } else {
+      await renderIntroMessage();
+      await init(userState);
+      // Navigate tree
+      const techTree = new TechTree();
 
-    await techTree.start();
+      await techTree.start();
+    }
+  } catch (error) {
+    if (error instanceof Error && error.name === 'ExitPromptError') {
+      // Because canceling the promise (e.g. ctrl+c) can cause the inquirer prompt to throw we need to silence this error
+    } else {
+      throw error;
+    }
   }
 }
 
