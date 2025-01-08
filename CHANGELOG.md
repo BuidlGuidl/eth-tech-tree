@@ -1,5 +1,11 @@
 # eth-tech-tree
 
+## 0.2.1
+
+### Patch Changes
+
+- 546b37a: Update validation messages when submitting a completed CA for a challenge, Add searchable list when setting up or submitting with command, few extra bug-fixes/tweaks
+
 ## 0.2.0
 
 ### Minor Changes
