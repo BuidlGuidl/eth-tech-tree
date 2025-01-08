@@ -1,6 +1,9 @@
 import os from "os";
 import fs from "fs";
 import { IChallenge } from "../types";
+import { loadChallenges } from "./state-manager";
+import { fetchChallenges } from "../modules/api";
+import { Choice } from "../tasks/parse-command-arguments-and-options";
 
 export function wait(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms));
@@ -53,4 +56,14 @@ export const calculatePoints = (completedChallenges: Array<{ challenge: IChallen
           const points = pointsPerLevel[challenge!.level - 1] || 100;
           return total + points;
       }, 0);
+}
+
+export const searchChallenges = async (term: string = "") => {
+  const challenges = (await fetchChallenges()).filter((challenge: IChallenge) => challenge.enabled);
+  const choices = challenges.map((challenge: IChallenge) => ({
+      value: challenge.name,
+      name: challenge.label,
+      description: ""
+  }));
+  return choices.filter((choice: Choice<string>) => choice.name?.toLowerCase().includes(term.toLowerCase()));
 }
