@@ -69,6 +69,8 @@ export async function parseCommandArgumentsAndOptions(
         "--dev": Boolean,
         "--help": Boolean,
         "-h": "--help",
+        "--version": Boolean,
+        "-v": "--version"
       },
       {
         argv: args,
@@ -79,7 +81,9 @@ export async function parseCommandArgumentsAndOptions(
   
     const help = parsedArgs["--help"] ?? parsedArgs._[0] === 'help' ?? false;
 
-    const command = parsedArgs._[0] ?? null;
+    const version = parsedArgs["--version"] ?? parsedArgs._[0] === 'version' ?? false;
+
+    const command = version ? 'version' : parsedArgs._[0] ?? null;
 
     const argumentObject: Partial<CommandOptions> = {
       dev,
