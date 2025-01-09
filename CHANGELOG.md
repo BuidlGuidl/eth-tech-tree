@@ -1,5 +1,11 @@
 # eth-tech-tree
 
+## 0.2.2
+
+### Patch Changes
+
+- 51926e1: add version flag
+
 ## 0.2.1
 
 ### Patch Changes
