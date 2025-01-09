@@ -1,5 +1,6 @@
 import { CommandOptions } from "./parse-command-arguments-and-options";
 import { removeStorage, setupChallenge, submitChallenge } from "../actions";
+import { version } from '../../package.json'
 
 export async function handleCommand(commands: CommandOptions) {
     const { command, installLocation, challenge, contractAddress, dev, help } = commands;
@@ -9,6 +10,11 @@ export async function handleCommand(commands: CommandOptions) {
         return;
     }
     
+    if (command === 'version') {
+        console.log(version)
+        return
+    }
+
     if (command === "setup") {
         await setupChallenge(challenge as string, installLocation as string);
     }
