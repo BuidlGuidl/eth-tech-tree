@@ -1,5 +1,11 @@
 # eth-tech-tree
 
+## 0.2.3
+
+### Patch Changes
+
+- 48a2fc2: Updating release workflow to commit package version changes
+
 ## 0.2.2
 
 ### Patch Changes
