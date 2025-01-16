@@ -299,7 +299,6 @@ Open up the challenge in your favorite code editor and follow the instructions i
             return { node: newNode as TreeNode, selection };
         });
         this.history = newHistory;
-        // this.history.pop(); // Remove the old node from history since it has different actions
     }
 
     getChallengeActions(challenge: TreeNode): Actions {
