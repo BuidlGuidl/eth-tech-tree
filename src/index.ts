@@ -314,8 +314,7 @@ Open up the challenge in your favorite code editor and follow the instructions i
                 // Wait for enter key
                 await this.pressEnterToContinue();
                 // Return to challenge menu
-                const challengeNode = this.findNode(this.globalTree, name) as TreeNode;
-                await this.navigate(challengeNode);
+                await this.goBack();
             };
         } else {
             actions["Reset Challenge"] = async () => {
