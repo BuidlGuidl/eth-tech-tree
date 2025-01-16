@@ -290,6 +290,17 @@ Open up the challenge in your favorite code editor and follow the instructions i
         return existsSync(targetDir);
     }
 
+    rebuildHistory():void {
+        // Rebuild Global tree
+        this.globalTree = this.buildTree();
+        // For each node in the current history, find the new node in the newly created tree
+        const newHistory = this.history.map(({ node, selection }) => {
+            const newNode = this.findNode(this.globalTree, node.name);
+            return { node: newNode as TreeNode, selection };
+        });
+        this.history = newHistory;
+    }
+
     getChallengeActions(challenge: TreeNode): Actions {
         const actions: Actions = {};
         const { address, installLocation } = this.userState;
@@ -298,14 +309,12 @@ Open up the challenge in your favorite code editor and follow the instructions i
             actions["Setup Challenge Repository"] = async () => {
                 this.clearView();
                 await setupChallenge(name, installLocation);
-                // Rebuild the tree
-                this.globalTree = this.buildTree();
+                // Rebuild the tree and history
+                this.rebuildHistory();
                 // Wait for enter key
                 await this.pressEnterToContinue();
-                this.history.pop(); // Remove the old node from history since it has different actions
                 // Return to challenge menu
-                const challengeNode = this.findNode(this.globalTree, name) as TreeNode;
-                await this.navigate(challengeNode);
+                await this.goBack();
             };
         } else {
             actions["Reset Challenge"] = async () => {
@@ -319,12 +328,11 @@ Open up the challenge in your favorite code editor and follow the instructions i
                     rmSync(targetDir, { recursive: true, force: true });
                     console.log(`Installing fresh copy of challenge...`);
                     await setupChallenge(name, installLocation);
-                    this.globalTree = this.buildTree();
+                    // Rebuild the tree and history
+                    this.rebuildHistory();
                     await this.pressEnterToContinue();
-                    this.history.pop(); // Remove the old node from history since it has different actions
                     // Return to challenge menu
-                    const challengeNode = this.findNode(this.globalTree, name) as TreeNode;
-                    await this.navigate(challengeNode);
+                    await this.goBack();
                 }
             };
             actions["Submit Completed Challenge"] = async () => {
@@ -336,14 +344,12 @@ Open up the challenge in your favorite code editor and follow the instructions i
                 this.userState.challenges = newUserState.challenges;
                 // Save the new user state locally
                 await saveUserState(this.userState);
-                // Rebuild the tree
-                this.globalTree = this.buildTree();
+                // Rebuild the tree and history
+                this.rebuildHistory();
                 // Wait for enter key
                 await this.pressEnterToContinue();
-                this.history.pop(); // Remove the old node from history since it has different actions
                 // Return to challenge menu
-                const challengeNode = this.findNode(this.globalTree, name) as TreeNode;
-                await this.navigate(challengeNode);
+                await this.goBack();
             };
         }
         return actions;
