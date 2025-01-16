@@ -1,5 +1,11 @@
 # eth-tech-tree
 
+## 0.2.4
+
+### Patch Changes
+
+- 351913b: Fixed a small bug when showing tree history, Also removed the (Y/n) that showed when prompted with "Press Enter to continue"
+
 ## 0.2.3
 
 ### Patch Changes
