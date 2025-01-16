@@ -1,5 +1,5 @@
 import { existsSync, rmSync } from "fs";
-import { confirm } from "@inquirer/prompts";
+import { confirm, input } from "@inquirer/prompts";
 import { IUserChallenge, IChallenge, TreeNode, IUser, Actions } from "./types";
 import chalk from "chalk";
 import { loadChallenges, loadUserState, saveUserState } from "./utils/state-manager";
@@ -319,7 +319,7 @@ Open up the challenge in your favorite code editor and follow the instructions i
         } else {
             actions["Reset Challenge"] = async () => {
                 this.clearView();
-                const confirmReset = await this.pressEnterToContinue("Are you sure you want to reset this challenge? This will remove the challenge from your local machine and re-install it.", false);
+                const confirmReset = await this.yesOrNo("Are you sure you want to reset this challenge? This will remove the challenge from your local machine and re-install it.", false);
                 if (!confirmReset) {
                     await this.goBack();
                 } else {
@@ -355,10 +355,20 @@ Open up the challenge in your favorite code editor and follow the instructions i
         return actions;
     };
 
-    async pressEnterToContinue(customMessage?: string, defaultAnswer: boolean = true) {
+    async yesOrNo(message: string, defaultAnswer: boolean = true) {
         const answer = await confirm({
-            message: typeof customMessage === "string" ? customMessage : 'Press Enter to continue...',
+            message,
             default: defaultAnswer,
+            theme: {
+                prefix: "",
+            }
+        });
+        return answer;
+    }
+
+    async pressEnterToContinue(customMessage?: string) {
+        const answer = await input({
+            message: typeof customMessage === "string" ? customMessage : 'Press Enter to continue...',
             theme: {
                 prefix: "",
             }
