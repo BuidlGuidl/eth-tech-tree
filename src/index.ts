@@ -53,7 +53,7 @@ export class TechTree {
         await this.navigate();
     }
 
-    async navigate(node?: TreeNode, selection?: string): Promise<void> {
+    async navigate(node?: TreeNode, selection?: string, heightOffset = 3): Promise<void> {
         if (!node) {
             this.globalTree = this.buildTree();
             node = Object.assign({}, this.globalTree);
@@ -68,7 +68,7 @@ export class TechTree {
             choices,
             loop: false,
             default: selection,
-            pageSize: this.getMaxViewHeight() - 3,
+            pageSize: this.getMaxViewHeight() - heightOffset,
             theme: {
                 helpMode: "always" as "never" | "always" | "auto" | undefined,
                 prefix: ""
@@ -446,13 +446,13 @@ Open up the challenge in your favorite code editor and follow the instructions i
     async printProgress(): Promise<void> {
         const progressView = new ProgressView(this.userState, this.challenges);
         const progressTree = progressView.buildProgressTree();
-        await this.navigate(progressTree);
+        await this.navigate(progressTree, undefined, 6);
     }
 
     async printLeaderboard(): Promise<void> {
         const leaderboardData = await fetchLeaderboard();
         const leaderboardView = new LeaderboardView(leaderboardData, this.userState.address);
         const leaderboardTree = leaderboardView.buildLeaderboardTree();
-        await this.navigate(leaderboardTree);
+        await this.navigate(leaderboardTree, undefined, 6);
     }
 }
