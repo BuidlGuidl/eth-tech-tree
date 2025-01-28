@@ -56,8 +56,8 @@ async function checkTerminalSize(): Promise<void> {
 }
 
 export const TITLE_TEXT = `${chalk.green('╔═══════════════════════════════════════════════════════════════╗')}
-${chalk.green('║')}${chalk.blue(' ▗▄▄▄▖▗▄▄▄▖▗▖ ▗▖   ▗▄▄▄▖▗▄▄▄▖ ▗▄▄▖▗▖ ▗▖   ▗▄▄▄▖▗▄▄▖ ▗▄▄▄▖▗▄▄▄▖ ')}${chalk.green('║')}
-${chalk.green('║')}${chalk.blue(' ▐▌     █  ▐▌ ▐▌     █  ▐▌   ▐▌   ▐▌ ▐▌     █  ▐▌ ▐▌▐▌   ▐▌    ')}${chalk.green('║')}
-${chalk.green('║')}${chalk.blue(' ▐▛▀▀▘  █  ▐▛▀▜▌     █  ▐▛▀▀▘▐▌   ▐▛▀▜▌     █  ▐▛▀▚▖▐▛▀▀▘▐▛▀▀▘ ')}${chalk.green('║')}
-${chalk.green('║')}${chalk.blue(' ▐▙▄▄▖  █  ▐▌ ▐▌     █  ▐▙▄▄▖▝▚▄▄▖▐▌ ▐▌     █  ▐▌ ▐▌▐▙▄▄▖▐▙▄▄▖ ')}${chalk.green('║')}
+${chalk.green('║')}${chalk.blueBright(' ▗▄▄▄▖▗▄▄▄▖▗▖ ▗▖   ▗▄▄▄▖▗▄▄▄▖ ▗▄▄▖▗▖ ▗▖   ▗▄▄▄▖▗▄▄▖ ▗▄▄▄▖▗▄▄▄▖ ')}${chalk.green('║')}
+${chalk.green('║')}${chalk.blueBright(' ▐▌     █  ▐▌ ▐▌     █  ▐▌   ▐▌   ▐▌ ▐▌     █  ▐▌ ▐▌▐▌   ▐▌    ')}${chalk.green('║')}
+${chalk.green('║')}${chalk.blueBright(' ▐▛▀▀▘  █  ▐▛▀▜▌     █  ▐▛▀▀▘▐▌   ▐▛▀▜▌     █  ▐▛▀▚▖▐▛▀▀▘▐▛▀▀▘ ')}${chalk.green('║')}
+${chalk.green('║')}${chalk.blueBright(' ▐▙▄▄▖  █  ▐▌ ▐▌     █  ▐▙▄▄▖▝▚▄▄▖▐▌ ▐▌     █  ▐▌ ▐▌▐▙▄▄▖▐▙▄▄▖ ')}${chalk.green('║')}
 ${chalk.green('╚═══════════════════════════════════════════════════════════════╝')}`;
