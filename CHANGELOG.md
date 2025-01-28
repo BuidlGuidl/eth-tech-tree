@@ -1,5 +1,11 @@
 # eth-tech-tree
 
+## 0.3.0
+
+### Minor Changes
+
+- 9a8ce39: using create-eth extensions for challenges, bug fixes with coloring of menus and view height
+
 ## 0.2.4
 
 ### Patch Changes
