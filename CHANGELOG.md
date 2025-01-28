@@ -1,5 +1,13 @@
 # eth-tech-tree
 
+## 0.3.1
+
+### Patch Changes
+
+- 576ea98: downgrade create-eth version
+- 3c9df1e: update lockfile
+- 775537e: downgrading create-eth due to bug in latest version
+
 ## 0.3.0
 
 ### Minor Changes
