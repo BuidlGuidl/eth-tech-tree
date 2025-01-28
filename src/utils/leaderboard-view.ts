@@ -53,7 +53,7 @@ export class LeaderboardView {
     private buildEntryMessage(entry: LeaderboardEntry): string {
         return `${chalk.bold(`Rank ${entry.rank}`)}
 Points: ${chalk.yellow(entry.points.toLocaleString())}
-Challenges Completed: ${chalk.blue(entry.challengesCompleted.toString())}
+Challenges Completed: ${chalk.blueBright(entry.challengesCompleted.toString())}
 Total Gas Used: ${chalk.green(entry.totalGasUsed.toLocaleString())}
 `;
     }
