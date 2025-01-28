@@ -400,7 +400,7 @@ Open up the challenge in your favorite code editor and follow the instructions i
         const width = process.stdout.columns;
         const userInfo = `${chalk.green(user)} ${chalk.yellow(`(${points} points)`)}`;
         const topMenuText = chalk.bold(`${borderLeft}${currentViewName}${new Array(width - (stripAnsi(currentViewName).length + stripAnsi(userInfo).length + 4)).fill(border).join('')}${userInfo}${borderRight}`);
-        const bottomMenuText = chalk.bold(`${borderLeft}${chalk.bgBlue(`<q>`)} to quit | ${chalk.bgBlue(`<Esc>`)} to go back | ${chalk.bgBlue(`<p>`)} view progress | ${chalk.bgBlue(`<l>`)} leaderboard${new Array(width - 72).fill(border).join('')}${borderRight}`);
+        const bottomMenuText = chalk.bold(`${borderLeft}${chalk.bgBlueBright(`<q>`)} to quit | ${chalk.bgBlueBright(`<Esc>`)} to go back | ${chalk.bgBlueBright(`<p>`)} view progress | ${chalk.bgBlueBright(`<l>`)} leaderboard${new Array(width - 72).fill(border).join('')}${borderRight}`);
         
         // Save cursor position
         process.stdout.write('\x1B7');
