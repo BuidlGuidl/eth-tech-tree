@@ -53,7 +53,7 @@ export class TechTree {
         await this.navigate();
     }
 
-    async navigate(node?: TreeNode, selection?: string): Promise<void> {
+    async navigate(node?: TreeNode, selection?: string, heightOffset = 3): Promise<void> {
         if (!node) {
             this.globalTree = this.buildTree();
             node = Object.assign({}, this.globalTree);
@@ -68,7 +68,7 @@ export class TechTree {
             choices,
             loop: false,
             default: selection,
-            pageSize: this.getMaxViewHeight() - 3,
+            pageSize: this.getMaxViewHeight() - heightOffset,
             theme: {
                 helpMode: "always" as "never" | "always" | "auto" | undefined,
                 prefix: ""
@@ -400,7 +400,7 @@ Open up the challenge in your favorite code editor and follow the instructions i
         const width = process.stdout.columns;
         const userInfo = `${chalk.green(user)} ${chalk.yellow(`(${points} points)`)}`;
         const topMenuText = chalk.bold(`${borderLeft}${currentViewName}${new Array(width - (stripAnsi(currentViewName).length + stripAnsi(userInfo).length + 4)).fill(border).join('')}${userInfo}${borderRight}`);
-        const bottomMenuText = chalk.bold(`${borderLeft}${chalk.bgBlue(`<q>`)} to quit | ${chalk.bgBlue(`<Esc>`)} to go back | ${chalk.bgBlue(`<p>`)} view progress | ${chalk.bgBlue(`<l>`)} leaderboard${new Array(width - 72).fill(border).join('')}${borderRight}`);
+        const bottomMenuText = chalk.bold(`${borderLeft}${chalk.bgBlueBright(`<q>`)} to quit | ${chalk.bgBlueBright(`<Esc>`)} to go back | ${chalk.bgBlueBright(`<p>`)} view progress | ${chalk.bgBlueBright(`<l>`)} leaderboard${new Array(width - 72).fill(border).join('')}${borderRight}`);
         
         // Save cursor position
         process.stdout.write('\x1B7');
@@ -446,13 +446,13 @@ Open up the challenge in your favorite code editor and follow the instructions i
     async printProgress(): Promise<void> {
         const progressView = new ProgressView(this.userState, this.challenges);
         const progressTree = progressView.buildProgressTree();
-        await this.navigate(progressTree);
+        await this.navigate(progressTree, undefined, 6);
     }
 
     async printLeaderboard(): Promise<void> {
         const leaderboardData = await fetchLeaderboard();
         const leaderboardView = new LeaderboardView(leaderboardData, this.userState.address);
         const leaderboardTree = leaderboardView.buildLeaderboardTree();
-        await this.navigate(leaderboardTree);
+        await this.navigate(leaderboardTree, undefined, 6);
     }
 }
