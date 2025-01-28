@@ -8,8 +8,7 @@ type RequiredDependency = "node" | "git" | "yarn" | "foundryup";
 export const setupChallenge = async (name: string, installLocation: string) => {
     checkUserDependencies();
 
-    let challengeRepo = "BuidlGuidl/eth-tech-tree-challenges";
-    challengeRepo = process.env.CHALLENGE_REPO || challengeRepo;
+    const challengeRepo = process.env.CHALLENGE_REPO || "BuidlGuidl/eth-tech-tree-challenges";
 
     // Create install location if it doesn't exist
     fs.mkdirSync(installLocation, { recursive: true });
