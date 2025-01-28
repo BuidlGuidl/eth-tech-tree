@@ -245,7 +245,7 @@ Open up the challenge in your favorite code editor and follow the instructions i
 
 
         if (isHeader) {
-            return `${depth}${chalk.blue(label)}`;
+            return `${depth}${chalk.blueBright(label)}`;
         } else if (!unlocked) {
             return `${depth}${chalk.dim(chalk.dim(label))}`;
         } else if (isChallenge) {
@@ -382,9 +382,9 @@ Open up the challenge in your favorite code editor and follow the instructions i
     }
 
     private printMenu(): void {
-        const border = chalk.blue("─");
-        const borderLeft = chalk.blue("●─");
-        const borderRight = chalk.blue("─●");
+        const border = chalk.blueBright("─");
+        const borderLeft = chalk.blueBright("●─");
+        const borderRight = chalk.blueBright("─●");
         const currentViewName = this.nodeLabel || "Main Menu";
         const user = this.userState.ens || this.userState.address;
         const completedChallenges = this.userState.challenges
@@ -400,7 +400,7 @@ Open up the challenge in your favorite code editor and follow the instructions i
         const width = process.stdout.columns;
         const userInfo = `${chalk.green(user)} ${chalk.yellow(`(${points} points)`)}`;
         const topMenuText = chalk.bold(`${borderLeft}${currentViewName}${new Array(width - (stripAnsi(currentViewName).length + stripAnsi(userInfo).length + 4)).fill(border).join('')}${userInfo}${borderRight}`);
-        const bottomMenuText = chalk.bold(`${borderLeft}${chalk.bgBlueBright(`<q>`)} to quit | ${chalk.bgBlueBright(`<Esc>`)} to go back | ${chalk.bgBlueBright(`<p>`)} view progress | ${chalk.bgBlueBright(`<l>`)} leaderboard${new Array(width - 72).fill(border).join('')}${borderRight}`);
+        const bottomMenuText = chalk.bold(`${borderLeft}${chalk.bgGreen(`<q>`)} to quit | ${chalk.bgGreen(`<Esc>`)} to go back | ${chalk.bgGreen(`<p>`)} view progress | ${chalk.bgGreen(`<l>`)} leaderboard${new Array(width - 72).fill(border).join('')}${borderRight}`);
         
         // Save cursor position
         process.stdout.write('\x1B7');

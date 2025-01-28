@@ -32,7 +32,7 @@ export async function submitChallenge(name: string, contractAddress?: string) {
             }
             console.log("Failing tests:", Object.keys(failingTests).length);
             for (const testName in failingTests) {
-                console.log(chalk.blue(testName), chalk.red(failingTests[testName].reason));
+                console.log(chalk.blueBright(testName), chalk.red(failingTests[testName].reason));
             }
             console.log("");
             console.log("Challenge failed tests. See output above for details.");

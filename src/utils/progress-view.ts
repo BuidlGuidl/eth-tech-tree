@@ -56,17 +56,17 @@ export class ProgressView {
         return `Address: ${chalk.green(this.userState.ens || this.userState.address)}
 ${chalk.yellow(`Points Earned: ${points.toLocaleString()}`)}
 
-Challenges Completed: ${chalk.blue(`${completedChallenges}/${totalChallenges} (${completionRate}%)`)}
+Challenges Completed: ${chalk.blueBright(`${completedChallenges}/${totalChallenges} (${completionRate}%)`)}
 ${completedChallenges ? "Details:" : ""}`;
     }
 
     private buildChallengeMessage(challenge: IChallenge, completion: any): string {
         let message = `Description: ${challenge.description}\n\n`;
-        message += `Completion Date: ${chalk.blue(new Date(completion.timestamp).toLocaleString())}\n`;
+        message += `Completion Date: ${chalk.blueBright(new Date(completion.timestamp).toLocaleString())}\n`;
         
         if (completion.contractAddress) {
-            message += `Contract Address: ${chalk.blue(completion.contractAddress)}\n`;
-            message += `Network: ${chalk.blue(completion.network)}\n`;
+            message += `Contract Address: ${chalk.blueBright(completion.contractAddress)}\n`;
+            message += `Network: ${chalk.blueBright(completion.network)}\n`;
         }
 
         return message;
