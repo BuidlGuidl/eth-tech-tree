@@ -2,4 +2,4 @@
 "eth-tech-tree": minor
 ---
 
-Added leaderboard view
+Updated create-eth to 1.0.2

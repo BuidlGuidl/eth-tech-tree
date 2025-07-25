@@ -11,6 +11,9 @@ import { calculatePoints, stripAnsi } from "./utils/helpers";
 import { LeaderboardView } from "./utils/leaderboard-view";
 import { fetchLeaderboard } from "./modules/api";
 
+// Set to true for a flat tree with all challenges at the top level
+const FLAT_TREE_MODE = true;
+
 type GlobalChoice = {
     value: string;
     key: string;
@@ -148,6 +151,28 @@ Open up the challenge in your favorite code editor and follow the instructions i
 
     buildTree(): TreeNode {
         const userChallenges = this.userState?.challenges || [];
+        
+        if (FLAT_TREE_MODE) {
+            // Flat tree mode: all challenges at the top level
+            const allChallenges = this.challenges.filter((challenge: IChallenge) => challenge.enabled);
+            const transformedChallenges = allChallenges.map((challenge: IChallenge) => {
+                const { label, name, level, type, childrenNames, enabled: unlocked, description } = challenge;
+                const completed = userChallenges.find((c: IUserChallenge) => c.challengeName === name)?.status === "success";
+
+                return { label, name, level, type: type as "challenge", actions: this.getChallengeActions(challenge as unknown as TreeNode), completed, installed: this.challengeIsInstalled(challenge as unknown as TreeNode), childrenNames, parentName: undefined, unlocked, message: description, children: [] };
+            });
+
+            const mainMenu: TreeNode = {
+                label: "Main Menu",
+                name: "main-menu",
+                type: "header",
+                children: transformedChallenges,
+            };
+
+            return mainMenu;
+        }
+
+        // Original hierarchical tree mode
         const tree: TreeNode[] = [];
         const tags = this.challenges.reduce((acc: string[], challenge: IChallenge) => {
             return Array.from(new Set(acc.concat(challenge.tags)));
