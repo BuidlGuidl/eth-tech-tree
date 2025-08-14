@@ -56,14 +56,14 @@ export const upsertUser = async (userData: { address?: string, ens?: string, dev
 /**
  * Submit Challenge
  */
-export const submitChallengeToServer = async (userAddress: string, network: string, challengeName: string, contractAddress: string) => {
+export const submitChallengeToServer = async (userAddress: string, challengeName: string, contractAddress: string) => {
   try {
     const response = await fetch(`${API_URL}/submit`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ challengeName, contractAddress, network, userAddress }),
+      body: JSON.stringify({ challengeName, contractAddress, userAddress }),
     });
     const data = await response.json();
     return data;

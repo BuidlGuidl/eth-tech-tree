@@ -20,7 +20,7 @@ export async function submitChallenge(name: string, contractAddress?: string) {
     console.log("");
 
     // Send the contract address to the server
-    const response = await submitChallengeToServer(userAddress as string, "sepolia", name, contractAddress as string);
+    const response = await submitChallengeToServer(userAddress as string, name, contractAddress as string);
     if (response.result) {
         const { passed, failingTests, error } = response.result;
         if (passed) {
