@@ -1,42 +1,50 @@
 import chalk from "chalk";
 import { wait } from "../utils/helpers";
+import { version } from "../../package.json";
 
 const MAX_VIEW_HEIGHT = 20; // Match the max height from index.ts
 
 export async function renderIntroMessage() {
   await checkTerminalSize();
   console.clear();
-  const trimmedText = getTrimmedTitleText();
+  const trimmedText = getTrimmedTitleText(version);
   console.log(trimmedText);
   await wait(1500);
   console.clear();
 }
 
-function getTrimmedTitleText(): string {
+function getTrimmedTitleText(currVersion: string): string {
+  const stripAnsi = (s: string) => s.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '');
   const lines = TITLE_TEXT.split('\n').filter(line => line.length > 0);
   const { columns } = process.stdout;
-  
-  // Calculate the width of the longest line (without ANSI escape codes)
-  const maxLineWidth = Math.max(...lines.map(line => 
-    line.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '').length
-  ));
-  
-  // Calculate horizontal padding
+
+  const maxLineWidth = Math.max(...lines.map(line => stripAnsi(line).length));
+
   const horizontalPadding = Math.max(0, Math.floor((columns - maxLineWidth) / 2));
-  
-  // Calculate vertical padding within MAX_VIEW_HEIGHT
-  const verticalPadding = Math.max(0, Math.floor((MAX_VIEW_HEIGHT - lines.length) / 2));
-  
-  // Add horizontal padding to each line
+
+  // Space for extra subtitle + version lines
+  const totalLines = lines.length + 2;
+  const verticalPadding = Math.max(0, Math.floor((MAX_VIEW_HEIGHT - totalLines) / 2));
+
   const centeredLines = lines.map(line => ' '.repeat(horizontalPadding) + line);
-  
-  // Add vertical padding
+
+  const subtitleStyled = chalk.dim.bold('Build • Learn • Level Up');
+  const subtitleInnerPad = Math.max(0, Math.floor((maxLineWidth - stripAnsi(subtitleStyled).length) / 2));
+  const subtitleLine = ' '.repeat(horizontalPadding + subtitleInnerPad) + subtitleStyled;
+
+  const versionStyled = chalk.gray.bold(`v${currVersion}`);
+  const versionInnerPad = Math.max(0, Math.floor((maxLineWidth - stripAnsi(versionStyled).length) / 2));
+  const versionLine = ' '.repeat(horizontalPadding + versionInnerPad) + versionStyled;
+
   const verticallyPaddedLines = [
     ...Array(verticalPadding).fill(''),
     ...centeredLines,
+    '',
+    subtitleLine,
+    versionLine,
     ...Array(verticalPadding).fill('')
   ];
-  
+
   return verticallyPaddedLines.join('\n');
 }
 
@@ -55,9 +63,9 @@ async function checkTerminalSize(): Promise<void> {
   }
 }
 
-export const TITLE_TEXT = `${chalk.green('╔═══════════════════════════════════════════════════════════════╗')}
-${chalk.green('║')}${chalk.blueBright(' ▗▄▄▄▖▗▄▄▄▖▗▖ ▗▖   ▗▄▄▄▖▗▄▄▄▖ ▗▄▄▖▗▖ ▗▖   ▗▄▄▄▖▗▄▄▖ ▗▄▄▄▖▗▄▄▄▖ ')}${chalk.green('║')}
-${chalk.green('║')}${chalk.blueBright(' ▐▌     █  ▐▌ ▐▌     █  ▐▌   ▐▌   ▐▌ ▐▌     █  ▐▌ ▐▌▐▌   ▐▌    ')}${chalk.green('║')}
-${chalk.green('║')}${chalk.blueBright(' ▐▛▀▀▘  █  ▐▛▀▜▌     █  ▐▛▀▀▘▐▌   ▐▛▀▜▌     █  ▐▛▀▚▖▐▛▀▀▘▐▛▀▀▘ ')}${chalk.green('║')}
-${chalk.green('║')}${chalk.blueBright(' ▐▙▄▄▖  █  ▐▌ ▐▌     █  ▐▙▄▄▖▝▚▄▄▖▐▌ ▐▌     █  ▐▌ ▐▌▐▙▄▄▖▐▙▄▄▖ ')}${chalk.green('║')}
-${chalk.green('╚═══════════════════════════════════════════════════════════════╝')}`;
+export const TITLE_TEXT = `${chalk.hex('#00ffd1')('╔═══════════════════════════════════════════════════════════════╗')}
+${chalk.hex('#00ffd1')('║')}${chalk.hex('#00c2ff').bold(' ▗▄▄▄▖▗▄▄▄▖▗▖ ▗▖   ▗▄▄▄▖▗▄▄▄▖ ▗▄▄▖▗▖ ▗▖   ▗▄▄▄▖▗▄▄▖ ▗▄▄▄▖▗▄▄▄▖ ')}${chalk.hex('#00ffd1')('║')}
+${chalk.hex('#00ffd1')('║')}${chalk.hex('#9b5cff').bold(' ▐▌     █  ▐▌ ▐▌     █  ▐▌   ▐▌   ▐▌ ▐▌     █  ▐▌ ▐▌▐▌   ▐▌    ')}${chalk.hex('#00ffd1')('║')}
+${chalk.hex('#00ffd1')('║')}${chalk.hex('#ff6ec7').bold(' ▐▛▀▀▘  █  ▐▛▀▜▌     █  ▐▛▀▀▘▐▌   ▐▛▀▜▌     █  ▐▛▀▚▖▐▛▀▀▘▐▛▀▀▘ ')}${chalk.hex('#00ffd1')('║')}
+${chalk.hex('#00ffd1')('║')}${chalk.hex('#00ff85').bold(' ▐▙▄▄▖  █  ▐▌ ▐▌     █  ▐▙▄▄▖▝▚▄▄▖▐▌ ▐▌     █  ▐▌ ▐▌▐▙▄▄▖▐▙▄▄▖ ')}${chalk.hex('#00ffd1')('║')}
+${chalk.hex('#00ffd1')('╚═══════════════════════════════════════════════════════════════╝')}`;
