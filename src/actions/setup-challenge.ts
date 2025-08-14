@@ -16,7 +16,7 @@ export const setupChallenge = async (name: string, installLocation: string) => {
     const extensionName = `${challengeRepo}:${name}-extension`;
     const challengeDir = `${installLocation}/${name}`;
     try {
-        await execa("create-eth", ["-e", extensionName, challengeDir], { stdio: "inherit" });
+        await execa("create-eth", ["-e", extensionName, challengeDir], { stdio: "inherit", preferLocal: true });
         console.clear();
         console.log(chalk.green("Challenge setup completed successfully.\n"));
         console.log(chalk.cyan(`Now open this repository in your favorite code editor and look at the readme for instructions:\n${challengeDir}`));
@@ -46,7 +46,7 @@ const checkDependencyVersion = async (name: RequiredDependency, requiredVersion:
 
 export const checkUserDependencies = async () => {
     await Promise.all([
-        checkDependencyVersion("node", ">=18.17.0"),
+        checkDependencyVersion("node", ">=20.18.3"),
         checkDependencyInstalled("git"),
         checkDependencyInstalled("yarn"),
         checkDependencyInstalled("foundryup"),
