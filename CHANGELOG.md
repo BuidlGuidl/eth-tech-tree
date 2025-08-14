@@ -1,5 +1,18 @@
 # eth-tech-tree
 
+## 0.4.0
+
+### Minor Changes
+
+- a834977: Updated create-eth to 1.0.2
+
+### Patch Changes
+
+- afd19bf: added types package for semver
+- 545f9f5: update create-eth to 1.0.3
+- 51926e1: add version flag
+- 8ba8a0f: removed unused paramter
+
 ## 0.3.3
 
 ### Patch Changes
