@@ -13,7 +13,9 @@ export async function cli(args: Args) {
   try {
     const commands = await parseCommandArgumentsAndOptions(args);
     const userState = loadUserState();
-    if (commands.command || commands.help) {
+    if (commands.help) {
+      await handleCommand(commands);
+    } else if (commands.command) {
       const parsedCommands = await promptForMissingCommandArgs(commands, userState);
       await handleCommand(parsedCommands);
     } else {
