@@ -1,5 +1,11 @@
 # eth-tech-tree
 
+## 0.4.2
+
+### Patch Changes
+
+- ad97942: fix flickering
+
 ## 0.4.1
 
 ### Patch Changes
