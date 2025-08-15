@@ -166,6 +166,8 @@ async function animateShineDiagonal(
   const maxWidth = Math.max(...titleLineIndices.map(i => stripAnsiCodes(lines[i]).length));
   const totalFrames = maxWidth + bandWidth * 2;
 
+  // Hide cursor during animation to reduce visual noise
+  process.stdout.write('\x1b[?25l');
   for (let frame = -bandWidth; frame < totalFrames - bandWidth; frame++) {
     const rendered = lines.map((line, idx) => {
       if (!titleLineIndices.includes(idx)) return line;
@@ -175,13 +177,16 @@ async function animateShineDiagonal(
       const end = center + Math.ceil(bandWidth / 2);
       return applyStyleToVisibleRange(line, start, end, s => chalk.whiteBright.bold(s));
     });
-    console.clear();
-    console.log(rendered.join('\n'));
+    // Move cursor up by the number of lines to redraw in place, avoiding full screen clears
+    process.stdout.write(`\x1b[${lines.length}F`);
+    process.stdout.write(rendered.join('\n'));
     await wait(frameDelayMs);
   }
-
-  console.clear();
-  console.log(text);
+  // Final frame: redraw original text to leave a stable view
+  process.stdout.write(`\x1b[${lines.length}F`);
+  process.stdout.write(lines.join('\n'));
+  // Show cursor again
+  process.stdout.write('\x1b[?25h');
 }
 
 export const TITLE_TEXT = `${chalk.hex('#00a3a3')('╔═══════════════════════════════════════════════════════════════╗')}
