@@ -1,23 +1,32 @@
 import fs from 'fs';
 import { promisify } from 'util';
 import path from 'path';
+import os from 'os';
 import { IChallenge, IUser } from '../types';
 
 const writeFile = promisify(fs.writeFile);
 
-export async function saveUserState(state: IUser) {
-  const configPath = path.join(process.cwd(), "storage");
+export function getConfigPath(): string {
+  return path.join(os.homedir(), '.eth-tech-tree', 'config');
+}
+
+function ensureConfigExists(): void {
+  const configPath = getConfigPath();
   if (!fs.existsSync(configPath)) {
-    fs.mkdirSync(configPath);
+    fs.mkdirSync(configPath, { recursive: true });
   }
-  const filePath = path.join(configPath, "user.json");
+}
+
+export async function saveUserState(state: IUser) {
+  ensureConfigExists();
+  const filePath = path.join(getConfigPath(), "user.json");
   await writeFile(filePath, JSON.stringify(state, null, 2));
 }
 
 export function loadUserState(): IUser {
   try {
-    const configPath = path.join(process.cwd(), "storage", `user.json`);
-    const data = fs.readFileSync(configPath, 'utf8');
+    const filePath = path.join(getConfigPath(), "user.json");
+    const data = fs.readFileSync(filePath, 'utf8');
     return JSON.parse(data) as IUser;
   } catch (error: any) {
     if (error.code === 'ENOENT') {
@@ -28,19 +37,15 @@ export function loadUserState(): IUser {
 }
 
 export async function saveChallenges(challenges: IChallenge[]) {
-  const configPath = path.join(process.cwd(), "storage");
-
-  if (!fs.existsSync(configPath)) {
-    fs.mkdirSync(configPath);
-  }
-  const filePath = path.join(configPath, "challenges.json");
+  ensureConfigExists();
+  const filePath = path.join(getConfigPath(), "challenges.json");
   await writeFile(filePath, JSON.stringify(challenges, null, 2));
 }
 
 export function loadChallenges(): IChallenge[] {
   try {
-    const configPath = path.join(process.cwd(), "storage", `challenges.json`);
-    const data = fs.readFileSync(configPath, 'utf8');
+    const filePath = path.join(getConfigPath(), "challenges.json");
+    const data = fs.readFileSync(filePath, 'utf8');
     return JSON.parse(data);
   } catch (error: any) {
     if (error.code === 'ENOENT') {

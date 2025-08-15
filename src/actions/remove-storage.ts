@@ -1,9 +1,9 @@
 import fs from "fs";
-import path from "path";
+import { getConfigPath } from "../utils/state-manager";
 
 export function removeStorage() {
     console.log("Resetting storage...");
-    const configPath = path.join(process.cwd(), "storage");
+    const configPath = getConfigPath();
     if (!fs.existsSync(configPath)) {
         console.log("Storage does not exist. Nothing to reset.");
         return;
