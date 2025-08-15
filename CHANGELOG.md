@@ -1,5 +1,11 @@
 # eth-tech-tree
 
+## 0.4.1
+
+### Patch Changes
+
+- a12ac66: show version on start up, add help menu, animate intro message
+
 ## 0.4.0
 
 ### Minor Changes
