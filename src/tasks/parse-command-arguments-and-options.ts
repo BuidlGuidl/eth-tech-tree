@@ -83,7 +83,18 @@ export async function parseCommandArgumentsAndOptions(
 
     const version = parsedArgs["--version"] ?? parsedArgs._[0] === 'version' ?? false;
 
-    const command = version ? 'version' : parsedArgs._[0] ?? null;
+    // Determine command, supporting patterns like:
+    // - "setup --help" -> help=true, command="setup"
+    // - "help setup" -> help=true, command="setup"
+    // - "version" or "-v/--version" -> command="version"
+    let command: string | null = null;
+    if (version) {
+      command = 'version';
+    } else if (help && parsedArgs._[0] === 'help') {
+      command = parsedArgs._[1] ?? null;
+    } else {
+      command = parsedArgs._[0] ?? null;
+    }
 
     const argumentObject: Partial<CommandOptions> = {
       dev,
