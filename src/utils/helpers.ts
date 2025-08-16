@@ -1,7 +1,6 @@
 import os from "os";
 import fs from "fs";
 import { IChallenge } from "../types";
-import { loadChallenges } from "./state-manager";
 import { fetchChallenges, getEnsAddress } from "../modules/api";
 import { Choice } from "../tasks/parse-command-arguments-and-options";
 
