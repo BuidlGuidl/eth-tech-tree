@@ -74,6 +74,25 @@ export const submitChallengeToServer = async (userAddress: string, challengeName
 };
 
 /**
+ * Get address from ENS name
+ */
+export const getEnsAddress = async (ensName: string) => {
+  try {
+    const response = await fetch(`${API_URL}/ens/${ensName}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error:', error);
+    return { valid: false, error: 'Network error' };
+  }
+};
+
+/**
  * Fetch Leaderboard
  */
 export const fetchLeaderboard = async () => {
