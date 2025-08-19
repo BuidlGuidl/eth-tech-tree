@@ -1,5 +1,15 @@
 # eth-tech-tree
 
+## 0.5.0
+
+### Minor Changes
+
+- 50ccad5: Move config files from the `cwd` to the user's home directory `~/.eth-tech-tree` to prevent creating multiple config files when the command is run from different locations
+
+### Patch Changes
+
+- 58ea048: fix ens resolution
+
 ## 0.4.2
 
 ### Patch Changes
