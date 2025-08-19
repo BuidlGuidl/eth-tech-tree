@@ -1,8 +1,7 @@
 import os from "os";
 import fs from "fs";
 import { IChallenge } from "../types";
-import { loadChallenges } from "./state-manager";
-import { fetchChallenges } from "../modules/api";
+import { fetchChallenges, getEnsAddress } from "../modules/api";
 import { Choice } from "../tasks/parse-command-arguments-and-options";
 
 export function wait(ms: number) {
@@ -29,12 +28,26 @@ export const checkValidPathOrCreate = async (path: string) => {
   }
 };
 
+export const isValidEns = async (name: string): Promise<boolean> => {
+  try {
+    const result = await getEnsAddress(name);
+    return result.address !== null;
+  } catch (error) {
+    console.error('Error validating ENS:', error);
+    return false;
+  }
+};
+
 export const isValidAddress = (value: string): boolean => {
     return /^0x[a-fA-F0-9]{40}$/.test(value)
 };
   
-export const isValidAddressOrENS = (value: string): boolean => {
-    return /^(0x[a-fA-F0-9]{40}|.+\.eth)$/.test(value);
+export const isValidAddressOrENS = async (value: string): Promise<string | boolean> => {
+  if (value.endsWith('.eth')) {
+    return await isValidEns(value) ? true : "Invalid ENS name";
+  } else {
+    return isValidAddress(value) ? true : "Invalid address";
+  }
 };
 
 export const getDevice = (): string => {
