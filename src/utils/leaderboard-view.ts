@@ -1,5 +1,5 @@
-import { TreeNode } from "../types";
 import chalk from "chalk";
+import { TreeNode } from "../types";
 import { stripAnsi } from "./helpers";
 
 interface LeaderboardEntry {
@@ -39,7 +39,7 @@ export class LeaderboardView {
 
     private getEntryLabel(entry: LeaderboardEntry): string {
         const identifier = entry.ens || entry.address;
-        return chalk.white(`${this.getRankFormatting(entry.rank)}  | ${this.formatSpacing(chalk.yellow(entry.points.toLocaleString()), 8)} | ${chalk.green(identifier)}`);
+        return chalk.white(`${this.getRankFormatting(entry.rank)}  | ${this.formatSpacing(chalk.yellow(entry.points.toLocaleString()), 8)} | ${this.formatSpacing(chalk.cyan(entry.totalGasUsed.toLocaleString()), 14)} | ${chalk.green(identifier)}`);
     }
 
     private getRankFormatting(rank: number): string {
@@ -108,6 +108,6 @@ Total Gas Used: ${chalk.green(entry.totalGasUsed.toLocaleString())}
             }
         }
 
-        return chalk.bold(`${statement}\n\nTop Players\n   Rank  |  Points  |  Player`);
+        return chalk.bold(`${statement}\n\nTop Players\n${this.formatSpacing("Rank", 7, false)}  | ${this.formatSpacing("Points", 8)} | ${this.formatSpacing("Total Gas Used", 12)} | Player`);
     }
 } 
