@@ -1,8 +1,8 @@
-import os from "os";
 import fs from "fs";
-import { IChallenge } from "../types";
+import os from "os";
 import { fetchChallenges, getEnsAddress } from "../modules/api";
 import { Choice } from "../tasks/parse-command-arguments-and-options";
+import { IChallenge } from "../types";
 
 export function wait(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms));
@@ -69,6 +69,15 @@ export const calculatePoints = (completedChallenges: Array<{ challenge: IChallen
           const points = pointsPerLevel[challenge!.level - 1] || 100;
           return total + points;
       }, 0);
+}
+
+export const calculateTotalGasUsed = (completedChallenges: Array<{ challenge: IChallenge | undefined, completion?: { gasReport?: Array<{ functionName: string, gasUsed: number }> } }>): number => {
+  return completedChallenges
+    .reduce((total, challengeItem) => {
+      const gasReport = challengeItem.completion?.gasReport;
+      const challengeGasUsed = gasReport?.reduce((challengeTotal: number, report: { functionName: string, gasUsed: number }) => challengeTotal + report.gasUsed, 0) || 0;
+      return total + challengeGasUsed;
+    }, 0);
 }
 
 export const searchChallenges = async (term: string = "") => {

@@ -1,6 +1,6 @@
-import { IUser, IChallenge, TreeNode } from "../types";
 import chalk from "chalk";
-import { calculatePoints } from "./helpers";
+import { IChallenge, IUser, TreeNode } from "../types";
+import { calculatePoints, calculateTotalGasUsed } from "./helpers";
 
 export class ProgressView {
     constructor(
@@ -18,6 +18,7 @@ export class ProgressView {
             .filter(c => c.challenge);
 
         const points = calculatePoints(completedChallenges);
+        const totalGasUsed = calculateTotalGasUsed(completedChallenges);
         const completionRate = (completedChallenges.length / this.challenges.filter(c => c.enabled).length * 100).toFixed(1);
 
         // Create completed challenges node with all completed challenges as children
@@ -44,17 +45,17 @@ export class ProgressView {
             label: "Progress",
             name: "stats",
             children: [...challengeNodes],
-            message: this.buildStatsMessage(points, completionRate)
+            message: this.buildStatsMessage(points, completionRate, totalGasUsed)
         };
 
         return statsNode;
     }
 
-    private buildStatsMessage(points: number, completionRate: string): string {
+    private buildStatsMessage(points: number, completionRate: string, totalGasUsed: number): string {
         const totalChallenges = this.challenges.filter(c => c.enabled).length;
         const completedChallenges = this.userState.challenges.filter(c => c.status === "success").length;
         return `Address: ${chalk.green(this.userState.ens || this.userState.address)}
-${chalk.yellow(`Points Earned: ${points.toLocaleString()}`)}
+${chalk.yellow(`Points Earned: ${points.toLocaleString()}\n${chalk.cyan(`Total Gas Used: ${totalGasUsed.toLocaleString()}`)}`)}
 
 Challenges Completed: ${chalk.blueBright(`${completedChallenges}/${totalChallenges} (${completionRate}%)`)}
 ${completedChallenges ? "Details:" : ""}`;
