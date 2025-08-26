@@ -1,5 +1,11 @@
 # eth-tech-tree
 
+## 0.6.0
+
+### Minor Changes
+
+- fdf7ed7: Add "Total Gas Used" to Progress and Leader Board views
+
 ## 0.5.0
 
 ### Minor Changes
