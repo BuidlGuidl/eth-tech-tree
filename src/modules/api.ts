@@ -56,14 +56,14 @@ export const upsertUser = async (userData: { address?: string, ens?: string, dev
 /**
  * Submit Challenge
  */
-export const submitChallengeToServer = async (userAddress: string, challengeName: string, contractAddress: string) => {
+export const submitChallengeToServer = async (userAddress: string, challengeName: string, contractAddress: string, signature: string) => {
   try {
     const response = await fetch(`${API_URL}/submit`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ challengeName, contractAddress, userAddress }),
+      body: JSON.stringify({ challengeName, contractAddress, userAddress, signature }),
     });
     const data = await response.json();
     return data;
@@ -103,5 +103,32 @@ export const fetchLeaderboard = async () => {
   } catch (error) {
     console.error('Error:', error);
     return [];
+  }
+};
+
+/**
+ * Get Authentication Message
+ */
+export const getAuthMessage = async (userAddress: string) => {
+  try {
+    const response = await fetch(`${API_URL}/message/${userAddress}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new Error('User not found');
+      }
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    return data.message;
+  } catch (error) {
+    console.error('Error fetching auth message:', error);
+    throw error;
   }
 };
