@@ -1,8 +1,45 @@
-import { loadUserState } from "../utils/state-manager";
-import { submitChallengeToServer } from "../modules/api";
+import { confirm, input } from "@inquirer/prompts";
 import chalk from "chalk";
-import { input } from "@inquirer/prompts";
+import { getAuthMessage, submitChallengeToServer } from "../modules/api";
 import { isValidAddress } from "../utils/helpers";
+import { requestSignature } from "../utils/request-signature";
+import { loadUserState } from "../utils/state-manager";
+
+async function requestSignatureWithRetry(authMessage: string): Promise<string> {
+    console.log("Requesting signature...");
+    
+    let signature: string | undefined;
+    let err: string | undefined;
+    
+    do {
+        if (err) {
+            
+            console.log(chalk.red(`User rejected request. Signature is required to submit.`));
+            const tryAgain = await confirm({
+                message: "Would you like to try signing again?",
+                default: true
+            });
+            
+            if (!tryAgain) {
+                console.log("Signature request cancelled.");
+                throw new Error("Signature request cancelled by user");
+            }
+            
+            process.stdout.write("\x1b[2A\x1b[0J");
+        }
+        
+        const { data, error } = await requestSignature(authMessage);
+        signature = data;
+        err = error;
+    } while (err);
+    
+    if (!signature) {
+        throw new Error("Failed to get signature after all attempts.");
+    }
+    
+    console.log("✅ Signature received!");
+    return signature;
+}
 
 export async function submitChallenge(name: string, contractAddress?: string) {
     const { address: userAddress } = loadUserState();
@@ -15,12 +52,15 @@ export async function submitChallenge(name: string, contractAddress?: string) {
         const answer = await input(question);
         contractAddress = answer;
     }
-    
+
+    const authMessage = await getAuthMessage(userAddress as string);
+    const signature = await requestSignatureWithRetry(authMessage);
+
     console.log("Submitting challenge...");
     console.log("");
 
     // Send the contract address to the server
-    const response = await submitChallengeToServer(userAddress as string, name, contractAddress as string);
+    const response = await submitChallengeToServer(userAddress as string, name, contractAddress as string, signature);
     if (response.result) {
         const { passed, failingTests, error } = response.result;
         if (passed) {
